@@ -103,23 +103,31 @@ function normalize(parsed) {
     return task
   })
   const PACK_DESC =
-    "Pack everything you might need properly tonight, so you're set for whatever tomorrow brings."
-  // Bring an earlier-seeded pack task up to date: rename, make it daily, and move
-  // it to Lifestyle. One-time (guarded) so it won't clobber your own edits.
+    "Get your things ready for tomorrow tonight, so your morning's calm — school day or not."
+  const OLD_PACK_DESCS = new Set([
+    "Sort your books, uniform and gear tonight so the morning's stress-free and nothing gets left behind.",
+    "Pack everything you might need properly tonight, so you're set for whatever tomorrow brings.",
+  ])
+  // Bring an earlier-seeded pack task up to date: rename, make it daily, move it
+  // to Lifestyle. One-time (guarded) so it won't clobber your own edits.
   if (!data.packLifestyle) {
     data.tasks = data.tasks.map((t) =>
       t.title === "Pack tomorrow's bag" || t.title === 'Pack your bag'
-        ? { ...t, title: 'Pack your bag', description: PACK_DESC, days: [], category: 'lifestyle' }
+        ? { ...t, title: 'Pack your bag', days: [], category: 'lifestyle' }
         : t,
     )
     data.packLifestyle = true
   }
-  // The pack task only makes sense the night before a school day — mark it so it
-  // hides before weekends/holidays. (`schoolNight` set once for older copies.)
-  data.tasks = data.tasks.map((t) =>
-    t.title === 'Pack your bag' && t.schoolNight === undefined ? { ...t, schoolNight: true } : t,
-  )
-  // Seed a helpful default once: a reminder to pack the night before school.
+  // Keep the default pack task's wording current and shown every day (drop the
+  // earlier school-night-only behaviour). Skips a description you've edited.
+  data.tasks = data.tasks.map((t) => {
+    if (t.title !== 'Pack your bag') return t
+    const next = { ...t }
+    delete next.schoolNight
+    if (OLD_PACK_DESCS.has(t.description)) next.description = PACK_DESC
+    return next
+  })
+  // Seed a helpful default once: a nightly reminder to get ready for tomorrow.
   // Only added a single time — delete it and it stays gone.
   if (!data.seededPackTask) {
     data.tasks = [
@@ -132,7 +140,6 @@ function normalize(parsed) {
         category: 'lifestyle',
         repeat: true,
         days: [],
-        schoolNight: true,
         log: {},
         due: '',
         done: false,

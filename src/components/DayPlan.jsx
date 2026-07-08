@@ -1,6 +1,5 @@
 import { useState } from 'react'
-import { dueLabel, toKey, addDays } from '../dateUtils'
-import { isSchoolDay } from '../schoolCalendar'
+import { dueLabel, toKey } from '../dateUtils'
 import { DAY_PARTS } from '../dayParts'
 import { habitDueOn, habitDoneOn, habitStreak } from '../habits'
 import { categoryMeta } from '../taskCategories'
@@ -17,16 +16,14 @@ export default function DayPlan({ schedule }) {
   const { tasks } = schedule
   const todayKey = toKey(new Date())
   const now = new Date()
-  const schoolTomorrow = isSchoolDay(addDays(now, 1))
 
   // Everything in a bucket, repeating routines first, then one-off to-dos
-  // (undone before done, earliest due first). School-night tasks drop out
-  // entirely when there's no school tomorrow.
+  // (undone before done, earliest due first). Repeating tasks only appear on the
+  // days they're actually due.
   const tasksIn = (key) =>
     tasks
       .filter((t) => (t.bucket || '') === key)
-      // Repeating tasks only appear on the days they're actually due.
-      .filter((t) => (!t.repeat ? true : t.schoolNight ? schoolTomorrow : habitDueOn(t, now)))
+      .filter((t) => (t.repeat ? habitDueOn(t, now) : true))
       .sort((a, b) => {
         if (!!a.repeat !== !!b.repeat) return a.repeat ? -1 : 1
         if (!a.repeat) {
