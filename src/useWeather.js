@@ -92,6 +92,8 @@ function rainWindow(hours) {
   return {
     label: fmtWindow(run[0].hour, run[run.length - 1].hour + 1),
     peak: Math.max(...run.map((x) => x.prob)),
+    start: run[0].hour,
+    end: run[run.length - 1].hour + 1,
   }
 }
 

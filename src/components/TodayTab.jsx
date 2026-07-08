@@ -1,6 +1,8 @@
 import { toKey, addDays, prettyDate, isToday } from '../dateUtils'
 import { cycleDay } from '../schoolCalendar'
 import { useWeather } from '../useWeather'
+import { trainingWarnings } from '../trainingAlert'
+import Icon from './Icon'
 import DayPlan from './DayPlan'
 import WeatherStrip from './WeatherStrip'
 import NotesList from './NotesList'
@@ -16,6 +18,9 @@ export default function TodayTab({ schedule }) {
   const weatherDate = showTomorrowWeather ? addDays(date, 1) : date
 
   const { byDate, status: weatherStatus } = useWeather()
+
+  // Free heads-up: a training today that clashes with likely rain.
+  const warnings = trainingWarnings(schedule, byDate?.[toKey(date)], date)
 
   return (
     <div className="tab-content">
@@ -39,6 +44,19 @@ export default function TodayTab({ schedule }) {
         status={weatherStatus}
         note={showTomorrowWeather ? 'Tomorrow' : null}
       />
+
+      {warnings.length > 0 && (
+        <section className="card warn-card">
+          <div className="warn-head"><Icon name="cloudRain" size={18} /> Weather heads-up</div>
+          <ul className="warn-list">
+            {warnings.map((w, i) => (
+              <li key={i}>
+                <strong>{w.title}</strong> {w.when} — rain likely {w.label} ({w.peak}%). Take a raincoat.
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
 
       <DayPlan schedule={schedule} />
 
