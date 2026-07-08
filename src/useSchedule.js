@@ -99,20 +99,25 @@ function normalize(parsed) {
     if (task.category === 'mental') task.category = 'health'
     return task
   })
-  // Seed a helpful default once: pack tomorrow's bag on school nights (Sun–Thu).
-  // Only added a single time — delete it and it stays gone.
+  // Bring any earlier-seeded pack task up to the current wording/schedule.
+  const PACK_DESC =
+    "Pack everything you might need properly tonight, so you're set for whatever tomorrow brings."
+  data.tasks = data.tasks.map((t) =>
+    t.title === "Pack tomorrow's bag" ? { ...t, title: 'Pack your bag', description: PACK_DESC, days: [] } : t,
+  )
+  // Seed a helpful default once: a nightly reminder to pack properly. Only added
+  // a single time — delete it and it stays gone.
   if (!data.seededPackTask) {
     data.tasks = [
       ...data.tasks,
       {
         id: makeId(),
-        title: "Pack tomorrow's bag",
-        description:
-          "Sort your books, uniform and gear tonight so the morning's stress-free and nothing gets left behind.",
+        title: 'Pack your bag',
+        description: PACK_DESC,
         bucket: 'night',
         category: 'health',
         repeat: true,
-        days: [0, 1, 2, 3, 4],
+        days: [],
         log: {},
         due: '',
         done: false,

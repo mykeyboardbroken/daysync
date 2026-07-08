@@ -90,10 +90,12 @@ export default function DayPlan({ schedule }) {
         <div className="habit-body">
           <span className="habit-title">{t.title}</span>
           {t.description && <span className="task-desc">{t.description}</span>}
-          <span className="habit-sub">
-            {habitScheduleLabel(t)}
-            {!dueToday && ' · not today'}
-          </span>
+          {t.days && t.days.length > 0 && (
+            <span className="habit-sub">
+              {habitScheduleLabel(t)}
+              {!dueToday && ' · not today'}
+            </span>
+          )}
         </div>
         {streak > 0 && (
           <span className="habit-streak"><Icon name="flame" size={13} /> {streak}</span>
