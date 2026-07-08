@@ -1,0 +1,50 @@
+:root {
+  --bg: #0f172a;
+  --surface: #1e293b;
+  --surface-2: #273449;
+  --border: #334155;
+  --text: #e2e8f0;
+  --text-dim: #94a3b8;
+  --accent: #6366f1;
+  --accent-hover: #4f46e5;
+  --danger: #ef4444;
+  --warn: #f59e0b;
+
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  color: var(--text);
+  background: var(--bg);
+}
+
+/* Colour themes — swap just the accent (dark base) or the whole palette (light). */
+[data-theme='emerald'] {
+  --accent: #10b981;
+  --accent-hover: #059669;
+}
+[data-theme='teal'] {
+  --accent: #14b8a6;
+  --accent-hover: #0d9488;
+}
+[data-theme='light'] {
+  --bg: #f6f8fb;
+  --surface: #ffffff;
+  --surface-2: #eef2f7;
+  --border: #dde5ee;
+  --text: #0f172a;
+  --text-dim: #64748b;
+  --accent: #6366f1;
+  --accent-hover: #4f46e5;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+}
