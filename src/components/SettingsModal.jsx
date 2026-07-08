@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import Icon from './Icon'
 
 // Slide the hue, keep saturation/lightness fixed → always a pleasant accent.
@@ -31,7 +31,7 @@ function hexToHue(hex) {
   else if (max === g) hue = (b - r) / d + 2
   else hue = (r - g) / d + 4
   hue *= 60
-  return Math.round(hue < 0 ? hue + 360 : hue)
+  return ((Math.round(hue) % 360) + 360) % 360 // always 0–359
 }
 
 // Curated accent colours — tap-to-pick so they always look
@@ -60,6 +60,15 @@ export default function SettingsModal({
   const [section, setSection] = useState(null)
   const [backupMsg, setBackupMsg] = useState('')
   const fileRef = useRef(null)
+
+  // The hue slider tracks its own position so dragging is smooth (deriving it
+  // from the colour each render makes the thumb snap, since 0° and 360° are the
+  // same red). Sync only on a big jump, e.g. when a preset swatch is tapped.
+  const [hue, setHue] = useState(() => hexToHue(customColors?.primary))
+  useEffect(() => {
+    const h = hexToHue(customColors?.primary)
+    setHue((prev) => (Math.abs(prev - h) > 3 ? h : prev))
+  }, [customColors?.primary])
 
   const current = SECTIONS.find((s) => s.key === section)
 
@@ -141,10 +150,15 @@ export default function SettingsModal({
                   <input
                     type="range"
                     min="0"
-                    max="360"
+                    max="359"
+                    step="1"
                     className="hue-slider"
-                    value={hexToHue(customColors?.primary)}
-                    onChange={(e) => onSetCustomColor('primary', hslToHex(Number(e.target.value), 72, 58))}
+                    value={hue}
+                    onChange={(e) => {
+                      const h = Number(e.target.value)
+                      setHue(h)
+                      onSetCustomColor('primary', hslToHex(h, 72, 58))
+                    }}
                     aria-label="Accent hue"
                   />
                 </div>
