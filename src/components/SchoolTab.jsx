@@ -3,9 +3,18 @@ import ComingUp from './ComingUp'
 import ClassesTab from './ClassesTab'
 import AssignmentsTab from './AssignmentsTab'
 import ReportTab from './ReportTab'
+import StudyTab from './StudyTab'
 
-// The school hub: what's coming up, then a sub-toggle between "Classes" (today's
-// timetable & packing), "Work" (assignments & tests) and "Grades" (report card).
+// The school hub: what's coming up, then a sub-toggle between Classes (today's
+// timetable & packing), Work (assignments & tests), Grades (report card) and
+// Study (AI study coach).
+const SUBS = [
+  { key: 'classes', label: 'Classes' },
+  { key: 'work', label: 'Work' },
+  { key: 'grades', label: 'Grades' },
+  { key: 'study', label: 'Study' },
+]
+
 export default function SchoolTab({ schedule }) {
   const [sub, setSub] = useState('classes')
   return (
@@ -14,28 +23,20 @@ export default function SchoolTab({ schedule }) {
         <ComingUp schedule={schedule} />
       </div>
       <div className="sub-tabs">
-        <button
-          className={`sub-tab ${sub === 'classes' ? 'active' : ''}`}
-          onClick={() => setSub('classes')}
-        >
-          Classes
-        </button>
-        <button
-          className={`sub-tab ${sub === 'work' ? 'active' : ''}`}
-          onClick={() => setSub('work')}
-        >
-          Work
-        </button>
-        <button
-          className={`sub-tab ${sub === 'grades' ? 'active' : ''}`}
-          onClick={() => setSub('grades')}
-        >
-          Grades
-        </button>
+        {SUBS.map((s) => (
+          <button
+            key={s.key}
+            className={`sub-tab ${sub === s.key ? 'active' : ''}`}
+            onClick={() => setSub(s.key)}
+          >
+            {s.label}
+          </button>
+        ))}
       </div>
       {sub === 'classes' && <ClassesTab schedule={schedule} />}
       {sub === 'work' && <AssignmentsTab schedule={schedule} />}
       {sub === 'grades' && <ReportTab schedule={schedule} />}
+      {sub === 'study' && <StudyTab schedule={schedule} />}
     </div>
   )
 }
