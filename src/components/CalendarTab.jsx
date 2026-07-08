@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react'
 import { toKey, keyToDate, addDays, startOfWeek, prettyDate, MONTHS } from '../dateUtils'
-import { cycleDay } from '../schoolCalendar'
+import { cycleDay, publicHolidayOn, schoolBreakOn } from '../schoolCalendar'
 import { testMeta } from '../eventMeta'
 import { subjectColor } from '../subjectColor'
 import Icon from './Icon'
@@ -41,6 +41,8 @@ export default function CalendarTab({ schedule }) {
 
   const selDate = keyToDate(selectedKey)
   const selCycle = cycleDay(selDate)
+  const selPublic = publicHolidayOn(selDate)
+  const selBreak = schoolBreakOn(selDate)
   const dayTests = schedule.events.filter((e) => e.date === selectedKey)
   const dayAssignments = schedule.assignments.filter((a) => dueKey(a.due) === selectedKey)
   const dayTasks = schedule.tasks.filter((t) => dueKey(t.due) === selectedKey)
@@ -79,14 +81,18 @@ export default function CalendarTab({ schedule }) {
           const key = toKey(d)
           const inMonth = d.getMonth() === anchor.getMonth()
           const count = countByDay[key] || 0
+          const pub = publicHolidayOn(d)
+          const brk = schoolBreakOn(d)
           const classes = [
             'cal-day',
             inMonth ? '' : 'other',
+            brk ? 'break' : '',
             key === todayKey ? 'today' : '',
             key === selectedKey ? 'selected' : '',
           ].join(' ')
           return (
-            <button key={key} className={classes} onClick={() => setSelectedKey(key)}>
+            <button key={key} className={classes} onClick={() => setSelectedKey(key)} title={pub || brk || ''}>
+              {pub && <span className="cal-pub" aria-hidden="true" />}
               <span className="cal-num">{d.getDate()}</span>
               {count > 0 && (
                 <span className="cal-dots">
@@ -100,11 +106,24 @@ export default function CalendarTab({ schedule }) {
         })}
       </div>
 
+      <div className="cal-legend">
+        <span><span className="cal-legend-break" /> School holidays</span>
+        <span><span className="cal-legend-pub" /> Public holiday</span>
+      </div>
+
       <section className="card">
         <div className="card-header">
           <div>
             <h2>{prettyDate(selDate)}</h2>
-            <p className="subtle">{selCycle ? `Day ${selCycle}` : 'No school'}</p>
+            <p className="subtle">
+              {selPublic
+                ? `${selPublic} · public holiday`
+                : selBreak
+                  ? selBreak
+                  : selCycle
+                    ? `Day ${selCycle}`
+                    : 'No school'}
+            </p>
           </div>
           <button className="cal-add" onClick={() => setAdding('menu')} aria-label="Add to this day">
             <svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true">

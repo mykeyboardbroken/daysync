@@ -35,10 +35,42 @@ const YEAR_END = '2026-12-05' // last day
 
 // Inclusive no-school date ranges ("YYYY-MM-DD") — the term breaks.
 const HOLIDAYS = [
-  { from: '2026-04-04', to: '2026-04-19' }, // Term 1 holidays
-  { from: '2026-07-04', to: '2026-07-19' }, // Term 2 holidays
-  { from: '2026-09-26', to: '2026-10-11' }, // Term 3 holidays
+  { from: '2026-04-04', to: '2026-04-19', name: 'Term 1 holidays' },
+  { from: '2026-07-04', to: '2026-07-19', name: 'Term 2 holidays' },
+  { from: '2026-09-26', to: '2026-10-11', name: 'Term 3 holidays' },
 ]
+
+// NZ / Auckland public holidays for 2026 (observed dates included).
+const PUBLIC_HOLIDAYS = {
+  '2026-01-01': "New Year's Day",
+  '2026-01-02': "Day after New Year's",
+  '2026-01-26': 'Auckland Anniversary',
+  '2026-02-06': 'Waitangi Day',
+  '2026-04-03': 'Good Friday',
+  '2026-04-06': 'Easter Monday',
+  '2026-04-25': 'ANZAC Day',
+  '2026-04-27': 'ANZAC Day (observed)',
+  '2026-06-01': "King's Birthday",
+  '2026-07-10': 'Matariki',
+  '2026-10-26': 'Labour Day',
+  '2026-12-25': 'Christmas Day',
+  '2026-12-26': 'Boxing Day',
+  '2026-12-28': 'Boxing Day (observed)',
+}
+
+// The name of the public holiday on `date`, or null.
+export function publicHolidayOn(date) {
+  return PUBLIC_HOLIDAYS[toKey(date)] || null
+}
+
+// If `date` falls in a school break, its name ("Term 2 holidays" / "Summer
+// holidays"); otherwise null. Regular weekends are not counted as a break.
+export function schoolBreakOn(date) {
+  const key = toKey(date)
+  if (key < YEAR_START || key > YEAR_END) return 'Summer holidays'
+  const h = HOLIDAYS.find((x) => key >= x.from && key <= x.to)
+  return h ? h.name : null
+}
 
 // A school day is a weekday inside the school year and not inside a holiday.
 export function isSchoolDay(date) {
