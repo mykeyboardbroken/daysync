@@ -1,7 +1,8 @@
 import { useState } from 'react'
-import { dueLabel, toKey } from '../dateUtils'
+import { dueLabel, toKey, addDays } from '../dateUtils'
+import { isSchoolDay } from '../schoolCalendar'
 import { DAY_PARTS } from '../dayParts'
-import { habitDueOn, habitDoneOn, habitStreak, habitScheduleLabel } from '../habits'
+import { habitDueOn, habitDoneOn, habitStreak } from '../habits'
 import { categoryMeta } from '../taskCategories'
 import ConfirmDelete from './ConfirmDelete'
 import Icon from './Icon'
@@ -16,12 +17,16 @@ export default function DayPlan({ schedule }) {
   const { tasks } = schedule
   const todayKey = toKey(new Date())
   const now = new Date()
+  const schoolTomorrow = isSchoolDay(addDays(now, 1))
 
   // Everything in a bucket, repeating routines first, then one-off to-dos
-  // (undone before done, earliest due first).
+  // (undone before done, earliest due first). School-night tasks drop out
+  // entirely when there's no school tomorrow.
   const tasksIn = (key) =>
     tasks
       .filter((t) => (t.bucket || '') === key)
+      // Repeating tasks only appear on the days they're actually due.
+      .filter((t) => (!t.repeat ? true : t.schoolNight ? schoolTomorrow : habitDueOn(t, now)))
       .sort((a, b) => {
         if (!!a.repeat !== !!b.repeat) return a.repeat ? -1 : 1
         if (!a.repeat) {
@@ -63,25 +68,16 @@ export default function DayPlan({ schedule }) {
 
   const showStreaks = schedule.settings?.showStreaks
   const renderRepeating = (t) => {
-    const dueToday = habitDueOn(t, now)
+    // Only rendered on days it's due, so it's always active here.
     const doneToday = habitDoneOn(t, todayKey)
     const streak = showStreaks ? habitStreak(t, now) : 0
     const cat = categoryMeta(t.category)
     return (
-      <li
-        key={t.id}
-        className={`habit-row tappable ${dueToday ? '' : 'off-day'}`}
-        onClick={() => setEditingTask(t)}
-      >
-        <label
-          className="assignment-check"
-          title={dueToday ? '' : 'Not scheduled today'}
-          onClick={(e) => e.stopPropagation()}
-        >
+      <li key={t.id} className="habit-row tappable" onClick={() => setEditingTask(t)}>
+        <label className="assignment-check" onClick={(e) => e.stopPropagation()}>
           <input
             type="checkbox"
             checked={doneToday}
-            disabled={!dueToday}
             onChange={() => schedule.toggleTask(t.id, todayKey)}
           />
           <span className="checkmark" />
@@ -90,12 +86,6 @@ export default function DayPlan({ schedule }) {
         <div className="habit-body">
           <span className="habit-title">{t.title}</span>
           {t.description && <span className="task-desc">{t.description}</span>}
-          {t.days && t.days.length > 0 && (
-            <span className="habit-sub">
-              {habitScheduleLabel(t)}
-              {!dueToday && ' · not today'}
-            </span>
-          )}
         </div>
         {streak > 0 && (
           <span className="habit-streak"><Icon name="flame" size={13} /> {streak}</span>

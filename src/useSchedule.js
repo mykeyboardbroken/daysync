@@ -27,6 +27,7 @@ function emptyData() {
     tasks: [],
     seededPackTask: false, // whether the default nightly "pack your bag" task was seeded once
     packLifestyle: false, // one-time move of the pack task into the Lifestyle category
+    seededChores: false, // whether the extra default tasks (grooming, chores) were seeded once
     theme: 'custom', // appearance is now always a custom accent on a dark/bright base
     // Used when theme === 'custom': primary = the accent colour (the darker
     // hover/pressed shade is derived from it), base = 'dark' | 'bright' (which
@@ -113,8 +114,13 @@ function normalize(parsed) {
     )
     data.packLifestyle = true
   }
-  // Seed a helpful default once: a nightly reminder to pack properly. Only added
-  // a single time — delete it and it stays gone.
+  // The pack task only makes sense the night before a school day — mark it so it
+  // hides before weekends/holidays. (`schoolNight` set once for older copies.)
+  data.tasks = data.tasks.map((t) =>
+    t.title === 'Pack your bag' && t.schoolNight === undefined ? { ...t, schoolNight: true } : t,
+  )
+  // Seed a helpful default once: a reminder to pack the night before school.
+  // Only added a single time — delete it and it stays gone.
   if (!data.seededPackTask) {
     data.tasks = [
       ...data.tasks,
@@ -126,12 +132,56 @@ function normalize(parsed) {
         category: 'lifestyle',
         repeat: true,
         days: [],
+        schoolNight: true,
         log: {},
         due: '',
         done: false,
       },
     ]
     data.seededPackTask = true
+  }
+  // Seed a few more helpful defaults once (deletable, like the rest).
+  if (!data.seededChores) {
+    data.tasks = [
+      ...data.tasks,
+      {
+        id: makeId(),
+        title: 'Morning grooming',
+        description: 'Gentle wash and moisturise, brush your teeth, and check your hair.',
+        bucket: 'morning',
+        category: 'health',
+        repeat: true,
+        days: [], // every day
+        log: {},
+        due: '',
+        done: false,
+      },
+      {
+        id: makeId(),
+        title: 'Clean your room',
+        description: 'Give your room a proper tidy — floor, desk and surfaces.',
+        bucket: 'afternoon',
+        category: 'lifestyle',
+        repeat: true,
+        days: [0], // Sunday
+        log: {},
+        due: '',
+        done: false,
+      },
+      {
+        id: makeId(),
+        title: 'Organise your wardrobe',
+        description: "Sort your clothes, fold the clean ones and clear the pile on the chair.",
+        bucket: 'afternoon',
+        category: 'lifestyle',
+        repeat: true,
+        days: [6], // Saturday
+        log: {},
+        due: '',
+        done: false,
+      },
+    ]
+    data.seededChores = true
   }
   return data
 }
