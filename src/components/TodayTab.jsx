@@ -19,8 +19,14 @@ export default function TodayTab({ schedule }) {
 
   const { byDate, status: weatherStatus } = useWeather()
 
-  // Free heads-up: a training today that clashes with likely rain.
-  const warnings = trainingWarnings(schedule, byDate?.[toKey(date)], date)
+  // Free heads-up: a training that clashes with likely rain. After 8pm this
+  // looks ahead to tomorrow (same as the weather line) so you can pack tonight.
+  const warnings = trainingWarnings(
+    schedule,
+    byDate?.[toKey(weatherDate)],
+    weatherDate,
+    showTomorrowWeather,
+  )
 
   return (
     <div className="tab-content">

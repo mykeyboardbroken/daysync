@@ -13,34 +13,42 @@ const BUCKET_HOURS = {
   '': [0, 24], // Anytime — any rain today counts
 }
 const BUCKET_WHEN = {
-  morning: 'this morning',
-  afternoon: 'this afternoon',
-  night: 'tonight',
-  '': 'today',
+  today: { morning: 'this morning', afternoon: 'this afternoon', night: 'tonight', '': 'today' },
+  tomorrow: {
+    morning: 'tomorrow morning',
+    afternoon: 'tomorrow afternoon',
+    night: 'tomorrow night',
+    '': 'tomorrow',
+  },
 }
 
 function isTraining(t) {
   return t.category === 'physical' || t.category === 'cocurricular' || TRAIN_RE.test(t.title || '')
 }
 
-// Warn when a training happening TODAY overlaps today's likely-rain window.
-// Returns [{ title, when, label, peak }]. Free — pure logic on data we already have.
-export function trainingWarnings(schedule, todayWeather, now = new Date()) {
-  const win = todayWeather?.rainWindow
+// Warn when a training on `targetDate` overlaps that day's likely-rain window.
+// `tomorrow` picks the wording and whether undated to-dos count (they sit in
+// today's plan, so they only count for today). Returns [{ title, when, label, peak }].
+// Free — pure logic on data we already have.
+export function trainingWarnings(schedule, weather, targetDate, tomorrow = false) {
+  const win = weather?.rainWindow
   if (!win || win.start == null) return []
-  const todayKey = toKey(now)
+  const key = toKey(targetDate)
+  const when = tomorrow ? BUCKET_WHEN.tomorrow : BUCKET_WHEN.today
   const out = []
   for (const t of schedule.tasks) {
     if (t.done || !isTraining(t)) continue
-    // Happening today?
-    const today = t.repeat
-      ? habitDueOn(t, now)
-      : !t.due || t.due.slice(0, 10) === todayKey
-    if (!today) continue
+    // Happening on the target day?
+    const on = t.repeat
+      ? habitDueOn(t, targetDate)
+      : t.due
+        ? t.due.slice(0, 10) === key
+        : !tomorrow // undated one-offs are "today" only
+    if (!on) continue
     // Does its time of day overlap the rain window?
     const [bStart, bEnd] = BUCKET_HOURS[t.bucket] || BUCKET_HOURS['']
     if (bStart < win.end && win.start < bEnd) {
-      out.push({ title: t.title, when: BUCKET_WHEN[t.bucket] ?? 'today', label: win.label, peak: win.peak })
+      out.push({ title: t.title, when: when[t.bucket] ?? when[''], label: win.label, peak: win.peak })
     }
   }
   return out
