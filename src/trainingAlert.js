@@ -1,8 +1,9 @@
 import { toKey } from './dateUtils'
 import { habitDueOn } from './habits'
 
-// A "training" is any physical / co-curricular task, or one whose title reads
-// like a sports session — these are the ones bad weather actually matters for.
+// A "training" is any co-curricular task, or one whose title reads like a sports
+// session — these are the ones bad weather actually matters for. (Health &
+// Fitness is too broad — a "drink water" task isn't a training.)
 const TRAIN_RE = /train|practice|prac\b|trial|\bgame\b|\bmatch\b|tournament|athletics|fitness|sport|\brun\b/i
 
 // Rough hours each time-of-day bucket covers, to overlap against the rain window.
@@ -23,7 +24,7 @@ const BUCKET_WHEN = {
 }
 
 function isTraining(t) {
-  return t.category === 'physical' || t.category === 'cocurricular' || TRAIN_RE.test(t.title || '')
+  return t.category === 'cocurricular' || TRAIN_RE.test(t.title || '')
 }
 
 // Warn when a training on `targetDate` overlaps that day's likely-rain window.

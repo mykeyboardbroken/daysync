@@ -26,6 +26,7 @@ function emptyData() {
     // Repeating:  { id, title, bucket, repeat: true, days, log }  (days: weekday nums, [] = daily)
     tasks: [],
     seededPackTask: false, // whether the default nightly "pack your bag" task was seeded once
+    packLifestyle: false, // one-time move of the pack task into the Lifestyle category
     theme: 'custom', // appearance is now always a custom accent on a dark/bright base
     // Used when theme === 'custom': primary = the accent colour (the darker
     // hover/pressed shade is derived from it), base = 'dark' | 'bright' (which
@@ -95,16 +96,23 @@ function normalize(parsed) {
       done: false,
       ...t,
     }
-    // "Mental" was folded into "Health & Lifestyle".
-    if (task.category === 'mental') task.category = 'health'
+    // "Mental" was folded into "Health & Lifestyle"; then "Physical" + "Health"
+    // merged into "Health & Fitness" (key stays `health`).
+    if (task.category === 'mental' || task.category === 'physical') task.category = 'health'
     return task
   })
-  // Bring any earlier-seeded pack task up to the current wording/schedule.
   const PACK_DESC =
     "Pack everything you might need properly tonight, so you're set for whatever tomorrow brings."
-  data.tasks = data.tasks.map((t) =>
-    t.title === "Pack tomorrow's bag" ? { ...t, title: 'Pack your bag', description: PACK_DESC, days: [] } : t,
-  )
+  // Bring an earlier-seeded pack task up to date: rename, make it daily, and move
+  // it to Lifestyle. One-time (guarded) so it won't clobber your own edits.
+  if (!data.packLifestyle) {
+    data.tasks = data.tasks.map((t) =>
+      t.title === "Pack tomorrow's bag" || t.title === 'Pack your bag'
+        ? { ...t, title: 'Pack your bag', description: PACK_DESC, days: [], category: 'lifestyle' }
+        : t,
+    )
+    data.packLifestyle = true
+  }
   // Seed a helpful default once: a nightly reminder to pack properly. Only added
   // a single time — delete it and it stays gone.
   if (!data.seededPackTask) {
@@ -115,7 +123,7 @@ function normalize(parsed) {
         title: 'Pack your bag',
         description: PACK_DESC,
         bucket: 'night',
-        category: 'health',
+        category: 'lifestyle',
         repeat: true,
         days: [],
         log: {},
