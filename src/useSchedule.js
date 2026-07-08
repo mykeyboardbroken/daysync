@@ -25,6 +25,7 @@ function emptyData() {
     // One-off:    { id, title, bucket, repeat: false, due, done }
     // Repeating:  { id, title, bucket, repeat: true, days, log }  (days: weekday nums, [] = daily)
     tasks: [],
+    seededPackTask: false, // whether the default nightly "pack your bag" task was seeded once
     theme: 'custom', // appearance is now always a custom accent on a dark/bright base
     // Used when theme === 'custom': primary = the accent colour (the darker
     // hover/pressed shade is derived from it), base = 'dark' | 'bright' (which
@@ -98,6 +99,27 @@ function normalize(parsed) {
     if (task.category === 'mental') task.category = 'health'
     return task
   })
+  // Seed a helpful default once: pack tomorrow's bag on school nights (Sun–Thu).
+  // Only added a single time — delete it and it stays gone.
+  if (!data.seededPackTask) {
+    data.tasks = [
+      ...data.tasks,
+      {
+        id: makeId(),
+        title: "Pack tomorrow's bag",
+        description:
+          "Sort your books, uniform and gear tonight so the morning's stress-free and nothing gets left behind.",
+        bucket: 'night',
+        category: 'health',
+        repeat: true,
+        days: [0, 1, 2, 3, 4],
+        log: {},
+        due: '',
+        done: false,
+      },
+    ]
+    data.seededPackTask = true
+  }
   return data
 }
 
