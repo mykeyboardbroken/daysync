@@ -102,24 +102,25 @@ function normalize(parsed) {
     if (task.category === 'mental' || task.category === 'physical') task.category = 'health'
     return task
   })
-  // The default nightly "get ready" task. Its description is a general base; the
-  // Today view adds a school-gear line only when there's school tomorrow, so it
-  // never mentions school on non-school nights (see DayPlan `schoolAware`).
+  // The default nightly "get ready" task with a concrete checklist.
   const READY_TITLE = 'Get ready for tomorrow'
-  const READY_DESC = "Get your things ready tonight, so your morning's calm."
+  const READY_DESC =
+    "Lay out tomorrow's clothes, pack your bag, charge your devices, set your alarm, and check what's on tomorrow."
   const OLD_READY_TITLES = ["Pack tomorrow's bag", 'Pack your bag']
   const OLD_READY_DESCS = new Set([
     "Sort your books, uniform and gear tonight so the morning's stress-free and nothing gets left behind.",
     "Pack everything you might need properly tonight, so you're set for whatever tomorrow brings.",
     "Get your things ready for tomorrow tonight, so your morning's calm — school day or not.",
+    "Get your things ready tonight, so your morning's calm.",
   ])
-  // Adopt older seeded copies into the current form (rename, Lifestyle, daily,
-  // school-aware). Text refresh skips a description you've edited yourself.
+  // Adopt older seeded copies into the current form (rename, Lifestyle, daily).
+  // Text refresh skips a description you've edited yourself.
   data.tasks = data.tasks.map((t) => {
     const isOld = OLD_READY_TITLES.includes(t.title)
     if (!isOld && t.title !== READY_TITLE) return t
-    const next = { ...t, title: READY_TITLE, schoolAware: true }
+    const next = { ...t, title: READY_TITLE }
     delete next.schoolNight
+    delete next.schoolAware
     if (OLD_READY_DESCS.has(t.description)) next.description = READY_DESC
     if (isOld) {
       next.category = 'lifestyle'
@@ -139,7 +140,6 @@ function normalize(parsed) {
         category: 'lifestyle',
         repeat: true,
         days: [],
-        schoolAware: true,
         log: {},
         due: '',
         done: false,
