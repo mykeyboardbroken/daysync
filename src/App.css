@@ -611,7 +611,19 @@
 }
 .survey-option:hover { border-color: var(--accent); }
 .survey-option.selected { border-color: var(--accent); }
-.task-desc { font-size: 12px; color: var(--text-dim); line-height: 1.4; white-space: pre-wrap; }
+/* Collapsed: keep it to a single line so every box is the same height. */
+.task-desc {
+  font-size: 12px;
+  color: var(--text-dim);
+  line-height: 1.4;
+  display: block;
+  max-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+/* Expanded: show the whole description. */
+.expanded .task-desc { white-space: pre-wrap; overflow: visible; text-overflow: clip; }
 .assignment.done .task-desc { text-decoration: line-through; }
 /* Steps checklist shown on a task */
 .task-steps { margin: 5px 0 0; padding-left: 18px; font-size: 12px; color: var(--text-dim); line-height: 1.5; }

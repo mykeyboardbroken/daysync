@@ -19,6 +19,9 @@ export default function DayPlan({ schedule }) {
 
   const toggleExpand = (id) => setExpandedId((cur) => (cur === id ? null : id))
 
+  // Fall back to "Routine for <category>" when there's no description.
+  const descOf = (t) => t.description || `Routine for ${categoryMeta(t.category)?.label || 'this'}`
+
   // Everything in a bucket, repeating routines first, then one-off to-dos
   // (undone before done, earliest due first). Repeating tasks only appear on the
   // days they're actually due.
@@ -76,7 +79,7 @@ export default function DayPlan({ schedule }) {
         {cat && <span className="task-cat" title={cat.label}><Icon name={cat.icon} size={15} /></span>}
         <div className="assignment-body">
           <span className="assignment-title">{t.title}</span>
-          {t.description && <span className="task-desc">{t.description}</span>}
+          <span className="task-desc">{descOf(t)}</span>
           {expanded && expandedDrawer(t)}
         </div>
         {!t.done && t.due && <span className={`assignment-due tone-${due.tone}`}>{due.text}</span>}
@@ -109,7 +112,7 @@ export default function DayPlan({ schedule }) {
         {cat && <span className="task-cat" title={cat.label}><Icon name={cat.icon} size={15} /></span>}
         <div className="habit-body">
           <span className="habit-title">{t.title}</span>
-          {t.description && <span className="task-desc">{t.description}</span>}
+          <span className="task-desc">{descOf(t)}</span>
           {expanded && expandedDrawer(t)}
         </div>
         {streak > 0 && (
