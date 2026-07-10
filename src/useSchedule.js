@@ -102,44 +102,44 @@ function normalize(parsed) {
     if (task.category === 'mental' || task.category === 'physical') task.category = 'health'
     return task
   })
-  const PACK_DESC =
-    "Get your things ready for tomorrow tonight, so your morning's calm — school day or not."
-  const OLD_PACK_DESCS = new Set([
+  // The default nightly "get ready" task. Its description is a general base; the
+  // Today view adds a school-gear line only when there's school tomorrow, so it
+  // never mentions school on non-school nights (see DayPlan `schoolAware`).
+  const READY_TITLE = 'Get ready for tomorrow'
+  const READY_DESC = "Get your things ready tonight, so your morning's calm."
+  const OLD_READY_TITLES = ["Pack tomorrow's bag", 'Pack your bag']
+  const OLD_READY_DESCS = new Set([
     "Sort your books, uniform and gear tonight so the morning's stress-free and nothing gets left behind.",
     "Pack everything you might need properly tonight, so you're set for whatever tomorrow brings.",
+    "Get your things ready for tomorrow tonight, so your morning's calm — school day or not.",
   ])
-  // Bring an earlier-seeded pack task up to date: rename, make it daily, move it
-  // to Lifestyle. One-time (guarded) so it won't clobber your own edits.
-  if (!data.packLifestyle) {
-    data.tasks = data.tasks.map((t) =>
-      t.title === "Pack tomorrow's bag" || t.title === 'Pack your bag'
-        ? { ...t, title: 'Pack your bag', days: [], category: 'lifestyle' }
-        : t,
-    )
-    data.packLifestyle = true
-  }
-  // Keep the default pack task's wording current and shown every day (drop the
-  // earlier school-night-only behaviour). Skips a description you've edited.
+  // Adopt older seeded copies into the current form (rename, Lifestyle, daily,
+  // school-aware). Text refresh skips a description you've edited yourself.
   data.tasks = data.tasks.map((t) => {
-    if (t.title !== 'Pack your bag') return t
-    const next = { ...t }
+    const isOld = OLD_READY_TITLES.includes(t.title)
+    if (!isOld && t.title !== READY_TITLE) return t
+    const next = { ...t, title: READY_TITLE, schoolAware: true }
     delete next.schoolNight
-    if (OLD_PACK_DESCS.has(t.description)) next.description = PACK_DESC
+    if (OLD_READY_DESCS.has(t.description)) next.description = READY_DESC
+    if (isOld) {
+      next.category = 'lifestyle'
+      next.days = []
+    }
     return next
   })
-  // Seed a helpful default once: a nightly reminder to get ready for tomorrow.
-  // Only added a single time — delete it and it stays gone.
+  // Seed it once. Only added a single time — delete it and it stays gone.
   if (!data.seededPackTask) {
     data.tasks = [
       ...data.tasks,
       {
         id: makeId(),
-        title: 'Pack your bag',
-        description: PACK_DESC,
+        title: READY_TITLE,
+        description: READY_DESC,
         bucket: 'night',
         category: 'lifestyle',
         repeat: true,
         days: [],
+        schoolAware: true,
         log: {},
         due: '',
         done: false,

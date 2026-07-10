@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { dueLabel, toKey } from '../dateUtils'
+import { dueLabel, toKey, addDays } from '../dateUtils'
+import { isSchoolDay } from '../schoolCalendar'
 import { DAY_PARTS } from '../dayParts'
 import { habitDueOn, habitDoneOn, habitStreak } from '../habits'
 import { categoryMeta } from '../taskCategories'
@@ -69,6 +70,11 @@ export default function DayPlan({ schedule }) {
     const doneToday = habitDoneOn(t, todayKey)
     const streak = showStreaks ? habitStreak(t, now) : 0
     const cat = categoryMeta(t.category)
+    // School-aware tasks tack on a school-gear line only when there's school tomorrow.
+    const desc =
+      t.schoolAware && isSchoolDay(addDays(now, 1))
+        ? `${t.description} Don't forget your school gear.`
+        : t.description
     return (
       <li key={t.id} className="habit-row tappable" onClick={() => setEditingTask(t)}>
         <label className="assignment-check" onClick={(e) => e.stopPropagation()}>
@@ -82,7 +88,7 @@ export default function DayPlan({ schedule }) {
         {cat && <span className="task-cat" title={cat.label}><Icon name={cat.icon} size={15} /></span>}
         <div className="habit-body">
           <span className="habit-title">{t.title}</span>
-          {t.description && <span className="task-desc">{t.description}</span>}
+          {desc && <span className="task-desc">{desc}</span>}
         </div>
         {streak > 0 && (
           <span className="habit-streak"><Icon name="flame" size={13} /> {streak}</span>
