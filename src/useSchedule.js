@@ -94,6 +94,7 @@ function normalize(parsed) {
       bucket: '',
       category: 'other',
       description: '',
+      steps: [],
       done: false,
       ...t,
     }
@@ -102,10 +103,16 @@ function normalize(parsed) {
     if (task.category === 'mental' || task.category === 'physical') task.category = 'health'
     return task
   })
-  // The default nightly "get ready" task with a concrete checklist.
+  // The default nightly "get ready" task: a general description plus steps.
   const READY_TITLE = 'Get ready for tomorrow'
-  const READY_DESC =
-    "Clothes laid out, bag packed, devices charging, alarm set, and tomorrow's plans reviewed."
+  const READY_DESC = 'A quick evening routine so the morning runs smoothly.'
+  const READY_STEPS = [
+    "Lay out tomorrow's clothes",
+    'Pack your bag',
+    'Charge your devices',
+    'Set your alarm',
+    "Check tomorrow's plans",
+  ]
   const OLD_READY_TITLES = ["Pack tomorrow's bag", 'Pack your bag']
   const OLD_READY_DESCS = new Set([
     "Sort your books, uniform and gear tonight so the morning's stress-free and nothing gets left behind.",
@@ -113,16 +120,20 @@ function normalize(parsed) {
     "Get your things ready for tomorrow tonight, so your morning's calm — school day or not.",
     "Get your things ready tonight, so your morning's calm.",
     "Lay out tomorrow's clothes, pack your bag, charge your devices, set your alarm, and check what's on tomorrow.",
+    "Clothes laid out, bag packed, devices charging, alarm set, and tomorrow's plans reviewed.",
   ])
-  // Adopt older seeded copies into the current form (rename, Lifestyle, daily).
-  // Text refresh skips a description you've edited yourself.
+  // Adopt older seeded copies into the current form (rename, Lifestyle, daily,
+  // general description + steps). Skips a description you've edited yourself.
   data.tasks = data.tasks.map((t) => {
     const isOld = OLD_READY_TITLES.includes(t.title)
     if (!isOld && t.title !== READY_TITLE) return t
     const next = { ...t, title: READY_TITLE }
     delete next.schoolNight
     delete next.schoolAware
-    if (OLD_READY_DESCS.has(t.description)) next.description = READY_DESC
+    if (OLD_READY_DESCS.has(t.description)) {
+      next.description = READY_DESC
+      if (!next.steps || next.steps.length === 0) next.steps = READY_STEPS
+    }
     if (isOld) {
       next.category = 'lifestyle'
       next.days = []
@@ -137,6 +148,7 @@ function normalize(parsed) {
         id: makeId(),
         title: READY_TITLE,
         description: READY_DESC,
+        steps: READY_STEPS,
         bucket: 'night',
         category: 'lifestyle',
         repeat: true,
@@ -493,7 +505,16 @@ export function useSchedule() {
   // with a weekday schedule `days` ([] = every day) and a per-day `log` for
   // streaks). Both carry an optional time-of-day `bucket`.
   const addTask = useCallback(
-    ({ title, description = '', bucket = '', category = 'other', repeat = false, days = [], due = '' }) => {
+    ({
+      title,
+      description = '',
+      steps = [],
+      bucket = '',
+      category = 'other',
+      repeat = false,
+      days = [],
+      due = '',
+    }) => {
       setData((prev) => ({
         ...prev,
         tasks: [
@@ -502,6 +523,7 @@ export function useSchedule() {
             id: makeId(),
             title,
             description,
+            steps,
             bucket,
             category,
             repeat,

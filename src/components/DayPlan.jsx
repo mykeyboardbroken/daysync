@@ -52,6 +52,11 @@ export default function DayPlan({ schedule }) {
         <div className="assignment-body">
           <span className="assignment-title">{t.title}</span>
           {t.description && <span className="task-desc">{t.description}</span>}
+          {t.steps?.length > 0 && (
+            <ol className="task-steps">
+              {t.steps.map((s, i) => <li key={i}>{s}</li>)}
+            </ol>
+          )}
         </div>
         {!t.done && t.due && <span className={`assignment-due tone-${due.tone}`}>{due.text}</span>}
         <ConfirmDelete
@@ -83,6 +88,11 @@ export default function DayPlan({ schedule }) {
         <div className="habit-body">
           <span className="habit-title">{t.title}</span>
           {t.description && <span className="task-desc">{t.description}</span>}
+          {t.steps?.length > 0 && (
+            <ol className="task-steps">
+              {t.steps.map((s, i) => <li key={i}>{s}</li>)}
+            </ol>
+          )}
         </div>
         {streak > 0 && (
           <span className="habit-streak"><Icon name="flame" size={13} /> {streak}</span>

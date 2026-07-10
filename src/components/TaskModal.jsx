@@ -17,6 +17,7 @@ export default function TaskModal({
 }) {
   const [title, setTitle] = useState(initial?.title || '')
   const [description, setDescription] = useState(initial?.description || '')
+  const [steps, setSteps] = useState(initial?.steps || [])
   const [due, setDue] = useState(initial?.due ? initial.due.slice(0, 10) : defaultDue)
   const [bucket, setBucket] = useState(initial?.bucket ?? defaultBucket)
   const [category, setCategory] = useState(initial?.category || '')
@@ -40,14 +41,19 @@ export default function TaskModal({
     setDays((prev) => (prev.includes(d) ? prev.filter((x) => x !== d) : [...prev, d]))
   }
 
+  const updateStep = (i, v) => setSteps((prev) => prev.map((s, j) => (j === i ? v : s)))
+  const removeStep = (i) => setSteps((prev) => prev.filter((_, j) => j !== i))
+  const addStep = () => setSteps((prev) => [...prev, ''])
+
   function handleSubmit(e) {
     e.preventDefault()
     if (!valid) return
     const desc = description.trim()
+    const cleanSteps = steps.map((s) => s.trim()).filter(Boolean)
     if (repeat) {
-      onAdd({ title: title.trim(), description: desc, bucket, category, repeat: true, days })
+      onAdd({ title: title.trim(), description: desc, steps: cleanSteps, bucket, category, repeat: true, days })
     } else {
-      onAdd({ title: title.trim(), description: desc, bucket, category, repeat: false, due: due ? `${due}T23:59` : '' })
+      onAdd({ title: title.trim(), description: desc, steps: cleanSteps, bucket, category, repeat: false, due: due ? `${due}T23:59` : '' })
     }
     onClose()
   }
@@ -82,10 +88,36 @@ export default function TaskModal({
               ref={descRef}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="Any extra details…"
+              placeholder="A general note about this task…"
               rows={2}
             />
           </label>
+
+          <div className="field">
+            Steps <span className="label-optional">(optional — things to do)</span>
+            <div className="steps-editor">
+              {steps.map((s, i) => (
+                <div className="step-row" key={i}>
+                  <span className="step-num">{i + 1}</span>
+                  <input
+                    type="text"
+                    value={s}
+                    onChange={(e) => updateStep(i, e.target.value)}
+                    placeholder={`Step ${i + 1}`}
+                  />
+                  <button
+                    type="button"
+                    className="step-del"
+                    onClick={() => removeStep(i)}
+                    aria-label="Remove step"
+                  >
+                    ✕
+                  </button>
+                </div>
+              ))}
+              <button type="button" className="add-step-btn" onClick={addStep}>+ Add step</button>
+            </div>
+          </div>
 
           <div className="field">
             What's it for?

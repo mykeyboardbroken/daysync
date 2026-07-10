@@ -579,6 +579,50 @@
 .warn-list li { font-size: 14px; line-height: 1.45; color: var(--text); }
 .task-desc { font-size: 12px; color: var(--text-dim); line-height: 1.4; white-space: pre-wrap; }
 .assignment.done .task-desc { text-decoration: line-through; }
+/* Steps checklist shown on a task */
+.task-steps { margin: 5px 0 0; padding-left: 18px; font-size: 12px; color: var(--text-dim); line-height: 1.5; }
+.task-steps li { padding-left: 2px; }
+.assignment.done .task-steps { text-decoration: line-through; opacity: 0.8; }
+
+/* Steps editor in the task modal */
+.steps-editor { display: flex; flex-direction: column; gap: 8px; }
+.step-row { display: flex; align-items: center; gap: 8px; }
+.step-num {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+  font-size: 11px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.step-row input { flex: 1; min-width: 0; }
+.step-del {
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  color: var(--text-dim);
+  font-size: 14px;
+  padding: 4px 6px;
+  border-radius: 6px;
+}
+.step-del:hover { color: var(--danger); background: var(--surface-2); }
+.add-step-btn {
+  align-self: flex-start;
+  background: none;
+  border: 1px dashed var(--border);
+  color: var(--text-dim);
+  border-radius: 8px;
+  padding: 7px 12px;
+  font-size: 13px;
+  font-weight: 600;
+}
+.add-step-btn:hover { border-color: var(--accent); color: var(--accent); }
 
 .copy-row {
   display: flex;
