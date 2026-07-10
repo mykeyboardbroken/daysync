@@ -579,9 +579,7 @@
 .warn-list li { font-size: 14px; line-height: 1.45; color: var(--text); }
 
 /* ---------- Greeting banner ---------- */
-.greeting { margin-bottom: 2px; }
-.greeting-main { font-size: 24px; font-weight: 800; margin: 0; letter-spacing: -0.01em; }
-.greeting-quote { font-size: 13px; color: var(--text-dim); margin: 5px 0 0; font-style: italic; }
+.greeting-main { font-size: 24px; font-weight: 800; margin: 0; letter-spacing: -0.01em; line-height: 1.25; }
 
 /* ---------- Onboarding survey ---------- */
 .survey-eyebrow { font-size: 14px; color: var(--accent); font-weight: 700; margin: 0 0 8px; }
@@ -619,6 +617,32 @@
 .task-steps { margin: 5px 0 0; padding-left: 18px; font-size: 12px; color: var(--text-dim); line-height: 1.5; }
 .task-steps li { padding-left: 2px; }
 .assignment.done .task-steps { text-decoration: line-through; opacity: 0.8; }
+/* Tap-to-expand chevron + Edit button in the drawer */
+.task-chevron { color: var(--text-dim); flex-shrink: 0; opacity: 0.55; transition: transform 0.15s; }
+.task-chevron.open { transform: rotate(90deg); }
+.task-edit-btn {
+  align-self: flex-start;
+  margin-top: 8px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 6px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text);
+  cursor: pointer;
+}
+.task-edit-btn:hover { border-color: var(--accent); color: var(--accent); }
+.danger-link {
+  background: none;
+  border: none;
+  color: var(--danger);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 4px 2px;
+}
+.danger-link:hover { text-decoration: underline; }
 
 /* Steps editor in the task modal */
 .steps-editor { display: flex; flex-direction: column; gap: 8px; }

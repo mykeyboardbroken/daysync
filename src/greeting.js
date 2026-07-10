@@ -1,11 +1,5 @@
-// Time-of-day greeting for the Today banner, plus a rotating cheer-up quote.
-
-export function greetingFor(hour, name) {
-  const who = name ? `, ${name}` : ''
-  if (hour >= 5 && hour < 12) return `Good morning${who}`
-  if (hour >= 12 && hour < 18) return `Good afternoon${who}`
-  return `Good night${who}`
-}
+// A single banner line for the Today tab: a time-of-day greeting during
+// morning / afternoon / night, and a cheer-up quote in the in-between hours.
 
 // Short, encouraging lines to lift the mood — one shown per day.
 export const QUOTES = [
@@ -33,4 +27,15 @@ export const QUOTES = [
 export function quoteOfDay(date = new Date()) {
   const dayOfYear = Math.floor((date - new Date(date.getFullYear(), 0, 0)) / 86400000)
   return QUOTES[dayOfYear % QUOTES.length]
+}
+
+// The one-line banner: a greeting when there's something to say, otherwise a
+// cheer-up quote for the in-between hours (evening).
+export function bannerLine(date, name) {
+  const hour = date.getHours()
+  const who = name ? `, ${name}` : ''
+  if (hour >= 5 && hour < 12) return `Good morning${who}`
+  if (hour >= 12 && hour < 17) return `Good afternoon${who}`
+  if (hour >= 21 || hour < 5) return `Good night${who}`
+  return quoteOfDay(date) // evening in-between
 }

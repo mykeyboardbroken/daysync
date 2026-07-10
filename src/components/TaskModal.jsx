@@ -9,6 +9,7 @@ import Icon from './Icon'
 // streak). Toggle "Repeat" to switch between the two. Pass `initial` to edit.
 export default function TaskModal({
   onAdd,
+  onDelete,
   onClose,
   initial,
   defaultBucket = '',
@@ -195,6 +196,9 @@ export default function TaskModal({
           )}
 
           <div className="modal-actions">
+            {editing && onDelete && (
+              <button type="button" className="danger-link" onClick={onDelete}>Delete</button>
+            )}
             <span className="spacer" />
             <button type="button" className="ghost-btn" onClick={onClose}>Cancel</button>
             <button type="submit" className="primary-btn" disabled={!valid}>
