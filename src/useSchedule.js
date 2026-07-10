@@ -105,13 +105,14 @@ function normalize(parsed) {
   // The default nightly "get ready" task with a concrete checklist.
   const READY_TITLE = 'Get ready for tomorrow'
   const READY_DESC =
-    "Lay out tomorrow's clothes, pack your bag, charge your devices, set your alarm, and check what's on tomorrow."
+    "Clothes laid out, bag packed, devices charging, alarm set, and tomorrow's plans reviewed."
   const OLD_READY_TITLES = ["Pack tomorrow's bag", 'Pack your bag']
   const OLD_READY_DESCS = new Set([
     "Sort your books, uniform and gear tonight so the morning's stress-free and nothing gets left behind.",
     "Pack everything you might need properly tonight, so you're set for whatever tomorrow brings.",
     "Get your things ready for tomorrow tonight, so your morning's calm — school day or not.",
     "Get your things ready tonight, so your morning's calm.",
+    "Lay out tomorrow's clothes, pack your bag, charge your devices, set your alarm, and check what's on tomorrow.",
   ])
   // Adopt older seeded copies into the current form (rename, Lifestyle, daily).
   // Text refresh skips a description you've edited yourself.
@@ -154,7 +155,7 @@ function normalize(parsed) {
       {
         id: makeId(),
         title: 'Morning grooming',
-        description: 'Gentle wash and moisturise, brush your teeth, and check your hair.',
+        description: 'A gentle wash and moisturiser, brushing teeth, and a quick hair check.',
         bucket: 'morning',
         category: 'health',
         repeat: true,
@@ -166,7 +167,7 @@ function normalize(parsed) {
       {
         id: makeId(),
         title: 'Clean your room',
-        description: 'Give your room a proper tidy — floor, desk and surfaces.',
+        description: 'Tidying the floor, desk, and surfaces.',
         bucket: 'afternoon',
         category: 'lifestyle',
         repeat: true,
@@ -178,7 +179,7 @@ function normalize(parsed) {
       {
         id: makeId(),
         title: 'Organise your wardrobe',
-        description: "Sort your clothes, fold the clean ones and clear the pile on the chair.",
+        description: 'Sorting clothes, folding clean items, and clearing anything left out.',
         bucket: 'afternoon',
         category: 'lifestyle',
         repeat: true,
@@ -190,6 +191,26 @@ function normalize(parsed) {
     ]
     data.seededChores = true
   }
+  // Refresh the chore defaults' wording on existing copies (informative style),
+  // without touching a description you've edited yourself.
+  const CHORE_DESCS = {
+    'Morning grooming': {
+      desc: 'A gentle wash and moisturiser, brushing teeth, and a quick hair check.',
+      old: new Set(['Gentle wash and moisturise, brush your teeth, and check your hair.']),
+    },
+    'Clean your room': {
+      desc: 'Tidying the floor, desk, and surfaces.',
+      old: new Set(['Give your room a proper tidy — floor, desk and surfaces.']),
+    },
+    'Organise your wardrobe': {
+      desc: 'Sorting clothes, folding clean items, and clearing anything left out.',
+      old: new Set(['Sort your clothes, fold the clean ones and clear the pile on the chair.']),
+    },
+  }
+  data.tasks = data.tasks.map((t) => {
+    const r = CHORE_DESCS[t.title]
+    return r && r.old.has(t.description) ? { ...t, description: r.desc } : t
+  })
   return data
 }
 
