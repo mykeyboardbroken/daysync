@@ -1,7 +1,7 @@
 import { useState } from 'react'
 
-// First-open onboarding survey — steps through the questions and hands the
-// collected answers back on Finish. Can't be dismissed by tapping outside.
+// First-open onboarding — a full-screen flow that steps through the questions
+// and hands the collected answers back on Finish.
 export default function SurveyModal({ questions, onComplete }) {
   const [step, setStep] = useState(0)
   const [answers, setAnswers] = useState({})
@@ -26,62 +26,75 @@ export default function SurveyModal({ questions, onComplete }) {
   }
 
   return (
-    <div className="modal-overlay">
-      <div className="modal survey-modal">
-        {idx === 0 && <p className="survey-eyebrow">Welcome 👋</p>}
-        <p className="survey-progress">Question {idx + 1} of {visible.length}</p>
-        <h3>{q.question}</h3>
-        {q.hint && <p className="modal-sub">{q.hint}</p>}
-
-        {q.type === 'text' && (
-          <input
-            className="survey-input"
-            type="text"
-            value={value || ''}
-            placeholder={q.placeholder || ''}
-            onChange={(e) => setAnswer(e.target.value)}
-            autoFocus
-          />
-        )}
-
-        {q.type === 'single' && (
-          <div className="survey-options">
-            {q.options.map((o) => (
-              <button
-                key={o}
-                type="button"
-                className={`survey-option ${value === o ? 'selected' : ''}`}
-                onClick={() => setAnswer(o)}
-              >
-                {o}
-              </button>
-            ))}
+    <div className="survey-screen">
+      <div className="survey-inner">
+        <div className="survey-top">
+          <div className="survey-bar">
+            <div
+              className="survey-bar-fill"
+              style={{ width: `${((idx + 1) / visible.length) * 100}%` }}
+            />
           </div>
-        )}
+          <p className="survey-progress">Question {idx + 1} of {visible.length}</p>
+        </div>
 
-        {q.type === 'multi' && (
-          <div className="survey-options">
-            {q.options.map((o) => (
-              <button
-                key={o}
-                type="button"
-                className={`survey-option ${(value || []).includes(o) ? 'selected' : ''}`}
-                onClick={() => toggleMulti(o)}
-              >
-                {o}
-              </button>
-            ))}
-          </div>
-        )}
+        <div className="survey-body" key={idx}>
+          {idx === 0 && <p className="survey-eyebrow">Welcome 👋</p>}
+          <h2 className="survey-question">{q.question}</h2>
+          {q.hint && <p className="survey-hint">{q.hint}</p>}
 
-        <div className="modal-actions">
+          {q.type === 'text' && (
+            <input
+              className="survey-input"
+              type="text"
+              value={value || ''}
+              placeholder={q.placeholder || ''}
+              onChange={(e) => setAnswer(e.target.value)}
+              autoFocus
+            />
+          )}
+
+          {q.type === 'single' && (
+            <div className="survey-options">
+              {q.options.map((o, i) => (
+                <button
+                  key={o}
+                  type="button"
+                  className={`survey-option ${value === o ? 'selected' : ''}`}
+                  style={{ animationDelay: `${i * 0.03}s` }}
+                  onClick={() => setAnswer(o)}
+                >
+                  {o}
+                </button>
+              ))}
+            </div>
+          )}
+
+          {q.type === 'multi' && (
+            <div className="survey-options">
+              {q.options.map((o, i) => (
+                <button
+                  key={o}
+                  type="button"
+                  className={`survey-option ${(value || []).includes(o) ? 'selected' : ''}`}
+                  style={{ animationDelay: `${i * 0.03}s` }}
+                  onClick={() => toggleMulti(o)}
+                >
+                  {o}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+
+        <div className="survey-nav">
           {idx > 0 ? (
             <button type="button" className="ghost-btn" onClick={() => setStep(idx - 1)}>Back</button>
           ) : (
             <span className="spacer" />
           )}
           <span className="spacer" />
-          <button type="button" className="primary-btn" onClick={next}>
+          <button type="button" className="primary-btn survey-next" onClick={next}>
             {isLast ? 'Finish' : 'Next'}
           </button>
         </div>
