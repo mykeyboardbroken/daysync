@@ -278,6 +278,11 @@ function normalize(parsed) {
     ]
     data.seededRoutinePlus = true
   }
+  // New task model: blank weekdays = one-off. Give every-day repeats explicit
+  // all-week days so an empty picker unambiguously means a one-off.
+  data.tasks = data.tasks.map((t) =>
+    t.repeat && (!t.days || t.days.length === 0) ? { ...t, days: [0, 1, 2, 3, 4, 5, 6] } : t,
+  )
   return data
 }
 

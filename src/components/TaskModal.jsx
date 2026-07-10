@@ -4,9 +4,9 @@ import { HABIT_WEEKDAYS } from '../habits'
 import { TASK_CATEGORIES } from '../taskCategories'
 import Icon from './Icon'
 
-// Create or edit a task. A task is either one-off (an optional due date) or
-// repeating (a routine on a weekday schedule — blank = every day — that builds a
-// streak). Toggle "Repeat" to switch between the two. Pass `initial` to edit.
+// Create or edit a task. Pick weekdays under "Repeat on" to make it a recurring
+// routine; leave them blank for a one-off with an optional date. Pass `initial`
+// to edit.
 export default function TaskModal({
   onAdd,
   onDelete,
@@ -22,9 +22,10 @@ export default function TaskModal({
   const [due, setDue] = useState(initial?.due ? initial.due.slice(0, 10) : defaultDue)
   const [bucket, setBucket] = useState(initial?.bucket ?? defaultBucket)
   const [category, setCategory] = useState(initial?.category || '')
-  const [repeat, setRepeat] = useState(!!initial?.repeat)
   const [days, setDays] = useState(initial?.days || [])
 
+  // No explicit toggle: picking any weekday makes it repeat; blank = one-off.
+  const repeat = days.length > 0
   const editing = !!initial
   const valid = title.trim() && category
 
@@ -153,42 +154,22 @@ export default function TaskModal({
           </div>
 
           <div className="field">
-            Repeat
-            <div className="type-select repeat-select habit-days">
-              <button
-                type="button"
-                className={`type-option ${!repeat ? 'selected' : ''}`}
-                onClick={() => setRepeat(false)}
-              >
-                <Icon name="check" size={15} /> One-off
-              </button>
-              <button
-                type="button"
-                className={`type-option ${repeat ? 'selected' : ''}`}
-                onClick={() => setRepeat(true)}
-              >
-                <Icon name="repeat" size={15} /> Repeats
-              </button>
+            Repeat on <span className="label-optional">(leave blank for a one-off)</span>
+            <div className="type-select repeat-select day-grid">
+              {HABIT_WEEKDAYS.map((w) => (
+                <button
+                  type="button"
+                  key={w.d}
+                  className={`type-option ${days.includes(w.d) ? 'selected' : ''}`}
+                  onClick={() => toggleDay(w.d)}
+                >
+                  {w.label}
+                </button>
+              ))}
             </div>
           </div>
 
-          {repeat ? (
-            <div className="field">
-              On <span className="label-optional">(blank = every day)</span>
-              <div className="type-select repeat-select day-grid">
-                {HABIT_WEEKDAYS.map((w) => (
-                  <button
-                    type="button"
-                    key={w.d}
-                    className={`type-option ${days.includes(w.d) ? 'selected' : ''}`}
-                    onClick={() => toggleDay(w.d)}
-                  >
-                    {w.label}
-                  </button>
-                ))}
-              </div>
-            </div>
-          ) : (
+          {!repeat && (
             <label>
               Date <span className="label-optional">(optional)</span>
               <input type="date" value={due} onChange={(e) => setDue(e.target.value)} />
