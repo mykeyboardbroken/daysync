@@ -632,6 +632,20 @@
 /* Tap-to-expand chevron + Edit button in the drawer */
 .task-chevron { color: var(--text-dim); flex-shrink: 0; opacity: 0.55; transition: transform 0.15s; }
 .task-chevron.open { transform: rotate(90deg); }
+/* Today's plan Edit toggle + add-a-default button */
+.plan-edit-btn {
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+  border-radius: 8px;
+  padding: 5px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.plan-edit-btn:hover { border-color: var(--accent); color: var(--accent); }
+.plan-add-templates { align-self: flex-start; margin-top: 12px; }
 .task-edit-btn {
   align-self: flex-start;
   margin-top: 8px;

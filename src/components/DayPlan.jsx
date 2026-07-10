@@ -3,7 +3,9 @@ import { dueLabel, toKey } from '../dateUtils'
 import { DAY_PARTS } from '../dayParts'
 import { habitDueOn, habitDoneOn, habitStreak } from '../habits'
 import { categoryMeta } from '../taskCategories'
+import { TASK_TEMPLATES } from '../taskTemplates'
 import { generateSport, generateGeneral } from '../workouts'
+import ConfirmDelete from './ConfirmDelete'
 import Icon from './Icon'
 import TaskModal from './TaskModal'
 
@@ -17,6 +19,8 @@ const WORKOUT_BUCKET = { Morning: 'morning', Afternoon: 'afternoon', Night: 'nig
 export default function DayPlan({ schedule }) {
   const [editingTask, setEditingTask] = useState(null)
   const [expandedId, setExpandedId] = useState(null)
+  const [editing, setEditing] = useState(false)
+  const [showTemplates, setShowTemplates] = useState(false)
   const { tasks } = schedule
   const todayKey = toKey(new Date())
   const now = new Date()
@@ -141,7 +145,11 @@ export default function DayPlan({ schedule }) {
           {expanded && expandedDrawer(t)}
         </div>
         {!t.done && t.due && <span className={`assignment-due tone-${due.tone}`}>{due.text}</span>}
-        <Icon name="chevronRight" size={16} className={`task-chevron ${expanded ? 'open' : ''}`} />
+        {editing ? (
+          <ConfirmDelete className="assignment-del" label="Remove task" onDelete={() => schedule.deleteTask(t.id)} />
+        ) : (
+          <Icon name="chevronRight" size={16} className={`task-chevron ${expanded ? 'open' : ''}`} />
+        )}
       </li>
     )
   }
@@ -176,7 +184,11 @@ export default function DayPlan({ schedule }) {
         {streak > 0 && (
           <span className="habit-streak"><Icon name="flame" size={13} /> {streak}</span>
         )}
-        <Icon name="chevronRight" size={16} className={`task-chevron ${expanded ? 'open' : ''}`} />
+        {editing ? (
+          <ConfirmDelete className="assignment-del" label="Remove task" onDelete={() => schedule.deleteTask(t.id)} />
+        ) : (
+          <Icon name="chevronRight" size={16} className={`task-chevron ${expanded ? 'open' : ''}`} />
+        )}
       </li>
     )
   }
@@ -217,10 +229,56 @@ export default function DayPlan({ schedule }) {
   return (
     <>
       <section className="day-plan">
-        <div className="card-header"><div><h2>Today's plan</h2></div></div>
+        <div className="card-header">
+          <div><h2>Today's plan</h2></div>
+          <button type="button" className="plan-edit-btn" onClick={() => setEditing((v) => !v)}>
+            {editing ? 'Done' : 'Edit'}
+          </button>
+        </div>
         {bucketSection('', 'clock', 'Anytime', false)}
         {DAY_PARTS.map((p) => bucketSection(p.key, p.icon, p.label, true))}
+        {editing && (
+          <button type="button" className="add-step-btn plan-add-templates" onClick={() => setShowTemplates(true)}>
+            + Add a default task
+          </button>
+        )}
       </section>
+
+      {showTemplates && (
+        <div className="modal-overlay" onClick={() => setShowTemplates(false)}>
+          <div className="modal" onClick={(e) => e.stopPropagation()}>
+            <h3>Add a default task</h3>
+            <p className="modal-sub">Drop one of the built-in routines back into your day.</p>
+            <div className="add-menu">
+              {TASK_TEMPLATES.map((tpl) => {
+                const already = tasks.some((t) => t.title === tpl.title)
+                const hint = tpl.description || (tpl.steps || []).join(' · ')
+                return (
+                  <button
+                    key={tpl.title}
+                    type="button"
+                    className="add-menu-item"
+                    disabled={already}
+                    onClick={() => schedule.addTemplateTask(tpl)}
+                  >
+                    <span className="add-menu-icon" aria-hidden="true">
+                      <Icon name={categoryMeta(tpl.category)?.icon || 'dots'} size={22} />
+                    </span>
+                    <span className="add-menu-text">
+                      <span className="add-menu-label">{tpl.title}{already ? ' · added' : ''}</span>
+                      <span className="add-menu-hint">{hint}</span>
+                    </span>
+                  </button>
+                )
+              })}
+            </div>
+            <div className="modal-actions">
+              <span className="spacer" />
+              <button type="button" className="primary-btn" onClick={() => setShowTemplates(false)}>Done</button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {editingTask && (
         <TaskModal

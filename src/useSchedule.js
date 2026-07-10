@@ -710,6 +710,30 @@ export function useSchedule() {
     setData((prev) => ({ ...prev, tasks: prev.tasks.filter((t) => t.id !== id) }))
   }, [])
 
+  // Add one of the built-in default tasks back from a template.
+  const addTemplateTask = useCallback((tpl) => {
+    setData((prev) => ({
+      ...prev,
+      tasks: [
+        ...prev.tasks,
+        {
+          id: makeId(),
+          title: tpl.title,
+          description: tpl.description || '',
+          steps: tpl.steps || [],
+          bucket: tpl.bucket || '',
+          category: tpl.category || 'other',
+          repeat: true,
+          days: tpl.days || [0, 1, 2, 3, 4, 5, 6],
+          pinFirst: !!tpl.pinFirst,
+          log: {},
+          due: '',
+          done: false,
+        },
+      ],
+    }))
+  }, [])
+
   // ---- Theme (colour scheme) ----
   const setTheme = useCallback((theme) => {
     setData((prev) => ({ ...prev, theme }))
@@ -826,6 +850,7 @@ export function useSchedule() {
     toggleTask,
     updateTask,
     deleteTask,
+    addTemplateTask,
     addAssignment,
     toggleAssignment,
     deleteAssignment,
