@@ -1,0 +1,14 @@
+{
+  "name": "DaySync",
+  "short_name": "DaySync",
+  "description": "Your school day and personal life in one place — timetable, tasks, routines, grades and more.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0f172a",
+  "theme_color": "#0f172a",
+  "icons": [
+    { "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}
