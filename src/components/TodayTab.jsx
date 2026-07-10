@@ -1,5 +1,6 @@
 import { toKey, addDays, prettyDate, isToday } from '../dateUtils'
 import { cycleDay } from '../schoolCalendar'
+import { greetingFor, quoteOfDay } from '../greeting'
 import { useWeather } from '../useWeather'
 import { trainingWarnings } from '../trainingAlert'
 import Icon from './Icon'
@@ -12,6 +13,8 @@ import NotesList from './NotesList'
 export default function TodayTab({ schedule }) {
   const date = new Date()
   const cycle = cycleDay(date)
+  const greeting = greetingFor(date.getHours(), schedule.profile?.name)
+  const quote = quoteOfDay(date)
 
   // Weather: after 8pm, switch to tomorrow's so you can plan the next day.
   const showTomorrowWeather = date.getHours() >= 20
@@ -30,6 +33,11 @@ export default function TodayTab({ schedule }) {
 
   return (
     <div className="tab-content">
+      <div className="greeting">
+        <h1 className="greeting-main">{greeting}</h1>
+        <p className="greeting-quote">{quote}</p>
+      </div>
+
       <header className="today-header">
         <div className="th-left">
           <span className="th-date">{prettyDate(date)}</span>
