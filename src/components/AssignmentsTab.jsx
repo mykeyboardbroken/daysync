@@ -12,6 +12,7 @@ import ConfirmDelete from './ConfirmDelete'
 // is just the schoolwork to do: assignments and tests.
 const FILTERS = [
   { key: 'all', label: 'All' },
+  { key: 'homework', label: 'Homework' },
   { key: 'assignments', label: 'Assignments' },
   { key: 'tests', label: 'Tests' },
   { key: 'done', label: 'Done' },
@@ -36,8 +37,16 @@ export default function AssignmentsTab({ schedule }) {
   }, [schedule.assignments])
 
   // Active vs finished, split out so "Done" collects the ticked-off ones and the
-  // main Assignments list stays focused on what's still to do.
-  const activeAssignments = useMemo(() => assignments.filter((a) => !a.done), [assignments])
+  // main lists stay focused on what's still to do. Homework and assignments are
+  // the same shape, told apart by `kind`.
+  const activeHomework = useMemo(
+    () => assignments.filter((a) => !a.done && a.kind === 'homework'),
+    [assignments],
+  )
+  const activeAssignments = useMemo(
+    () => assignments.filter((a) => !a.done && a.kind !== 'homework'),
+    [assignments],
+  )
   const doneAssignments = useMemo(() => assignments.filter((a) => a.done), [assignments])
 
   const events = useMemo(
@@ -50,12 +59,13 @@ export default function AssignmentsTab({ schedule }) {
   const activeEvents = useMemo(() => events.filter((e) => !e.done), [events])
   const doneEvents = useMemo(() => events.filter((e) => e.done), [events])
 
+  const hasHomework = show('homework') && activeHomework.length > 0
   const hasAssignments = show('assignments') && activeAssignments.length > 0
   const hasTests = show('tests') && activeEvents.length > 0
   // Done lives only under its own filter — not in "All" — so the hub stays
   // focused on what's still outstanding.
   const hasDone = filter === 'done' && (doneAssignments.length > 0 || doneEvents.length > 0)
-  const nothing = !(hasAssignments || hasTests || hasDone)
+  const nothing = !(hasHomework || hasAssignments || hasTests || hasDone)
 
   // One row renderer shared by the active list and the Done list. Tapping the
   // card edits it; the checkbox (done) and ✕ (delete) stop the click from
@@ -112,6 +122,15 @@ export default function AssignmentsTab({ schedule }) {
           </button>
         ))}
       </div>
+
+      {hasHomework && (
+        <section className="card">
+          <div className="card-header">
+            <div><h2>Homework</h2></div>
+          </div>
+          <ul className="assignment-list">{activeHomework.map(renderAssignment)}</ul>
+        </section>
+      )}
 
       {hasAssignments && (
         <section className="card">

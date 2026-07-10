@@ -110,6 +110,10 @@ export default function App() {
         <AssignmentModal onAdd={schedule.addAssignment} onClose={closeAdd} />
       )}
 
+      {adding === 'homework' && (
+        <AssignmentModal onAdd={schedule.addAssignment} defaultKind="homework" onClose={closeAdd} />
+      )}
+
       {adding === 'test' && (
         <TestModal onAdd={schedule.addEvent} onClose={closeAdd} />
       )}

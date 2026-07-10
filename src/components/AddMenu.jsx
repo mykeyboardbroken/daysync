@@ -4,6 +4,7 @@ import Icon from './Icon'
 // things on the School tab, personal things on Today/Life.
 const OPTIONS = {
   assignment: { icon: 'book', label: 'Assignment', hint: 'Schoolwork with a deadline' },
+  homework: { icon: 'file', label: 'Homework', hint: 'Everyday homework to get done' },
   test: { icon: 'cap', label: 'Test', hint: 'An assessment or exam — track its grade' },
   bring: { icon: 'bag', label: 'To bring', hint: 'Extra items for your packing list' },
   task: { icon: 'check', label: 'Task', hint: 'A to-do — set it to repeat for a routine' },
@@ -13,7 +14,7 @@ const OPTIONS = {
 
 // Which kinds show per context.
 const MENUS = {
-  school: ['assignment', 'test', 'bring'],
+  school: ['assignment', 'homework', 'test', 'bring'],
   personal: ['task', 'date', 'note'],
   calendar: ['date', 'task'], // only things that land on a day
 }

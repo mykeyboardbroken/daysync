@@ -54,6 +54,8 @@ function normalize(parsed) {
   data.settings = { ...base.settings, ...(data.settings || {}) }
   data.customColors = { ...base.customColors, ...(data.customColors || {}) }
   data.profile = { ...(data.profile || {}) }
+  // Assignments gained a `kind` ('assignment' | 'homework') — default older ones.
+  data.assignments = (data.assignments || []).map((a) => ({ kind: 'assignment', ...a }))
   // The old preset themes were dropped — fold any legacy one into the custom
   // accent/base so the user's look carries over.
   if (data.theme && data.theme !== 'custom') {
@@ -413,10 +415,10 @@ export function useSchedule() {
   }, [data])
 
   // ---- Assignments (schoolwork with a due date) ----
-  const addAssignment = useCallback(({ title, subject, due }) => {
+  const addAssignment = useCallback(({ title, subject, due, kind = 'assignment' }) => {
     setData((prev) => ({
       ...prev,
-      assignments: [...prev.assignments, { id: makeId(), title, subject, due, done: false }],
+      assignments: [...prev.assignments, { id: makeId(), title, subject, due, kind, done: false }],
     }))
   }, [])
 
