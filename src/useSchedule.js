@@ -29,6 +29,7 @@ function emptyData() {
     packLifestyle: false, // one-time move of the pack task into the Lifestyle category
     seededChores: false, // whether the extra default tasks (grooming, chores) were seeded once
     seededRoutinePlus: false, // stretch + hydration defaults seeded once
+    seededReading: false, // reading default seeded once
     onboarded: false, // whether the first-open survey has been completed
     profile: {}, // answers from the onboarding survey, keyed by question id
     workoutLog: {}, // per-day done state for the generated workout ({ dateKey: true })
@@ -278,6 +279,26 @@ function normalize(parsed) {
       },
     ]
     data.seededRoutinePlus = true
+  }
+  // A daily reading habit in the afternoon (deletable, seeded once).
+  if (!data.seededReading) {
+    data.tasks = [
+      ...data.tasks,
+      {
+        id: makeId(),
+        title: 'Reading',
+        description: 'Twenty minutes with a book to unwind and pick up something new.',
+        steps: [],
+        bucket: 'afternoon',
+        category: 'lifestyle',
+        repeat: true,
+        days: [],
+        log: {},
+        due: '',
+        done: false,
+      },
+    ]
+    data.seededReading = true
   }
   // New task model: blank weekdays = one-off. Give every-day repeats explicit
   // all-week days so an empty picker unambiguously means a one-off.
