@@ -41,9 +41,9 @@ export const TASK_TEMPLATES = [
     title: 'Reading',
     description: 'Time with a book — read as much or as little as you like; what matters is that you read.',
     steps: [],
-    bucket: 'afternoon',
+    bucket: 'night',
     category: 'lifestyle',
-    days: [1, 2, 3, 4, 5], // weekdays — weekends are for the chores
+    days: ALL,
   },
   {
     title: 'Clean your room',
