@@ -327,7 +327,7 @@ function normalize(parsed) {
         id: makeId(),
         title: 'Journaling',
         description: 'A few lines to clear your head and set your intentions for the day.',
-        steps: [],
+        steps: ['Write your thoughts', "Write today's to-do list", "Write what you're grateful for"],
         bucket: 'morning',
         category: 'lifestyle',
         repeat: true,
@@ -367,6 +367,12 @@ function normalize(parsed) {
   // Stretch/Move sits first in its bucket (best right after waking up).
   data.tasks = data.tasks.map((t) =>
     t.title === 'Stretch / Move' && t.pinFirst === undefined ? { ...t, pinFirst: true } : t,
+  )
+  // Give the default Journaling task its steps (only if it has none — your edits stay).
+  data.tasks = data.tasks.map((t) =>
+    t.title === 'Journaling' && (!t.steps || t.steps.length === 0)
+      ? { ...t, steps: ['Write your thoughts', "Write today's to-do list", "Write what you're grateful for"] }
+      : t,
   )
   // Reading now lives at night, every day. Move the default afternoon copy over.
   data.tasks = data.tasks.map((t) =>

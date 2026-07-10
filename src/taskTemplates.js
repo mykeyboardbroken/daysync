@@ -16,7 +16,7 @@ export const TASK_TEMPLATES = [
   {
     title: 'Journaling',
     description: 'A few lines to clear your head and set your intentions for the day.',
-    steps: [],
+    steps: ['Write your thoughts', "Write today's to-do list", "Write what you're grateful for"],
     bucket: 'morning',
     category: 'lifestyle',
     days: ALL,

@@ -205,6 +205,7 @@ export default function DayPlan({ schedule }) {
           <p className="plan-empty">Nothing planned</p>
         ) : (
           <ul className="assignment-list">
+            {items.map((t) => (t.repeat ? renderRepeating(t) : renderOneOff(t)))}
             {showSport &&
               renderWorkoutRow({
                 id: 'sport',
@@ -219,7 +220,6 @@ export default function DayPlan({ schedule }) {
                 subtitle: general.label,
                 steps: general.steps,
               })}
-            {items.map((t) => (t.repeat ? renderRepeating(t) : renderOneOff(t)))}
           </ul>
         )}
       </div>
