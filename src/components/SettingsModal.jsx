@@ -49,16 +49,34 @@ const SECTIONS = [
   { key: 'backup', label: 'Backup', icon: 'file' },
 ]
 
+const SPORT_OPTIONS = [
+  'Football / Soccer',
+  'Basketball',
+  'Rugby',
+  'Netball',
+  'Running / Athletics',
+  'Cricket',
+  'Swimming',
+  'Tennis',
+]
+const EQUIP_OPTIONS = ['Dumbbells', 'Resistance bands', 'Pull-up bar', 'Kettlebell', 'Skipping rope', 'Just bodyweight']
+const TIME_OPTIONS = ['Morning', 'Afternoon', 'Night', 'Anytime', "I don't"]
+
 export default function SettingsModal({
   customColors,
   onSetCustomColor,
   settings,
   onSetSetting,
-  onRestartSurvey,
+  profile = {},
+  onSetProfile,
   onExport,
   onImport,
   onClose,
 }) {
+  const toggleProfileArr = (key, opt) => {
+    const cur = profile[key] || []
+    onSetProfile(key, cur.includes(opt) ? cur.filter((x) => x !== opt) : [...cur, opt])
+  }
   const [section, setSection] = useState(null)
   const [backupMsg, setBackupMsg] = useState('')
   const fileRef = useRef(null)
@@ -191,21 +209,120 @@ export default function SettingsModal({
 
             {section === 'profile' && (
               <div className="color-pickers">
-                <button
-                  type="button"
-                  className="settings-row"
-                  onClick={() => {
-                    onRestartSurvey()
-                    onClose()
-                  }}
-                >
-                  <Icon name="repeat" size={18} />
-                  <span className="settings-row-label">Redo intro survey</span>
-                  <Icon name="chevronRight" size={18} className="settings-chevron" />
-                </button>
-                <p className="settings-field-label">
-                  Re-answer your name, sports, gym/equipment and workout time.
-                </p>
+                <p className="settings-field-label">Personal information</p>
+                <label className="study-field">
+                  Name
+                  <input
+                    type="text"
+                    value={profile.name || ''}
+                    placeholder="Your name"
+                    onChange={(e) => onSetProfile('name', e.target.value)}
+                  />
+                </label>
+                <label className="study-field">
+                  Age
+                  <input
+                    type="number"
+                    value={profile.age || ''}
+                    placeholder="Your age"
+                    onChange={(e) => onSetProfile('age', e.target.value)}
+                  />
+                </label>
+
+                <p className="settings-field-label">Weight units</p>
+                <div className="type-select repeat-select habit-days">
+                  {['kg', 'lbs'].map((u) => (
+                    <button
+                      type="button"
+                      key={u}
+                      className={`type-option ${(settings?.weightUnit || 'kg') === u ? 'selected' : ''}`}
+                      onClick={() => onSetSetting('weightUnit', u)}
+                    >
+                      {u}
+                    </button>
+                  ))}
+                </div>
+
+                <p className="settings-field-label">Workout location</p>
+                <div className="type-select repeat-select habit-days">
+                  {[
+                    { label: 'Gym', gym: 'Yes' },
+                    { label: 'Home', gym: 'No' },
+                  ].map((o) => (
+                    <button
+                      type="button"
+                      key={o.label}
+                      className={`type-option ${(profile.gym === 'Yes' ? 'Gym' : 'Home') === o.label ? 'selected' : ''}`}
+                      onClick={() => onSetProfile('gym', o.gym)}
+                    >
+                      {o.label}
+                    </button>
+                  ))}
+                </div>
+
+                {profile.gym !== 'Yes' && (
+                  <>
+                    <p className="settings-field-label">Home equipment</p>
+                    <div className="type-select repeat-select habit-days">
+                      {EQUIP_OPTIONS.map((o) => (
+                        <button
+                          type="button"
+                          key={o}
+                          className={`type-option ${(profile.equipment || []).includes(o) ? 'selected' : ''}`}
+                          onClick={() => toggleProfileArr('equipment', o)}
+                        >
+                          {o}
+                        </button>
+                      ))}
+                    </div>
+                  </>
+                )}
+
+                <p className="settings-field-label">Sports</p>
+                <div className="type-select repeat-select habit-days">
+                  {SPORT_OPTIONS.map((o) => (
+                    <button
+                      type="button"
+                      key={o}
+                      className={`type-option ${(profile.sports || []).includes(o) ? 'selected' : ''}`}
+                      onClick={() => toggleProfileArr('sports', o)}
+                    >
+                      {o}
+                    </button>
+                  ))}
+                </div>
+
+                {(profile.sports || []).length > 0 && (
+                  <>
+                    <p className="settings-field-label">Sport training time</p>
+                    <div className="type-select repeat-select habit-days">
+                      {TIME_OPTIONS.map((o) => (
+                        <button
+                          type="button"
+                          key={o}
+                          className={`type-option ${profile.sportTime === o ? 'selected' : ''}`}
+                          onClick={() => onSetProfile('sportTime', o)}
+                        >
+                          {o}
+                        </button>
+                      ))}
+                    </div>
+                  </>
+                )}
+
+                <p className="settings-field-label">Workout time</p>
+                <div className="type-select repeat-select habit-days">
+                  {TIME_OPTIONS.map((o) => (
+                    <button
+                      type="button"
+                      key={o}
+                      className={`type-option ${profile.workoutTime === o ? 'selected' : ''}`}
+                      onClick={() => onSetProfile('workoutTime', o)}
+                    >
+                      {o}
+                    </button>
+                  ))}
+                </div>
               </div>
             )}
 

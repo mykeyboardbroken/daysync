@@ -41,7 +41,7 @@ function emptyData() {
     // hover/pressed shade is derived from it), base = 'dark' | 'bright' (which
     // background palette to sit it on).
     customColors: { primary: '#6366f1', base: 'dark' },
-    settings: { showStreaks: false }, // general prefs (opt-in streaks etc.)
+    settings: { showStreaks: false, weightUnit: 'kg' }, // general prefs
   }
 }
 
@@ -765,6 +765,11 @@ export function useSchedule() {
     setData((prev) => ({ ...prev, onboarded: false }))
   }, [])
 
+  // Update a single profile field (edited from Settings → Profile).
+  const setProfile = useCallback((key, value) => {
+    setData((prev) => ({ ...prev, profile: { ...prev.profile, [key]: value } }))
+  }, [])
+
   // ---- Generated workout ----
   const toggleWorkout = useCallback((dateKey) => {
     setData((prev) => {
@@ -848,6 +853,7 @@ export function useSchedule() {
     profile: data.profile,
     finishSurvey,
     restartSurvey,
+    setProfile,
     workoutLog: data.workoutLog,
     workoutSeed: data.workoutSeed,
     toggleWorkout,
