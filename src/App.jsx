@@ -3,6 +3,8 @@ import { useSchedule } from './useSchedule'
 import TabBar from './components/TabBar'
 import Icon from './components/Icon'
 import SettingsModal from './components/SettingsModal'
+import SurveyModal from './components/SurveyModal'
+import { SURVEY_QUESTIONS } from './survey'
 import TodayTab from './components/TodayTab'
 import SchoolTab from './components/SchoolTab'
 import CalendarTab from './components/CalendarTab'
@@ -77,6 +79,10 @@ export default function App() {
       </button>
 
       <TabBar active={tab} onChange={setTab} />
+
+      {!schedule.onboarded && SURVEY_QUESTIONS.length > 0 && (
+        <SurveyModal questions={SURVEY_QUESTIONS} onComplete={schedule.finishSurvey} />
+      )}
 
       {settingsOpen && (
         <SettingsModal

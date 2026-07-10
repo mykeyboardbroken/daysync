@@ -28,6 +28,8 @@ function emptyData() {
     seededPackTask: false, // whether the default nightly "pack your bag" task was seeded once
     packLifestyle: false, // one-time move of the pack task into the Lifestyle category
     seededChores: false, // whether the extra default tasks (grooming, chores) were seeded once
+    onboarded: false, // whether the first-open survey has been completed
+    profile: {}, // answers from the onboarding survey, keyed by question id
     theme: 'custom', // appearance is now always a custom accent on a dark/bright base
     // Used when theme === 'custom': primary = the accent colour (the darker
     // hover/pressed shade is derived from it), base = 'dark' | 'bright' (which
@@ -45,6 +47,7 @@ function normalize(parsed) {
   const data = { ...base, ...parsed }
   data.settings = { ...base.settings, ...(data.settings || {}) }
   data.customColors = { ...base.customColors, ...(data.customColors || {}) }
+  data.profile = { ...(data.profile || {}) }
   // The old preset themes were dropped — fold any legacy one into the custom
   // accent/base so the user's look carries over.
   if (data.theme && data.theme !== 'custom') {
@@ -596,6 +599,11 @@ export function useSchedule() {
     setData((prev) => ({ ...prev, settings: { ...prev.settings, [key]: value } }))
   }, [])
 
+  // ---- Onboarding survey ----
+  const finishSurvey = useCallback((answers) => {
+    setData((prev) => ({ ...prev, profile: { ...prev.profile, ...answers }, onboarded: true }))
+  }, [])
+
   // ---- Backup: export everything as JSON / restore from a backup file ----
   const exportData = useCallback(() => JSON.stringify(data, null, 2), [data])
 
@@ -661,6 +669,9 @@ export function useSchedule() {
     setCustomColor,
     settings: data.settings,
     setSetting,
+    onboarded: data.onboarded,
+    profile: data.profile,
+    finishSurvey,
     exportData,
     importData,
     addTask,

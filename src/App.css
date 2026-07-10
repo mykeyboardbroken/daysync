@@ -577,6 +577,37 @@
 }
 .warn-list { margin: 0; padding-left: 0; list-style: none; display: flex; flex-direction: column; gap: 6px; }
 .warn-list li { font-size: 14px; line-height: 1.45; color: var(--text); }
+
+/* ---------- Onboarding survey ---------- */
+.survey-eyebrow { font-size: 14px; color: var(--accent); font-weight: 700; margin: 0 0 8px; }
+.survey-progress { font-size: 12px; color: var(--text-dim); font-weight: 600; margin: 0 0 6px; }
+.survey-input {
+  width: 100%;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 11px 12px;
+  color: var(--text);
+  font-size: 15px;
+  font-family: inherit;
+  margin-top: 4px;
+}
+.survey-input:focus { outline: none; border-color: var(--accent); }
+.survey-options { display: flex; flex-direction: column; gap: 8px; margin-top: 8px; }
+.survey-option {
+  text-align: left;
+  background: var(--surface-2);
+  border: 2px solid transparent;
+  border-radius: 10px;
+  padding: 12px 14px;
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 0.12s;
+}
+.survey-option:hover { border-color: var(--accent); }
+.survey-option.selected { border-color: var(--accent); }
 .task-desc { font-size: 12px; color: var(--text-dim); line-height: 1.4; white-space: pre-wrap; }
 .assignment.done .task-desc { text-decoration: line-through; }
 /* Steps checklist shown on a task */
