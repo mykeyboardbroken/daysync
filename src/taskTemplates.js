@@ -43,7 +43,7 @@ export const TASK_TEMPLATES = [
     steps: [],
     bucket: 'afternoon',
     category: 'lifestyle',
-    days: ALL,
+    days: [1, 2, 3, 4, 5], // weekdays — weekends are for the chores
   },
   {
     title: 'Clean your room',

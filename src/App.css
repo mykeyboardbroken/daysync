@@ -1295,6 +1295,14 @@ p.weather-strip { font-size: 13px; }
 .add-menu-text { display: flex; flex-direction: column; gap: 2px; }
 .add-menu-label { font-size: 15px; font-weight: 600; }
 .add-menu-hint { font-size: 12px; color: var(--text-dim); }
+/* Already-added template: shaded in with a checkmark, not just faded. */
+.add-menu-item.added {
+  background: color-mix(in srgb, var(--accent) 16%, var(--surface-2));
+  border-color: var(--accent);
+  cursor: default;
+}
+.add-menu-item.added:hover { background: color-mix(in srgb, var(--accent) 16%, var(--surface-2)); }
+.add-menu-check { color: var(--accent); flex-shrink: 0; margin-left: auto; }
 .modal form { display: flex; flex-direction: column; gap: 14px; }
 .field-row { display: flex; gap: 12px; }
 .field-row label { flex: 1; }

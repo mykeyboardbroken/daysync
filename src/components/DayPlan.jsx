@@ -257,7 +257,7 @@ export default function DayPlan({ schedule }) {
                   <button
                     key={tpl.title}
                     type="button"
-                    className="add-menu-item"
+                    className={`add-menu-item ${already ? 'added' : ''}`}
                     disabled={already}
                     onClick={() => schedule.addTemplateTask(tpl)}
                   >
@@ -265,9 +265,10 @@ export default function DayPlan({ schedule }) {
                       <Icon name={categoryMeta(tpl.category)?.icon || 'dots'} size={22} />
                     </span>
                     <span className="add-menu-text">
-                      <span className="add-menu-label">{tpl.title}{already ? ' · added' : ''}</span>
+                      <span className="add-menu-label">{tpl.title}</span>
                       <span className="add-menu-hint">{hint}</span>
                     </span>
+                    {already && <Icon name="checkmark" size={18} className="add-menu-check" />}
                   </button>
                 )
               })}

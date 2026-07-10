@@ -302,7 +302,7 @@ function normalize(parsed) {
         bucket: 'afternoon',
         category: 'lifestyle',
         repeat: true,
-        days: [],
+        days: [1, 2, 3, 4, 5], // weekdays — weekends are for the chores
         log: {},
         due: '',
         done: false,
@@ -365,6 +365,14 @@ function normalize(parsed) {
   // Stretch/Move sits first in its bucket (best right after waking up).
   data.tasks = data.tasks.map((t) =>
     t.title === 'Stretch / Move' && t.pinFirst === undefined ? { ...t, pinFirst: true } : t,
+  )
+  // Reading is weekdays only — the weekend afternoons are for the chores instead.
+  // Only shift the default (every-day) copy; a schedule you set yourself stays.
+  data.tasks = data.tasks.map((t) =>
+    t.title === 'Reading' &&
+    JSON.stringify([...(t.days || [])].sort((a, b) => a - b)) === JSON.stringify([0, 1, 2, 3, 4, 5, 6])
+      ? { ...t, days: [1, 2, 3, 4, 5] }
+      : t,
   )
   return data
 }
