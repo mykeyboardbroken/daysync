@@ -280,10 +280,14 @@
   transition: background 0.12s, border-color 0.12s;
 }
 .cal-day.other { opacity: 0.35; }
+.cal-day.weekend { background: color-mix(in srgb, var(--accent) 14%, var(--surface-2)); } /* weekends stand out */
 .cal-day.break { background: rgba(16, 185, 129, 0.16); } /* school holidays */
 .cal-day.today { border-color: var(--accent); }
 .cal-day.selected { background: var(--accent); color: #fff; border-color: var(--accent); }
 .cal-num { font-weight: 600; line-height: 1; }
+.cal-day.weekend .cal-num { color: var(--accent); font-weight: 700; }
+.cal-day.weekend.selected .cal-num { color: #fff; }
+.cal-weekday.weekend { color: var(--accent); }
 .cal-dots { display: flex; gap: 3px; }
 .cal-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--accent); }
 .cal-day.selected .cal-dot { background: #fff; }

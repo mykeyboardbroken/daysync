@@ -73,7 +73,9 @@ export default function CalendarTab({ schedule }) {
       </div>
 
       <div className="cal-weekdays">
-        {WEEKDAY_LABELS.map((w) => <span key={w} className="cal-weekday">{w}</span>)}
+        {WEEKDAY_LABELS.map((w, i) => (
+          <span key={w} className={`cal-weekday ${i >= 5 ? 'weekend' : ''}`}>{w}</span>
+        ))}
       </div>
 
       <div className="cal-grid">
@@ -83,9 +85,11 @@ export default function CalendarTab({ schedule }) {
           const count = countByDay[key] || 0
           const pub = publicHolidayOn(d)
           const brk = schoolBreakOn(d)
+          const weekend = d.getDay() === 0 || d.getDay() === 6
           const classes = [
             'cal-day',
             inMonth ? '' : 'other',
+            weekend ? 'weekend' : '',
             brk ? 'break' : '',
             key === todayKey ? 'today' : '',
             key === selectedKey ? 'selected' : '',
