@@ -181,6 +181,15 @@ function availableEquip(profile) {
   return set
 }
 
+// Right-size the session by age. College age (the app's main audience) gets the
+// full workout; younger and older get something shorter/easier.
+function intensityForAge(age) {
+  const a = parseInt(age, 10)
+  if (!a || (a >= 16 && a <= 34)) return { main: 3, sport: 4 } // full (incl. unknown)
+  if (a < 16 || a >= 50) return { main: 2, sport: 3 } // shorter & easier
+  return { main: 3, sport: 3 } // 35–49 — slightly shorter
+}
+
 // Whether a workout applies at all (they told us when they train).
 export function hasWorkout(profile) {
   return !!profile && !!profile.workoutTime
@@ -197,7 +206,7 @@ export function generateSport(profile = {}, date = new Date(), seed = 0) {
   const rand = mulberry32(dayNumber(date) + seed * 131 + 7)
   const seen = new Set()
   const steps = [WARMUPS[Math.floor(rand() * WARMUPS.length)]]
-  steps.push(...pickSome(pool, 4, rand, seen))
+  steps.push(...pickSome(pool, intensityForAge(profile.age).sport, rand, seen))
   steps.push(COOLDOWNS[Math.floor(rand() * COOLDOWNS.length)])
   return { steps, label: today }
 }
@@ -212,7 +221,7 @@ export function generateGeneral(profile = {}, date = new Date(), seed = 0) {
   const pool = (part) => GENERAL[part].filter((e) => avail.has(e.eq)).map((e) => e.name)
 
   const steps = [WARMUPS[Math.floor(rand() * WARMUPS.length)]]
-  steps.push(...pickSome(pool(rot.key), 3, rand, seen))
+  steps.push(...pickSome(pool(rot.key), intensityForAge(profile.age).main, rand, seen))
   steps.push(...pickSome(pool('core'), 1, rand, seen))
   steps.push(COOLDOWNS[Math.floor(rand() * COOLDOWNS.length)])
   return { steps, label: rot.label }

@@ -9,6 +9,13 @@
 export const SURVEY_QUESTIONS = [
   { id: 'name', type: 'text', question: "What's your name?", placeholder: 'Your name' },
   {
+    id: 'age',
+    type: 'text',
+    question: 'How old are you?',
+    hint: 'Used to right-size your workout — shorter/easier or a bit longer.',
+    placeholder: 'e.g. 19',
+  },
+  {
     id: 'sports',
     type: 'multi',
     question: 'What sports do you play?',
