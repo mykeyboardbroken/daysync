@@ -30,7 +30,9 @@ function emptyData() {
     seededChores: false, // whether the extra default tasks (grooming, chores) were seeded once
     seededRoutinePlus: false, // stretch + hydration defaults seeded once
     seededReading: false, // reading default seeded once
+    readingAfternoon: false, // one-time move of Reading back to the afternoon
     seededJournaling: false, // journaling default seeded once
+    seededNightGrooming: false, // night grooming default seeded once
     seededCheckPlans: false, // "check tomorrow's plans" default seeded once
     onboarded: false, // whether the first-open survey has been completed
     profile: {}, // answers from the onboarding survey, keyed by question id
@@ -301,7 +303,7 @@ function normalize(parsed) {
         title: 'Reading',
         description: READING_DESC,
         steps: [],
-        bucket: 'night',
+        bucket: 'afternoon',
         category: 'lifestyle',
         repeat: true,
         days: [], // every day (→ all week)
@@ -339,6 +341,26 @@ function normalize(parsed) {
     ]
     data.seededJournaling = true
   }
+  // A nightly grooming routine (deletable, seeded once).
+  if (!data.seededNightGrooming) {
+    data.tasks = [
+      ...data.tasks,
+      {
+        id: makeId(),
+        title: 'Night grooming',
+        description: '',
+        steps: ['Wash your face', 'Brush your teeth', 'Moisturise / skincare'],
+        bucket: 'night',
+        category: 'health',
+        repeat: true,
+        days: [],
+        log: {},
+        due: '',
+        done: false,
+      },
+    ]
+    data.seededNightGrooming = true
+  }
   // A nightly "check tomorrow's plans" task (deletable, seeded once).
   if (!data.seededCheckPlans) {
     data.tasks = [
@@ -374,12 +396,13 @@ function normalize(parsed) {
       ? { ...t, steps: ['Write your thoughts', "Write today's to-do list", "Write what you're grateful for"] }
       : t,
   )
-  // Reading now lives at night, every day. Move the default afternoon copy over.
-  data.tasks = data.tasks.map((t) =>
-    t.title === 'Reading' && t.bucket === 'afternoon'
-      ? { ...t, bucket: 'night', days: [0, 1, 2, 3, 4, 5, 6] }
-      : t,
-  )
+  // Reading lives in the afternoon — one-time move for any night copy from before.
+  if (!data.readingAfternoon) {
+    data.tasks = data.tasks.map((t) =>
+      t.title === 'Reading' && t.bucket === 'night' ? { ...t, bucket: 'afternoon' } : t,
+    )
+    data.readingAfternoon = true
+  }
   return data
 }
 

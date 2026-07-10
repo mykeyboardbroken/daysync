@@ -30,6 +30,14 @@ export const TASK_TEMPLATES = [
     days: ALL,
   },
   {
+    title: 'Night grooming',
+    description: '',
+    steps: ['Wash your face', 'Brush your teeth', 'Moisturise / skincare'],
+    bucket: 'night',
+    category: 'health',
+    days: ALL,
+  },
+  {
     title: 'Hydration check',
     description: 'A reminder to drink water or refill your bottle to keep your energy from dipping.',
     steps: [],
@@ -41,7 +49,7 @@ export const TASK_TEMPLATES = [
     title: 'Reading',
     description: 'Time with a book — read as much or as little as you like; what matters is that you read.',
     steps: [],
-    bucket: 'night',
+    bucket: 'afternoon',
     category: 'lifestyle',
     days: ALL,
   },
