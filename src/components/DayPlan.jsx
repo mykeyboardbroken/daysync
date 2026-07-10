@@ -26,15 +26,16 @@ export default function DayPlan({ schedule }) {
   // Fall back to "Routine for <category>" when there's no description.
   const descOf = (t) => t.description || `Routine for ${categoryMeta(t.category)?.label || 'this'}`
 
-  // Generated workouts (free, offline). Two sessions — sport-specific + general
-  // (general rotates push/pull/legs by day) — shown in the bucket they picked.
+  // Generated workouts (free, offline). Sport training and the general workout
+  // each sit in their own chosen bucket (they can differ, or be "I don't").
   const profile = schedule.profile || {}
-  const workoutBucket = profile.workoutTime ? WORKOUT_BUCKET[profile.workoutTime] ?? '' : null
+  const bucketForTime = (t) =>
+    Object.prototype.hasOwnProperty.call(WORKOUT_BUCKET, t) ? WORKOUT_BUCKET[t] : null
+  const sportBucket = profile.sports?.length ? bucketForTime(profile.sportTime) : null
+  const generalBucket = bucketForTime(profile.workoutTime)
   const seed = schedule.workoutSeed || 0
-  const sport =
-    workoutBucket !== null && profile.sports?.length ? generateSport(profile, now, seed) : null
-  const general = workoutBucket !== null ? generateGeneral(profile, now, seed) : null
-  const hasWorkouts = !!(sport || general)
+  const sport = sportBucket !== null ? generateSport(profile, now, seed) : null
+  const general = generalBucket !== null ? generateGeneral(profile, now, seed) : null
 
   const renderWorkoutRow = ({ id, title, subtitle, steps }) => {
     const expanded = expandedId === id
@@ -77,24 +78,6 @@ export default function DayPlan({ schedule }) {
     )
   }
 
-  const renderWorkouts = () => (
-    <>
-      {sport &&
-        renderWorkoutRow({
-          id: 'sport',
-          title: 'Sport training',
-          subtitle: `${sport.label} drills`,
-          steps: sport.steps,
-        })}
-      {general &&
-        renderWorkoutRow({
-          id: 'general',
-          title: 'Workout',
-          subtitle: general.label,
-          steps: general.steps,
-        })}
-    </>
-  )
 
   // Everything in a bucket, repeating routines first, then one-off to-dos
   // (undone before done, earliest due first). Repeating tasks only appear on the
@@ -199,16 +182,30 @@ export default function DayPlan({ schedule }) {
 
   const bucketSection = (key, icon, label, alwaysShow) => {
     const items = tasksIn(key)
-    const showWorkout = hasWorkouts && workoutBucket === key
-    if (!alwaysShow && items.length === 0 && !showWorkout) return null
+    const showSport = sport && sportBucket === key
+    const showGeneral = general && generalBucket === key
+    if (!alwaysShow && items.length === 0 && !showSport && !showGeneral) return null
     return (
       <div className="plan-section" key={key || 'anytime'}>
         <div className="plan-section-head"><Icon name={icon} size={15} /> {label}</div>
-        {items.length === 0 && !showWorkout ? (
+        {items.length === 0 && !showSport && !showGeneral ? (
           <p className="plan-empty">Nothing planned</p>
         ) : (
           <ul className="assignment-list">
-            {showWorkout && renderWorkouts()}
+            {showSport &&
+              renderWorkoutRow({
+                id: 'sport',
+                title: 'Sport training',
+                subtitle: `${sport.label} drills`,
+                steps: sport.steps,
+              })}
+            {showGeneral &&
+              renderWorkoutRow({
+                id: 'general',
+                title: 'Workout',
+                subtitle: general.label,
+                steps: general.steps,
+              })}
             {items.map((t) => (t.repeat ? renderRepeating(t) : renderOneOff(t)))}
           </ul>
         )}

@@ -39,10 +39,18 @@ export const SURVEY_QUESTIONS = [
     showIf: (a) => a.gym === 'No',
   },
   {
+    id: 'sportTime',
+    type: 'single',
+    question: 'When do you do sport training?',
+    hint: 'Your sport drills will sit in this part of your day.',
+    options: ['Morning', 'Afternoon', 'Night', 'Anytime', "I don't"],
+    showIf: (a) => (a.sports || []).length > 0,
+  },
+  {
     id: 'workoutTime',
     type: 'single',
-    question: 'When do you usually work out?',
-    hint: 'Your workout will sit in this part of your day.',
-    options: ['Morning', 'Afternoon', 'Night', 'Anytime'],
+    question: 'When do you do a general workout?',
+    hint: 'Your strength workout will sit in this part of your day.',
+    options: ['Morning', 'Afternoon', 'Night', 'Anytime', "I don't"],
   },
 ]
