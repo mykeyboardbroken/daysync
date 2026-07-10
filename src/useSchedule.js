@@ -258,6 +258,7 @@ function normalize(parsed) {
         category: 'health',
         repeat: true,
         days: [],
+        pinFirst: true, // best thing to do first after waking up
         log: {},
         due: '',
         done: false,
@@ -282,6 +283,10 @@ function normalize(parsed) {
   // all-week days so an empty picker unambiguously means a one-off.
   data.tasks = data.tasks.map((t) =>
     t.repeat && (!t.days || t.days.length === 0) ? { ...t, days: [0, 1, 2, 3, 4, 5, 6] } : t,
+  )
+  // Stretch/Move sits first in its bucket (best right after waking up).
+  data.tasks = data.tasks.map((t) =>
+    t.title === 'Stretch / Move' && t.pinFirst === undefined ? { ...t, pinFirst: true } : t,
   )
   return data
 }

@@ -87,6 +87,7 @@ export default function DayPlan({ schedule }) {
       .filter((t) => (t.bucket || '') === key)
       .filter((t) => (t.repeat ? habitDueOn(t, now) : true))
       .sort((a, b) => {
+        if (!!a.pinFirst !== !!b.pinFirst) return a.pinFirst ? -1 : 1
         if (!!a.repeat !== !!b.repeat) return a.repeat ? -1 : 1
         if (!a.repeat) {
           if (a.done !== b.done) return a.done ? 1 : -1
