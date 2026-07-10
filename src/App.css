@@ -1096,6 +1096,8 @@ p.weather-strip { font-size: 13px; }
 /* Whole card is tap-to-edit (checkbox + ✕ opt out via stopPropagation). */
 .assignment.tappable { cursor: pointer; }
 .assignment.tappable:hover { border-color: var(--accent); }
+.habit-row.tappable { cursor: pointer; }
+.habit-row.tappable:hover { border-color: var(--accent); }
 .assignment-title { font-size: 15px; font-weight: 600; }
 .assignment.done .assignment-title {
   text-decoration: line-through;
