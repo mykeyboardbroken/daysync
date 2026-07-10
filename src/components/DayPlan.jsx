@@ -3,8 +3,12 @@ import { dueLabel, toKey } from '../dateUtils'
 import { DAY_PARTS } from '../dayParts'
 import { habitDueOn, habitDoneOn, habitStreak } from '../habits'
 import { categoryMeta } from '../taskCategories'
+import { generateWorkout } from '../workouts'
 import Icon from './Icon'
 import TaskModal from './TaskModal'
+
+// Which bucket the user's chosen workout time maps to ('' = Anytime).
+const WORKOUT_BUCKET = { Morning: 'morning', Afternoon: 'afternoon', Night: 'night', Anytime: '' }
 
 // The day organised by time of day: Morning / Afternoon / Night (+ an Anytime
 // catch-all). Tasks drop into their bucket. A task is either one-off (check it
@@ -21,6 +25,55 @@ export default function DayPlan({ schedule }) {
 
   // Fall back to "Routine for <category>" when there's no description.
   const descOf = (t) => t.description || `Routine for ${categoryMeta(t.category)?.label || 'this'}`
+
+  // Generated workout (free, offline). Shows in the bucket the user picked.
+  const profile = schedule.profile || {}
+  const workoutBucket = profile.workoutTime ? WORKOUT_BUCKET[profile.workoutTime] ?? '' : null
+  const workoutSteps =
+    workoutBucket !== null ? generateWorkout(profile, now, schedule.workoutSeed || 0) : null
+  const workoutDone = !!schedule.workoutLog?.[todayKey]
+  const workoutSub = profile.sports?.length
+    ? `Tailored to ${profile.sports.join(', ')}`
+    : 'General fitness session'
+
+  const renderWorkout = () => {
+    const expanded = expandedId === '__workout__'
+    return (
+      <li
+        key="__workout__"
+        className={`habit-row tappable ${expanded ? 'expanded' : ''}`}
+        onClick={() => toggleExpand('__workout__')}
+      >
+        <label className="assignment-check" onClick={(e) => e.stopPropagation()}>
+          <input type="checkbox" checked={workoutDone} onChange={() => schedule.toggleWorkout(todayKey)} />
+          <span className="checkmark" />
+        </label>
+        <span className="task-cat" title="Health & Fitness"><Icon name="activity" size={15} /></span>
+        <div className="habit-body">
+          <span className="habit-title">Workout</span>
+          <span className="task-desc">{workoutSub}</span>
+          {expanded && (
+            <>
+              <ol className="task-steps">
+                {workoutSteps.map((s, i) => <li key={i}>{s}</li>)}
+              </ol>
+              <button
+                type="button"
+                className="task-edit-btn"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  schedule.reshuffleWorkout()
+                }}
+              >
+                New workout
+              </button>
+            </>
+          )}
+        </div>
+        <Icon name="chevronRight" size={16} className={`task-chevron ${expanded ? 'open' : ''}`} />
+      </li>
+    )
+  }
 
   // Everything in a bucket, repeating routines first, then one-off to-dos
   // (undone before done, earliest due first). Repeating tasks only appear on the
@@ -125,14 +178,16 @@ export default function DayPlan({ schedule }) {
 
   const bucketSection = (key, icon, label, alwaysShow) => {
     const items = tasksIn(key)
-    if (!alwaysShow && items.length === 0) return null
+    const showWorkout = workoutSteps && workoutBucket === key
+    if (!alwaysShow && items.length === 0 && !showWorkout) return null
     return (
       <div className="plan-section" key={key || 'anytime'}>
         <div className="plan-section-head"><Icon name={icon} size={15} /> {label}</div>
-        {items.length === 0 ? (
+        {items.length === 0 && !showWorkout ? (
           <p className="plan-empty">Nothing planned</p>
         ) : (
           <ul className="assignment-list">
+            {showWorkout && renderWorkout()}
             {items.map((t) => (t.repeat ? renderRepeating(t) : renderOneOff(t)))}
           </ul>
         )}

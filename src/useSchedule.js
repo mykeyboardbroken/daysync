@@ -28,8 +28,11 @@ function emptyData() {
     seededPackTask: false, // whether the default nightly "pack your bag" task was seeded once
     packLifestyle: false, // one-time move of the pack task into the Lifestyle category
     seededChores: false, // whether the extra default tasks (grooming, chores) were seeded once
+    seededRoutinePlus: false, // stretch + hydration defaults seeded once
     onboarded: false, // whether the first-open survey has been completed
     profile: {}, // answers from the onboarding survey, keyed by question id
+    workoutLog: {}, // per-day done state for the generated workout ({ dateKey: true })
+    workoutSeed: 0, // bumped to reshuffle today's generated workout
     theme: 'custom', // appearance is now always a custom accent on a dark/bright base
     // Used when theme === 'custom': primary = the accent colour (the darker
     // hover/pressed shade is derived from it), base = 'dark' | 'bright' (which
@@ -241,6 +244,40 @@ function normalize(parsed) {
     if (!next.steps || next.steps.length === 0) next.steps = d.steps
     return next
   })
+  // A morning stretch + an afternoon hydration nudge (deletable, seeded once).
+  if (!data.seededRoutinePlus) {
+    data.tasks = [
+      ...data.tasks,
+      {
+        id: makeId(),
+        title: 'Stretch / Move',
+        description:
+          'Five minutes of light movement or stretching to get the blood flowing and shake off morning stiffness.',
+        steps: [],
+        bucket: 'morning',
+        category: 'health',
+        repeat: true,
+        days: [],
+        log: {},
+        due: '',
+        done: false,
+      },
+      {
+        id: makeId(),
+        title: 'Hydration check',
+        description: 'A reminder to drink water or refill your bottle to keep your energy from dipping.',
+        steps: [],
+        bucket: 'afternoon',
+        category: 'health',
+        repeat: true,
+        days: [],
+        log: {},
+        due: '',
+        done: false,
+      },
+    ]
+    data.seededRoutinePlus = true
+  }
   return data
 }
 
@@ -604,6 +641,24 @@ export function useSchedule() {
     setData((prev) => ({ ...prev, profile: { ...prev.profile, ...answers }, onboarded: true }))
   }, [])
 
+  const restartSurvey = useCallback(() => {
+    setData((prev) => ({ ...prev, onboarded: false }))
+  }, [])
+
+  // ---- Generated workout ----
+  const toggleWorkout = useCallback((dateKey) => {
+    setData((prev) => {
+      const log = { ...prev.workoutLog }
+      if (log[dateKey]) delete log[dateKey]
+      else log[dateKey] = true
+      return { ...prev, workoutLog: log }
+    })
+  }, [])
+
+  const reshuffleWorkout = useCallback(() => {
+    setData((prev) => ({ ...prev, workoutSeed: (prev.workoutSeed || 0) + 1 }))
+  }, [])
+
   // ---- Backup: export everything as JSON / restore from a backup file ----
   const exportData = useCallback(() => JSON.stringify(data, null, 2), [data])
 
@@ -672,6 +727,11 @@ export function useSchedule() {
     onboarded: data.onboarded,
     profile: data.profile,
     finishSurvey,
+    restartSurvey,
+    workoutLog: data.workoutLog,
+    workoutSeed: data.workoutSeed,
+    toggleWorkout,
+    reshuffleWorkout,
     exportData,
     importData,
     addTask,

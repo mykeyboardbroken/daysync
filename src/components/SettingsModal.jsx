@@ -45,6 +45,7 @@ const PALETTE = [
 const SECTIONS = [
   { key: 'appearance', label: 'Appearance', icon: 'palette' },
   { key: 'tasks', label: 'Tasks', icon: 'check' },
+  { key: 'profile', label: 'Profile', icon: 'user' },
   { key: 'backup', label: 'Backup', icon: 'file' },
 ]
 
@@ -53,6 +54,7 @@ export default function SettingsModal({
   onSetCustomColor,
   settings,
   onSetSetting,
+  onRestartSurvey,
   onExport,
   onImport,
   onClose,
@@ -185,6 +187,26 @@ export default function SettingsModal({
                   <span className="toggle-knob" />
                 </span>
               </button>
+            )}
+
+            {section === 'profile' && (
+              <div className="color-pickers">
+                <button
+                  type="button"
+                  className="settings-row"
+                  onClick={() => {
+                    onRestartSurvey()
+                    onClose()
+                  }}
+                >
+                  <Icon name="repeat" size={18} />
+                  <span className="settings-row-label">Redo intro survey</span>
+                  <Icon name="chevronRight" size={18} className="settings-chevron" />
+                </button>
+                <p className="settings-field-label">
+                  Re-answer your name, sports, gym/equipment and workout time.
+                </p>
+              </div>
             )}
 
             {section === 'backup' && (

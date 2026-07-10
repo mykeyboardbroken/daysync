@@ -90,6 +90,7 @@ export default function App() {
           onSetCustomColor={schedule.setCustomColor}
           settings={schedule.settings}
           onSetSetting={schedule.setSetting}
+          onRestartSurvey={schedule.restartSurvey}
           onExport={schedule.exportData}
           onImport={schedule.importData}
           onClose={() => setSettingsOpen(false)}

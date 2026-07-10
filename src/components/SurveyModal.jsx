@@ -6,8 +6,11 @@ export default function SurveyModal({ questions, onComplete }) {
   const [step, setStep] = useState(0)
   const [answers, setAnswers] = useState({})
 
-  const q = questions[step]
-  const isLast = step === questions.length - 1
+  // Only questions whose showIf currently passes are part of the flow.
+  const visible = questions.filter((q) => !q.showIf || q.showIf(answers))
+  const idx = Math.min(step, visible.length - 1)
+  const q = visible[idx]
+  const isLast = idx >= visible.length - 1
   const value = answers[q.id]
 
   const setAnswer = (v) => setAnswers((a) => ({ ...a, [q.id]: v }))
@@ -19,14 +22,14 @@ export default function SurveyModal({ questions, onComplete }) {
 
   function next() {
     if (isLast) onComplete(answers)
-    else setStep((s) => s + 1)
+    else setStep(idx + 1)
   }
 
   return (
     <div className="modal-overlay">
       <div className="modal survey-modal">
-        {step === 0 && <p className="survey-eyebrow">Welcome 👋</p>}
-        <p className="survey-progress">Question {step + 1} of {questions.length}</p>
+        {idx === 0 && <p className="survey-eyebrow">Welcome 👋</p>}
+        <p className="survey-progress">Question {idx + 1} of {visible.length}</p>
         <h3>{q.question}</h3>
         {q.hint && <p className="modal-sub">{q.hint}</p>}
 
@@ -72,8 +75,8 @@ export default function SurveyModal({ questions, onComplete }) {
         )}
 
         <div className="modal-actions">
-          {step > 0 ? (
-            <button type="button" className="ghost-btn" onClick={() => setStep((s) => s - 1)}>Back</button>
+          {idx > 0 ? (
+            <button type="button" className="ghost-btn" onClick={() => setStep(idx - 1)}>Back</button>
           ) : (
             <span className="spacer" />
           )}
