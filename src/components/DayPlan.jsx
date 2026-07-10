@@ -3,7 +3,7 @@ import { dueLabel, toKey } from '../dateUtils'
 import { DAY_PARTS } from '../dayParts'
 import { habitDueOn, habitDoneOn, habitStreak } from '../habits'
 import { categoryMeta } from '../taskCategories'
-import { generateWorkout } from '../workouts'
+import { generateSport, generateGeneral } from '../workouts'
 import Icon from './Icon'
 import TaskModal from './TaskModal'
 
@@ -26,36 +26,38 @@ export default function DayPlan({ schedule }) {
   // Fall back to "Routine for <category>" when there's no description.
   const descOf = (t) => t.description || `Routine for ${categoryMeta(t.category)?.label || 'this'}`
 
-  // Generated workout (free, offline). Shows in the bucket the user picked.
+  // Generated workouts (free, offline). Two sessions — sport-specific + general
+  // (general rotates push/pull/legs by day) — shown in the bucket they picked.
   const profile = schedule.profile || {}
   const workoutBucket = profile.workoutTime ? WORKOUT_BUCKET[profile.workoutTime] ?? '' : null
-  const workoutSteps =
-    workoutBucket !== null ? generateWorkout(profile, now, schedule.workoutSeed || 0) : null
-  const workoutDone = !!schedule.workoutLog?.[todayKey]
-  const workoutSub = profile.sports?.length
-    ? `Tailored to ${profile.sports.join(', ')}`
-    : 'General fitness session'
+  const seed = schedule.workoutSeed || 0
+  const sport =
+    workoutBucket !== null && profile.sports?.length ? generateSport(profile, now, seed) : null
+  const general = workoutBucket !== null ? generateGeneral(profile, now, seed) : null
+  const hasWorkouts = !!(sport || general)
 
-  const renderWorkout = () => {
-    const expanded = expandedId === '__workout__'
+  const renderWorkoutRow = ({ id, title, subtitle, steps }) => {
+    const expanded = expandedId === id
+    const doneKey = `${todayKey}|${id}`
+    const done = !!schedule.workoutLog?.[doneKey]
     return (
       <li
-        key="__workout__"
-        className={`habit-row tappable ${workoutDone ? 'done' : ''} ${expanded ? 'expanded' : ''}`}
-        onClick={() => toggleExpand('__workout__')}
+        key={id}
+        className={`habit-row tappable ${done ? 'done' : ''} ${expanded ? 'expanded' : ''}`}
+        onClick={() => toggleExpand(id)}
       >
         <label className="assignment-check" onClick={(e) => e.stopPropagation()}>
-          <input type="checkbox" checked={workoutDone} onChange={() => schedule.toggleWorkout(todayKey)} />
+          <input type="checkbox" checked={done} onChange={() => schedule.toggleWorkout(doneKey)} />
           <span className="checkmark" />
         </label>
         <span className="task-cat" title="Health & Fitness"><Icon name="activity" size={15} /></span>
         <div className="habit-body">
-          <span className="habit-title">Workout</span>
-          <span className="task-desc">{workoutSub}</span>
+          <span className="habit-title">{title}</span>
+          <span className="task-desc">{subtitle}</span>
           {expanded && (
             <>
               <ol className="task-steps">
-                {workoutSteps.map((s, i) => <li key={i}>{s}</li>)}
+                {steps.map((s, i) => <li key={i}>{s}</li>)}
               </ol>
               <button
                 type="button"
@@ -74,6 +76,25 @@ export default function DayPlan({ schedule }) {
       </li>
     )
   }
+
+  const renderWorkouts = () => (
+    <>
+      {sport &&
+        renderWorkoutRow({
+          id: 'sport',
+          title: 'Sport training',
+          subtitle: `${sport.label} drills`,
+          steps: sport.steps,
+        })}
+      {general &&
+        renderWorkoutRow({
+          id: 'general',
+          title: 'Workout',
+          subtitle: general.label,
+          steps: general.steps,
+        })}
+    </>
+  )
 
   // Everything in a bucket, repeating routines first, then one-off to-dos
   // (undone before done, earliest due first). Repeating tasks only appear on the
@@ -178,7 +199,7 @@ export default function DayPlan({ schedule }) {
 
   const bucketSection = (key, icon, label, alwaysShow) => {
     const items = tasksIn(key)
-    const showWorkout = workoutSteps && workoutBucket === key
+    const showWorkout = hasWorkouts && workoutBucket === key
     if (!alwaysShow && items.length === 0 && !showWorkout) return null
     return (
       <div className="plan-section" key={key || 'anytime'}>
@@ -187,7 +208,7 @@ export default function DayPlan({ schedule }) {
           <p className="plan-empty">Nothing planned</p>
         ) : (
           <ul className="assignment-list">
-            {showWorkout && renderWorkout()}
+            {showWorkout && renderWorkouts()}
             {items.map((t) => (t.repeat ? renderRepeating(t) : renderOneOff(t)))}
           </ul>
         )}
