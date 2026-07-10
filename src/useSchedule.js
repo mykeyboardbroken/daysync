@@ -281,13 +281,14 @@ function normalize(parsed) {
     data.seededRoutinePlus = true
   }
   // A daily reading habit in the afternoon (deletable, seeded once).
+  const READING_DESC = 'Time with a book — read as much or as little as you like; what matters is that you read.'
   if (!data.seededReading) {
     data.tasks = [
       ...data.tasks,
       {
         id: makeId(),
         title: 'Reading',
-        description: 'Twenty minutes with a book to unwind and pick up something new.',
+        description: READING_DESC,
         steps: [],
         bucket: 'afternoon',
         category: 'lifestyle',
@@ -300,6 +301,13 @@ function normalize(parsed) {
     ]
     data.seededReading = true
   }
+  // Refresh the reading default's wording (drop the fixed "twenty minutes").
+  data.tasks = data.tasks.map((t) =>
+    t.title === 'Reading' &&
+    t.description === 'Twenty minutes with a book to unwind and pick up something new.'
+      ? { ...t, description: READING_DESC }
+      : t,
+  )
   // New task model: blank weekdays = one-off. Give every-day repeats explicit
   // all-week days so an empty picker unambiguously means a one-off.
   data.tasks = data.tasks.map((t) =>
