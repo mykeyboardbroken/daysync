@@ -281,25 +281,36 @@
 }
 .cal-day.other { opacity: 0.35; }
 .cal-day.weekend { background: color-mix(in srgb, var(--accent) 14%, var(--surface-2)); } /* weekends stand out */
-.cal-day.break { background: rgba(16, 185, 129, 0.16); } /* school holidays */
+.cal-day.break { background: var(--cal-break); } /* school holidays */
+.cal-day.public { background: var(--cal-public-bg); } /* public holidays win over breaks */
 .cal-day.today { border-color: var(--accent); }
 .cal-day.selected { background: var(--accent); color: #fff; border-color: var(--accent); }
 .cal-num { font-weight: 600; line-height: 1; }
 .cal-day.weekend .cal-num { color: var(--accent); font-weight: 700; }
-.cal-day.weekend.selected .cal-num { color: #fff; }
+.cal-day.public .cal-num { color: var(--cal-public); font-weight: 700; }
+.cal-day.selected .cal-num { color: #fff; }
 .cal-weekday.weekend { color: var(--accent); }
 .cal-dots { display: flex; gap: 3px; }
 .cal-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--accent); }
 .cal-day.selected .cal-dot { background: #fff; }
 /* Public-holiday marker */
-.cal-pub { position: absolute; top: 4px; right: 4px; width: 6px; height: 6px; border-radius: 50%; background: #ef4444; }
-.cal-day.selected .cal-pub { background: #fff; }
+.cal-pub {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--cal-public);
+  box-shadow: 0 0 0 1.5px var(--surface-2);
+}
+.cal-day.selected .cal-pub { background: #fff; box-shadow: none; }
 
 /* Legend under the grid */
 .cal-legend { display: flex; gap: 16px; font-size: 12px; color: var(--text-dim); }
 .cal-legend span { display: inline-flex; align-items: center; gap: 6px; }
-.cal-legend-break { width: 12px; height: 12px; border-radius: 4px; background: rgba(16, 185, 129, 0.4); }
-.cal-legend-pub { width: 7px; height: 7px; border-radius: 50%; background: #ef4444; }
+.cal-legend-break { width: 12px; height: 12px; border-radius: 4px; background: var(--cal-break-legend); }
+.cal-legend-pub { width: 7px; height: 7px; border-radius: 50%; background: var(--cal-public); }
 
 .cal-items { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
 .cal-item {

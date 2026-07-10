@@ -9,6 +9,11 @@
   --accent-hover: #4f46e5;
   --danger: #ef4444;
   --warn: #f59e0b;
+  /* Calendar holiday markers (dark base) */
+  --cal-break: rgba(52, 211, 153, 0.15);
+  --cal-break-legend: rgba(52, 211, 153, 0.55);
+  --cal-public: #f87171;
+  --cal-public-bg: rgba(248, 113, 113, 0.24);
 
   font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   color: var(--text);
@@ -33,6 +38,11 @@
   --text-dim: #64748b;
   --accent: #6366f1;
   --accent-hover: #4f46e5;
+  /* Calendar holiday markers (bright base) — deeper so they read on white */
+  --cal-break: rgba(5, 150, 105, 0.15);
+  --cal-break-legend: rgba(5, 150, 105, 0.6);
+  --cal-public: #dc2626;
+  --cal-public-bg: rgba(220, 38, 38, 0.13);
 }
 
 * {

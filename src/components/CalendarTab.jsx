@@ -91,6 +91,7 @@ export default function CalendarTab({ schedule }) {
             inMonth ? '' : 'other',
             weekend ? 'weekend' : '',
             brk ? 'break' : '',
+            pub ? 'public' : '',
             key === todayKey ? 'today' : '',
             key === selectedKey ? 'selected' : '',
           ].join(' ')
