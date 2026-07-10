@@ -31,6 +31,7 @@ function emptyData() {
     seededRoutinePlus: false, // stretch + hydration defaults seeded once
     seededReading: false, // reading default seeded once
     seededJournaling: false, // journaling default seeded once
+    seededCheckPlans: false, // "check tomorrow's plans" default seeded once
     onboarded: false, // whether the first-open survey has been completed
     profile: {}, // answers from the onboarding survey, keyed by question id
     workoutLog: {}, // per-day done state for the generated workout ({ dateKey: true })
@@ -119,7 +120,6 @@ function normalize(parsed) {
     'Pack your bag',
     'Charge your devices',
     'Set your alarm',
-    "Check tomorrow's plans",
   ]
   const OLD_READY_TITLES = ["Pack tomorrow's bag", 'Pack your bag']
   const OLD_READY_DESCS = new Set([
@@ -148,6 +148,14 @@ function normalize(parsed) {
     }
     return next
   })
+  // "Check tomorrow's plans" is now its own task — drop it from Get-ready's steps
+  // (only when the steps are still the default set, so edits are preserved).
+  const OLD_READY_STEPS = [...READY_STEPS, "Check tomorrow's plans"]
+  data.tasks = data.tasks.map((t) =>
+    t.title === READY_TITLE && JSON.stringify(t.steps) === JSON.stringify(OLD_READY_STEPS)
+      ? { ...t, steps: READY_STEPS }
+      : t,
+  )
   // Seed it once. Only added a single time — delete it and it stays gone.
   if (!data.seededPackTask) {
     data.tasks = [
@@ -328,6 +336,26 @@ function normalize(parsed) {
       },
     ]
     data.seededJournaling = true
+  }
+  // A nightly "check tomorrow's plans" task (deletable, seeded once).
+  if (!data.seededCheckPlans) {
+    data.tasks = [
+      ...data.tasks,
+      {
+        id: makeId(),
+        title: "Check tomorrow's plans",
+        description: "A quick look at what's on tomorrow so nothing catches you off guard.",
+        steps: [],
+        bucket: 'night',
+        category: 'lifestyle',
+        repeat: true,
+        days: [],
+        log: {},
+        due: '',
+        done: false,
+      },
+    ]
+    data.seededCheckPlans = true
   }
   // New task model: blank weekdays = one-off. Give every-day repeats explicit
   // all-week days so an empty picker unambiguously means a one-off.
