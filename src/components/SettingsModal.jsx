@@ -63,11 +63,16 @@ export default function SettingsModal({
 
   // The hue slider tracks its own position so dragging is smooth (deriving it
   // from the colour each render makes the thumb snap, since 0° and 360° are the
-  // same red). Sync only on a big jump, e.g. when a preset swatch is tapped.
+  // same red). The effect only re-syncs on EXTERNAL colour changes (e.g. a preset
+  // swatch); slider-driven changes are ignored so they never interrupt a drag.
   const [hue, setHue] = useState(() => hexToHue(customColors?.primary))
+  const hueFromSlider = useRef(false)
   useEffect(() => {
-    const h = hexToHue(customColors?.primary)
-    setHue((prev) => (Math.abs(prev - h) > 3 ? h : prev))
+    if (hueFromSlider.current) {
+      hueFromSlider.current = false
+      return
+    }
+    setHue(hexToHue(customColors?.primary))
   }, [customColors?.primary])
 
   const current = SECTIONS.find((s) => s.key === section)
@@ -150,12 +155,13 @@ export default function SettingsModal({
                   <input
                     type="range"
                     min="0"
-                    max="359"
+                    max="360"
                     step="1"
                     className="hue-slider"
                     value={hue}
                     onChange={(e) => {
                       const h = Number(e.target.value)
+                      hueFromSlider.current = true
                       setHue(h)
                       onSetCustomColor('primary', hslToHex(h, 72, 58))
                     }}
