@@ -1021,7 +1021,17 @@ p.weather-strip { font-size: 13px; }
   padding: 12px 14px;
   transition: opacity 0.15s;
 }
-.assignment.done { opacity: 0.6; }
+/* Checked-off tasks go visibly darker (not just faded). */
+.assignment.done,
+.habit-row.done {
+  background: color-mix(in srgb, var(--surface-2) 72%, #000);
+  border-color: color-mix(in srgb, var(--border) 65%, #000);
+}
+.habit-row.done .habit-title {
+  text-decoration: line-through;
+  color: var(--text-dim);
+}
+.habit-row.done .task-desc { text-decoration: line-through; }
 
 .assignment-check {
   position: relative;

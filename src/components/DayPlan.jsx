@@ -41,7 +41,7 @@ export default function DayPlan({ schedule }) {
     return (
       <li
         key="__workout__"
-        className={`habit-row tappable ${expanded ? 'expanded' : ''}`}
+        className={`habit-row tappable ${workoutDone ? 'done' : ''} ${expanded ? 'expanded' : ''}`}
         onClick={() => toggleExpand('__workout__')}
       >
         <label className="assignment-check" onClick={(e) => e.stopPropagation()}>
@@ -151,7 +151,7 @@ export default function DayPlan({ schedule }) {
     return (
       <li
         key={t.id}
-        className={`habit-row tappable ${expanded ? 'expanded' : ''}`}
+        className={`habit-row tappable ${doneToday ? 'done' : ''} ${expanded ? 'expanded' : ''}`}
         onClick={() => toggleExpand(t.id)}
       >
         <label className="assignment-check" onClick={(e) => e.stopPropagation()}>
