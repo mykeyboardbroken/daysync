@@ -167,7 +167,8 @@ function normalize(parsed) {
       {
         id: makeId(),
         title: 'Morning grooming',
-        description: 'A gentle wash and moisturiser, brushing teeth, and a quick hair check.',
+        description: '',
+        steps: ['Gentle wash and moisturiser', 'Brush teeth', 'Hair check'],
         bucket: 'morning',
         category: 'health',
         repeat: true,
@@ -179,7 +180,8 @@ function normalize(parsed) {
       {
         id: makeId(),
         title: 'Clean your room',
-        description: 'Tidying the floor, desk, and surfaces.',
+        description: '',
+        steps: ['Tidy the floor', 'Clear the desk', 'Wipe down surfaces'],
         bucket: 'afternoon',
         category: 'lifestyle',
         repeat: true,
@@ -191,7 +193,8 @@ function normalize(parsed) {
       {
         id: makeId(),
         title: 'Organise your wardrobe',
-        description: 'Sorting clothes, folding clean items, and clearing anything left out.',
+        description: '',
+        steps: ['Sort your clothes', 'Fold the clean ones', 'Clear anything left out'],
         bucket: 'afternoon',
         category: 'lifestyle',
         repeat: true,
@@ -203,25 +206,37 @@ function normalize(parsed) {
     ]
     data.seededChores = true
   }
-  // Refresh the chore defaults' wording on existing copies (informative style),
+  // Move the chore defaults' prose descriptions into steps on existing copies,
   // without touching a description you've edited yourself.
-  const CHORE_DESCS = {
+  const CHORE_DEFAULTS = {
     'Morning grooming': {
-      desc: 'A gentle wash and moisturiser, brushing teeth, and a quick hair check.',
-      old: new Set(['Gentle wash and moisturise, brush your teeth, and check your hair.']),
+      steps: ['Gentle wash and moisturiser', 'Brush teeth', 'Hair check'],
+      old: new Set([
+        'Gentle wash and moisturise, brush your teeth, and check your hair.',
+        'A gentle wash and moisturiser, brushing teeth, and a quick hair check.',
+      ]),
     },
     'Clean your room': {
-      desc: 'Tidying the floor, desk, and surfaces.',
-      old: new Set(['Give your room a proper tidy — floor, desk and surfaces.']),
+      steps: ['Tidy the floor', 'Clear the desk', 'Wipe down surfaces'],
+      old: new Set([
+        'Give your room a proper tidy — floor, desk and surfaces.',
+        'Tidying the floor, desk, and surfaces.',
+      ]),
     },
     'Organise your wardrobe': {
-      desc: 'Sorting clothes, folding clean items, and clearing anything left out.',
-      old: new Set(['Sort your clothes, fold the clean ones and clear the pile on the chair.']),
+      steps: ['Sort your clothes', 'Fold the clean ones', 'Clear anything left out'],
+      old: new Set([
+        'Sort your clothes, fold the clean ones and clear the pile on the chair.',
+        'Sorting clothes, folding clean items, and clearing anything left out.',
+      ]),
     },
   }
   data.tasks = data.tasks.map((t) => {
-    const r = CHORE_DESCS[t.title]
-    return r && r.old.has(t.description) ? { ...t, description: r.desc } : t
+    const d = CHORE_DEFAULTS[t.title]
+    if (!d || !d.old.has(t.description)) return t
+    const next = { ...t, description: '' }
+    if (!next.steps || next.steps.length === 0) next.steps = d.steps
+    return next
   })
   return data
 }

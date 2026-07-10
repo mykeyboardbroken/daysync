@@ -127,8 +127,8 @@ export default function DayPlan({ schedule }) {
     <>
       <section className="day-plan">
         <div className="card-header"><div><h2>Today's plan</h2></div></div>
-        {DAY_PARTS.map((p) => bucketSection(p.key, p.icon, p.label, true))}
         {bucketSection('', 'clock', 'Anytime', false)}
+        {DAY_PARTS.map((p) => bucketSection(p.key, p.icon, p.label, true))}
       </section>
 
       {editingTask && (
