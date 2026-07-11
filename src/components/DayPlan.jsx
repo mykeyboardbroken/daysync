@@ -40,6 +40,9 @@ export default function DayPlan({ schedule }) {
   const seed = schedule.workoutSeed || 0
   const sport = sportBucket !== null ? generateSport(profile, now, seed) : null
   const general = generalBucket !== null ? generateGeneral(profile, now, seed) : null
+  // A morning workout already starts with a warm-up/stretch, so fold the standalone
+  // "Stretch / Move" into it — clearer than showing both.
+  const morningWorkout = sportBucket === 'morning' || generalBucket === 'morning'
 
   const renderWorkoutRow = ({ id, title, subtitle, steps }) => {
     const expanded = expandedId === id
@@ -90,6 +93,7 @@ export default function DayPlan({ schedule }) {
     tasks
       .filter((t) => (t.bucket || '') === key)
       .filter((t) => (t.repeat ? habitDueOn(t, now) : true))
+      .filter((t) => !(morningWorkout && t.title === 'Stretch / Move'))
       .sort((a, b) => {
         if (!!a.pinFirst !== !!b.pinFirst) return a.pinFirst ? -1 : 1
         if (!!a.repeat !== !!b.repeat) return a.repeat ? -1 : 1
