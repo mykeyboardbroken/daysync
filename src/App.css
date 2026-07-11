@@ -614,6 +614,46 @@
 }
 .error-card .primary-btn { margin-top: 6px; }
 
+/* ---------- Level / XP card ---------- */
+.level-card { padding: 14px 16px; }
+.level-top { display: flex; align-items: center; gap: 12px; }
+.level-badge {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: color-mix(in srgb, var(--accent) 18%, var(--surface-2));
+  color: var(--accent);
+}
+.level-info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
+.level-name { font-size: 15px; font-weight: 800; letter-spacing: -0.01em; }
+.level-xp { font-size: 12px; color: var(--text-dim); font-weight: 600; }
+.level-streak {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 14px;
+  font-weight: 800;
+  color: #f59e0b;
+}
+.level-bar {
+  margin-top: 10px;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--surface-2);
+  overflow: hidden;
+}
+.level-bar-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: var(--accent);
+  transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
 /* ---------- Greeting banner ---------- */
 .greeting-main { font-size: 24px; font-weight: 800; margin: 0; letter-spacing: -0.01em; line-height: 1.25; }
 

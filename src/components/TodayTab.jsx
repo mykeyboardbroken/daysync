@@ -7,6 +7,7 @@ import Icon from './Icon'
 import DayPlan from './DayPlan'
 import WeatherStrip from './WeatherStrip'
 import NotesList from './NotesList'
+import LevelBar from './LevelBar'
 
 // The day-focused view: today's date (+ cycle day), your plan for the day,
 // notes, and the weather. Classes, packing & what's-due live on the School tab.
@@ -54,6 +55,8 @@ export default function TodayTab({ schedule }) {
         status={weatherStatus}
         note={showTomorrowWeather ? 'Tomorrow' : null}
       />
+
+      <LevelBar xp={schedule.xp} loginStreak={schedule.loginStreak} />
 
       {warnings.length > 0 && (
         <section className="card warn-card">

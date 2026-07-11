@@ -1,6 +1,9 @@
 import { useState, useEffect, useCallback } from 'react'
 import { CYCLE_DAYS, isSharedPeriod } from './schoolCalendar'
-import { toKey } from './dateUtils'
+import { toKey, keyToDate, addDays } from './dateUtils'
+
+// XP awarded for completing each kind of thing.
+const XP = { task: 10, assignment: 15, event: 20, workout: 25 }
 
 const STORAGE_KEY = 'schedule-app.data'
 
@@ -39,6 +42,9 @@ function emptyData() {
     profile: {}, // answers from the onboarding survey, keyed by question id
     workoutLog: {}, // per-day done state for the generated workout ({ dateKey: true })
     workoutSeed: 0, // bumped to reshuffle today's generated workout
+    xp: 0, // total XP earned by completing things
+    loginStreak: 0, // consecutive days the app was opened
+    lastActive: '', // dateKey of the last day the app was opened
     theme: 'custom', // appearance is now always a custom accent on a dark/bright base
     // Used when theme === 'custom': primary = the accent colour (the darker
     // hover/pressed shade is derived from it), base = 'dark' | 'bright' (which
@@ -450,6 +456,18 @@ export function useSchedule() {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(data))
   }, [data])
 
+  // Login streak: bump once per day. Same day = no change; yesterday = +1;
+  // a gap resets to 1. Runs once on mount.
+  useEffect(() => {
+    setData((prev) => {
+      const today = toKey(new Date())
+      if (prev.lastActive === today) return prev
+      const yesterday = toKey(addDays(keyToDate(today), -1))
+      const streak = prev.lastActive === yesterday ? (prev.loginStreak || 0) + 1 : 1
+      return { ...prev, lastActive: today, loginStreak: streak }
+    })
+  }, [])
+
   // ---- Assignments (schoolwork with a due date) ----
   const addAssignment = useCallback(({ title, subject, due, kind = 'assignment' }) => {
     setData((prev) => ({
@@ -459,10 +477,15 @@ export function useSchedule() {
   }, [])
 
   const toggleAssignment = useCallback((id) => {
-    setData((prev) => ({
-      ...prev,
-      assignments: prev.assignments.map((a) => (a.id === id ? { ...a, done: !a.done } : a)),
-    }))
+    setData((prev) => {
+      let delta = 0
+      const assignments = prev.assignments.map((a) => {
+        if (a.id !== id) return a
+        delta = a.done ? -XP.assignment : XP.assignment
+        return { ...a, done: !a.done }
+      })
+      return { ...prev, assignments, xp: Math.max(0, (prev.xp || 0) + delta) }
+    })
   }, [])
 
   const deleteAssignment = useCallback((id) => {
@@ -494,10 +517,15 @@ export function useSchedule() {
   // Check a test/date off (or back on). Unlike delete, this keeps it around so
   // it moves into the "Done" section instead of vanishing.
   const toggleEvent = useCallback((id) => {
-    setData((prev) => ({
-      ...prev,
-      events: prev.events.map((e) => (e.id === id ? { ...e, done: !e.done } : e)),
-    }))
+    setData((prev) => {
+      let delta = 0
+      const events = prev.events.map((e) => {
+        if (e.id !== id) return e
+        delta = e.done ? -XP.event : XP.event
+        return { ...e, done: !e.done }
+      })
+      return { ...prev, events, xp: Math.max(0, (prev.xp || 0) + delta) }
+    })
   }, [])
 
   // Edit an existing test/date's fields (title / date / subject / testType).
@@ -728,19 +756,26 @@ export function useSchedule() {
   // Check a task off. One-offs flip `done`; repeating ones toggle `dateKey` in
   // their log (per-day completion, for streaks).
   const toggleTask = useCallback((id, dateKey) => {
-    setData((prev) => ({
-      ...prev,
-      tasks: prev.tasks.map((t) => {
+    setData((prev) => {
+      let delta = 0
+      const tasks = prev.tasks.map((t) => {
         if (t.id !== id) return t
         if (t.repeat) {
           const log = { ...t.log }
-          if (log[dateKey]) delete log[dateKey]
-          else log[dateKey] = true
+          if (log[dateKey]) {
+            delete log[dateKey]
+            delta = -XP.task
+          } else {
+            log[dateKey] = true
+            delta = XP.task
+          }
           return { ...t, log }
         }
+        delta = t.done ? -XP.task : XP.task
         return { ...t, done: !t.done }
-      }),
-    }))
+      })
+      return { ...prev, tasks, xp: Math.max(0, (prev.xp || 0) + delta) }
+    })
   }, [])
 
   const updateTask = useCallback((id, fields) => {
@@ -823,9 +858,15 @@ export function useSchedule() {
   const toggleWorkout = useCallback((dateKey) => {
     setData((prev) => {
       const log = { ...prev.workoutLog }
-      if (log[dateKey]) delete log[dateKey]
-      else log[dateKey] = true
-      return { ...prev, workoutLog: log }
+      let delta = 0
+      if (log[dateKey]) {
+        delete log[dateKey]
+        delta = -XP.workout
+      } else {
+        log[dateKey] = true
+        delta = XP.workout
+      }
+      return { ...prev, workoutLog: log, xp: Math.max(0, (prev.xp || 0) + delta) }
     })
   }, [])
 
@@ -908,6 +949,8 @@ export function useSchedule() {
     workoutSeed: data.workoutSeed,
     toggleWorkout,
     reshuffleWorkout,
+    xp: data.xp,
+    loginStreak: data.loginStreak,
     exportData,
     importData,
     addTask,
