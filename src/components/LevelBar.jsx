@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { levelInfo, LEVEL_TIERS } from '../gamify'
+import { levelInfo, LEVEL_TIERS, xpForLevel } from '../gamify'
 import Icon from './Icon'
 
 // Compact top-right chip; tap to open a details modal (progress, streak, tiers).
@@ -62,7 +62,7 @@ export default function LevelBar({ xp, loginStreak }) {
                   <div key={t.name} className={`tier-row ${unlocked ? 'unlocked' : ''} ${current ? 'current' : ''}`}>
                     <span className="tier-icon"><Icon name={t.icon} size={16} /></span>
                     <span className="tier-name">{t.name}</span>
-                    <span className="tier-lv">Lv {lvl}</span>
+                    <span className="tier-lv">{lvl === 1 ? 'Start' : `${xpForLevel(lvl)} XP`}</span>
                   </div>
                 )
               })}

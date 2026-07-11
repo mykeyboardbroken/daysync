@@ -20,6 +20,11 @@ export const LEVEL_TIERS = [
 // XP required to REACH level L (0 for level 1). Triangular → each step costs more.
 const threshold = (L) => 25 * L * (L - 1)
 
+// Public: total XP needed to reach a given level.
+export function xpForLevel(L) {
+  return threshold(L)
+}
+
 export function levelInfo(xp) {
   const x = Math.max(0, xp || 0)
   let L = 1

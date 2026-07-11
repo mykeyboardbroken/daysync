@@ -49,6 +49,16 @@
   box-sizing: border-box;
 }
 
+/* Slim, themed scrollbars instead of the chunky default. */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
+::-webkit-scrollbar { width: 7px; height: 7px; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 999px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text-dim); }
+::-webkit-scrollbar-track { background: transparent; }
+
 body {
   margin: 0;
   min-height: 100vh;

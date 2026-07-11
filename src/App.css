@@ -822,13 +822,13 @@
   gap: 4px;
   flex-wrap: wrap;
 }
-.tier-ladder { display: flex; flex-direction: column; gap: 4px; }
+.tier-ladder { display: flex; flex-direction: column; gap: 6px; }
 .tier-row {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 7px 10px;
-  border-radius: 8px;
+  gap: 12px;
+  padding: 12px 12px;
+  border-radius: 10px;
   opacity: 0.4;
 }
 .tier-row.unlocked { opacity: 1; }
