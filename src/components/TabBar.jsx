@@ -2,6 +2,7 @@ const TABS = [
   { key: 'today', label: 'Today' },
   { key: 'school', label: 'Academics' },
   { key: 'calendar', label: 'Calendar' },
+  { key: 'settings', label: 'Settings' },
 ]
 
 export default function TabBar({ active, onChange }) {

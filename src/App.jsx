@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useSchedule } from './useSchedule'
 import TabBar from './components/TabBar'
-import Icon from './components/Icon'
 import SettingsModal from './components/SettingsModal'
 import SurveyModal from './components/SurveyModal'
 import { SURVEY_QUESTIONS } from './survey'
@@ -36,7 +35,6 @@ export default function App() {
   const [tab, setTab] = useState('today')
   // null = closed; otherwise the add flow: 'menu' | 'assignment' | 'date' | …
   const [adding, setAdding] = useState(null)
-  const [settingsOpen, setSettingsOpen] = useState(false)
 
   // Apply the chosen colour theme to the whole document. A "custom" theme layers
   // the user's own primary/secondary on top via inline CSS variables.
@@ -62,29 +60,13 @@ export default function App() {
   return (
     <div className="app">
       <header className="app-header">
-        <h1>{{ today: 'Today', school: 'Academics', calendar: 'Calendar' }[tab]}</h1>
-        <button className="settings-btn" onClick={() => setSettingsOpen(true)} aria-label="Settings">
-          <Icon name="settings" size={20} />
-        </button>
+        <h1>{{ today: 'Today', school: 'Academics', calendar: 'Calendar', settings: 'Settings' }[tab]}</h1>
       </header>
 
       {tab === 'today' && <TodayTab schedule={schedule} />}
       {tab === 'school' && <SchoolTab schedule={schedule} />}
       {tab === 'calendar' && <CalendarTab schedule={schedule} />}
-
-      <button className="fab" onClick={() => setAdding('menu')} aria-label="Add">
-        <svg className="fab-plus" viewBox="0 0 24 24" width="26" height="26" aria-hidden="true">
-          <path d="M12 5v14M5 12h14" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" />
-        </svg>
-      </button>
-
-      <TabBar active={tab} onChange={setTab} />
-
-      {!schedule.onboarded && SURVEY_QUESTIONS.length > 0 && (
-        <SurveyModal questions={SURVEY_QUESTIONS} onComplete={schedule.finishSurvey} />
-      )}
-
-      {settingsOpen && (
+      {tab === 'settings' && (
         <SettingsModal
           customColors={schedule.customColors}
           onSetCustomColor={schedule.setCustomColor}
@@ -94,9 +76,23 @@ export default function App() {
           onSetProfile={schedule.setProfile}
           onExport={schedule.exportData}
           onImport={schedule.importData}
-          onClose={() => setSettingsOpen(false)}
         />
       )}
+
+      {tab !== 'settings' && (
+        <button className="fab" onClick={() => setAdding('menu')} aria-label="Add">
+          <svg className="fab-plus" viewBox="0 0 24 24" width="26" height="26" aria-hidden="true">
+            <path d="M12 5v14M5 12h14" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" />
+          </svg>
+        </button>
+      )}
+
+      <TabBar active={tab} onChange={setTab} />
+
+      {!schedule.onboarded && SURVEY_QUESTIONS.length > 0 && (
+        <SurveyModal questions={SURVEY_QUESTIONS} onComplete={schedule.finishSurvey} />
+      )}
+
 
       {adding === 'menu' && (
         <AddMenu

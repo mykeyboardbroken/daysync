@@ -71,7 +71,6 @@ export default function SettingsModal({
   onSetProfile,
   onExport,
   onImport,
-  onClose,
 }) {
   const toggleProfileArr = (key, opt) => {
     const cur = profile[key] || []
@@ -125,16 +124,15 @@ export default function SettingsModal({
   }
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
-      <div className="modal" onClick={(e) => e.stopPropagation()}>
-        {current ? (
-          <>
-            <div className="settings-head">
-              <button className="settings-back" onClick={() => setSection(null)} aria-label="Back">
-                <Icon name="chevronLeft" size={20} />
-              </button>
-              <h3>{current.label}</h3>
-            </div>
+    <div className="tab-content settings-tab">
+      {current ? (
+        <>
+          <div className="settings-head">
+            <button className="settings-back" onClick={() => setSection(null)} aria-label="Back">
+              <Icon name="chevronLeft" size={20} />
+            </button>
+            <h3>{current.label}</h3>
+          </div>
 
             {section === 'appearance' && (
               <div className="color-pickers">
@@ -352,25 +350,16 @@ export default function SettingsModal({
             )}
           </>
         ) : (
-          <>
-            <h3>Settings</h3>
-            <div className="settings-menu">
-              {SECTIONS.map((s) => (
-                <button key={s.key} className="settings-row" onClick={() => setSection(s.key)}>
-                  <Icon name={s.icon} size={18} />
-                  <span className="settings-row-label">{s.label}</span>
-                  <Icon name="chevronRight" size={18} className="settings-chevron" />
-                </button>
-              ))}
-            </div>
-          </>
+          <div className="settings-menu">
+            {SECTIONS.map((s) => (
+              <button key={s.key} className="settings-row" onClick={() => setSection(s.key)}>
+                <Icon name={s.icon} size={18} />
+                <span className="settings-row-label">{s.label}</span>
+                <Icon name="chevronRight" size={18} className="settings-chevron" />
+              </button>
+            ))}
+          </div>
         )}
-
-        <div className="modal-actions">
-          <span className="spacer" />
-          <button type="button" className="primary-btn" onClick={onClose}>Done</button>
-        </div>
-      </div>
     </div>
   )
 }
