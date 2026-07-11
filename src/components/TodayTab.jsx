@@ -33,7 +33,10 @@ export default function TodayTab({ schedule }) {
 
   return (
     <div className="tab-content">
-      <h1 className="greeting-main">{banner}</h1>
+      <div className="today-top-row">
+        <h1 className="greeting-main">{banner}</h1>
+        <LevelBar xp={schedule.xp} loginStreak={schedule.loginStreak} />
+      </div>
 
       <header className="today-header">
         <div className="th-left">
@@ -55,8 +58,6 @@ export default function TodayTab({ schedule }) {
         status={weatherStatus}
         note={showTomorrowWeather ? 'Tomorrow' : null}
       />
-
-      <LevelBar xp={schedule.xp} loginStreak={schedule.loginStreak} />
 
       {warnings.length > 0 && (
         <section className="card warn-card">

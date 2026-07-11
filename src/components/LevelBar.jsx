@@ -1,29 +1,21 @@
 import { levelInfo } from '../gamify'
 import Icon from './Icon'
 
-// Compact progress card: your level (icon + name), an XP bar to the next level,
-// and your login streak.
+// A small top-right chip: level icon (with an XP-progress ring), "Lv N", and the
+// login streak — compact so it stays out of the way of the plan.
 export default function LevelBar({ xp, loginStreak }) {
   const lv = levelInfo(xp)
-  const pct = lv.need > 0 ? Math.round((lv.into / lv.need) * 100) : 100
+  const pct = lv.need > 0 ? Math.min(100, Math.round((lv.into / lv.need) * 100)) : 100
 
   return (
-    <section className="card level-card">
-      <div className="level-top">
-        <span className="level-badge"><Icon name={lv.icon} size={20} /></span>
-        <div className="level-info">
-          <span className="level-name">Lv {lv.level} · {lv.name}</span>
-          <span className="level-xp">{lv.into} / {lv.need} XP</span>
-        </div>
-        {loginStreak > 0 && (
-          <span className="level-streak" title="Login streak">
-            <Icon name="flame" size={15} /> {loginStreak}
-          </span>
-        )}
-      </div>
-      <div className="level-bar">
-        <div className="level-bar-fill" style={{ width: `${pct}%` }} />
-      </div>
-    </section>
+    <div className="level-chip" title={`Lv ${lv.level} ${lv.name} — ${lv.into}/${lv.need} XP`}>
+      <span className="level-chip-badge" style={{ '--pct': pct }}>
+        <Icon name={lv.icon} size={13} />
+      </span>
+      <span className="level-chip-lv">Lv {lv.level}</span>
+      {loginStreak > 0 && (
+        <span className="level-chip-streak"><Icon name="flame" size={12} /> {loginStreak}</span>
+      )}
+    </div>
   )
 }
