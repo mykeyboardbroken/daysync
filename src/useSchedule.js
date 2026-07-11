@@ -787,6 +787,18 @@ export function useSchedule() {
     setData((prev) => ({ ...prev, profile: { ...prev.profile, [key]: value } }))
   }, [])
 
+  // Mark a sport aspect strong/weak (or null to clear) — tailors sport drills.
+  const setSportSkill = useCallback((sport, aspect, level) => {
+    setData((prev) => {
+      const all = { ...(prev.profile.sportSkills || {}) }
+      const forSport = { ...(all[sport] || {}) }
+      if (level) forSport[aspect] = level
+      else delete forSport[aspect]
+      all[sport] = forSport
+      return { ...prev, profile: { ...prev.profile, sportSkills: all } }
+    })
+  }, [])
+
   // ---- Generated workout ----
   const toggleWorkout = useCallback((dateKey) => {
     setData((prev) => {
@@ -871,6 +883,7 @@ export function useSchedule() {
     finishSurvey,
     restartSurvey,
     setProfile,
+    setSportSkill,
     workoutLog: data.workoutLog,
     workoutSeed: data.workoutSeed,
     toggleWorkout,

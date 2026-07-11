@@ -4,7 +4,7 @@ import { DAY_PARTS } from '../dayParts'
 import { habitDueOn, habitDoneOn, habitStreak } from '../habits'
 import { categoryMeta } from '../taskCategories'
 import { TASK_TEMPLATES } from '../taskTemplates'
-import { generateSport, generateGeneral } from '../workouts'
+import { generateSport, generateGeneral, sportAspects } from '../workouts'
 import ConfirmDelete from './ConfirmDelete'
 import Icon from './Icon'
 import TaskModal from './TaskModal'
@@ -44,14 +44,47 @@ export default function DayPlan({ schedule }) {
   // "Stretch / Move" into it — clearer than showing both.
   const morningWorkout = sportBucket === 'morning' || generalBucket === 'morning'
 
-  const renderWorkoutRow = ({ id, title, subtitle, steps }) => {
+  const renderSkillPicker = (sportName) => {
+    const focus = profile.sportSkills?.[sportName] || {}
+    return (
+      <div className="skill-picker" onClick={(e) => e.stopPropagation()}>
+        <p className="skill-title">Mark what you're weak or strong at — drills focus your weak spots.</p>
+        {sportAspects(sportName).map((asp) => {
+          const level = focus[asp]
+          return (
+            <div className="skill-row" key={asp}>
+              <span className="skill-name">{asp}</span>
+              <div className="skill-toggle">
+                <button
+                  type="button"
+                  className={`skill-btn ${level === 'weak' ? 'weak' : ''}`}
+                  onClick={() => schedule.setSportSkill(sportName, asp, level === 'weak' ? null : 'weak')}
+                >
+                  Weak
+                </button>
+                <button
+                  type="button"
+                  className={`skill-btn ${level === 'strong' ? 'strong' : ''}`}
+                  onClick={() => schedule.setSportSkill(sportName, asp, level === 'strong' ? null : 'strong')}
+                >
+                  Strong
+                </button>
+              </div>
+            </div>
+          )
+        })}
+      </div>
+    )
+  }
+
+  const renderWorkoutRow = ({ id, title, subtitle, steps, skillSport }) => {
     const expanded = expandedId === id
     const doneKey = `${todayKey}|${id}`
     const done = !!schedule.workoutLog?.[doneKey]
     return (
       <li
         key={id}
-        className={`habit-row tappable ${done ? 'done' : ''} ${expanded ? 'expanded' : ''}`}
+        className={`habit-row tappable workout-row ${done ? 'done' : ''} ${expanded ? 'expanded' : ''}`}
         onClick={() => toggleExpand(id)}
       >
         <label className="assignment-check" onClick={(e) => e.stopPropagation()}>
@@ -63,21 +96,19 @@ export default function DayPlan({ schedule }) {
           <span className="habit-title">{title}</span>
           <span className="task-desc">{subtitle}</span>
           {expanded && (
-            <>
-              <ol className="task-steps">
+            <div className="workout-drawer" onClick={(e) => e.stopPropagation()}>
+              {skillSport && renderSkillPicker(skillSport)}
+              <ol className="task-steps workout-steps">
                 {steps.map((s, i) => <li key={i}>{s}</li>)}
               </ol>
               <button
                 type="button"
                 className="task-edit-btn"
-                onClick={(e) => {
-                  e.stopPropagation()
-                  schedule.reshuffleWorkout()
-                }}
+                onClick={() => schedule.reshuffleWorkout()}
               >
                 New workout
               </button>
-            </>
+            </div>
           )}
         </div>
         <Icon name="chevronRight" size={16} className={`task-chevron ${expanded ? 'open' : ''}`} />
@@ -216,6 +247,7 @@ export default function DayPlan({ schedule }) {
                 title: 'Sport training',
                 subtitle: `${sport.label} drills`,
                 steps: sport.steps,
+                skillSport: sport.label,
               })}
             {showGeneral &&
               renderWorkoutRow({
