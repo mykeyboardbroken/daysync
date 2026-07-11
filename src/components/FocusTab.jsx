@@ -93,17 +93,32 @@ export default function FocusTab({ schedule }) {
         </div>
 
         {!running && (
-          <div className="focus-presets">
-            {PRESETS.map((m) => (
-              <button
-                key={m}
-                type="button"
-                className={`type-option ${minutes === m ? 'selected' : ''}`}
-                onClick={() => pick(m)}
-              >
-                {m} min
-              </button>
-            ))}
+          <div className="focus-setup">
+            <div className="focus-presets">
+              {PRESETS.map((m) => (
+                <button
+                  key={m}
+                  type="button"
+                  className={`type-option ${minutes === m ? 'selected' : ''}`}
+                  onClick={() => pick(m)}
+                >
+                  {m} min
+                </button>
+              ))}
+            </div>
+            <div className="focus-slider-row">
+              <input
+                type="range"
+                min="5"
+                max="120"
+                step="5"
+                value={minutes}
+                onChange={(e) => pick(Number(e.target.value))}
+                className="focus-slider"
+                aria-label="Custom focus time"
+              />
+              <span className="focus-slider-val">{minutes} min</span>
+            </div>
           </div>
         )}
 

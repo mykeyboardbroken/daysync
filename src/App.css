@@ -643,8 +643,12 @@
 }
 .focus-time { font-size: 44px; font-weight: 800; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
 .focus-sub { font-size: 13px; color: var(--text-dim); font-weight: 600; }
+.focus-setup { width: 100%; display: flex; flex-direction: column; gap: 12px; }
 .focus-presets { display: flex; gap: 8px; }
 .focus-presets .type-option { min-width: 72px; }
+.focus-slider-row { display: flex; align-items: center; gap: 12px; }
+.focus-slider { flex: 1; min-width: 0; height: 20px; accent-color: var(--accent); cursor: pointer; }
+.focus-slider-val { flex-shrink: 0; font-size: 13px; font-weight: 700; color: var(--text); min-width: 54px; text-align: right; }
 .focus-actions { display: flex; gap: 10px; width: 100%; }
 .focus-actions .primary-btn,
 .focus-actions .ghost-btn { flex: 1; }
