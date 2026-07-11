@@ -210,14 +210,18 @@
 }
 .tab {
   flex: 1 1 0;
+  min-width: 0;
   max-width: 200px;
   background: none;
   border: none;
   color: var(--text-dim);
-  font-size: 13px;
+  font-size: 12.5px;
   font-weight: 600;
-  padding: 11px 8px;
+  padding: 11px 4px;
   border-radius: 9px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   transition: background 0.15s, color 0.15s;
 }
 .tab:hover { color: var(--text); }
@@ -613,6 +617,79 @@
   word-break: break-word;
 }
 .error-card .primary-btn { margin-top: 6px; }
+
+/* ---------- Focus timer ---------- */
+.focus-card { display: flex; flex-direction: column; align-items: center; gap: 18px; }
+.focus-ring {
+  width: 220px;
+  max-width: 70vw;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: conic-gradient(var(--accent) calc(var(--pct) * 1%), var(--surface-2) 0);
+  transition: background 0.3s linear;
+}
+.focus-inner {
+  width: 82%;
+  height: 82%;
+  border-radius: 50%;
+  background: var(--surface);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+.focus-time { font-size: 44px; font-weight: 800; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+.focus-sub { font-size: 13px; color: var(--text-dim); font-weight: 600; }
+.focus-presets { display: flex; gap: 8px; }
+.focus-presets .type-option { min-width: 72px; }
+.focus-actions { display: flex; gap: 10px; width: 100%; }
+.focus-actions .primary-btn,
+.focus-actions .ghost-btn { flex: 1; }
+.focus-start { width: 100%; }
+.focus-warn { font-size: 13px; color: var(--warn); font-weight: 600; margin: 0; text-align: center; }
+.focus-done { font-size: 14px; color: var(--accent); font-weight: 700; margin: 0; text-align: center; }
+
+.focus-list { list-style: none; margin: 0 0 12px; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.focus-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 9px 12px;
+  font-size: 14px;
+  font-weight: 600;
+}
+.focus-del { background: none; border: none; color: var(--text-dim); font-size: 14px; cursor: pointer; padding: 2px 4px; }
+.focus-del:hover { color: var(--danger); }
+.focus-add { display: flex; gap: 8px; }
+.focus-add input {
+  flex: 1;
+  min-width: 0;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 12px;
+  color: var(--text);
+  font-size: 14px;
+  font-family: inherit;
+}
+.focus-add input:focus { outline: none; border-color: var(--accent); }
+.focus-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--text-dim);
+  line-height: 1.45;
+  margin: 12px 0 0;
+}
+.focus-note .icon { flex-shrink: 0; margin-top: 1px; }
 
 /* ---------- Level / XP chip (top-right) ---------- */
 .today-top-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }

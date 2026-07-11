@@ -2,6 +2,7 @@ const TABS = [
   { key: 'today', label: 'Today' },
   { key: 'school', label: 'Academics' },
   { key: 'calendar', label: 'Calendar' },
+  { key: 'focus', label: 'Focus' },
   { key: 'settings', label: 'Settings' },
 ]
 

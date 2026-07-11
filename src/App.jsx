@@ -7,6 +7,7 @@ import { SURVEY_QUESTIONS } from './survey'
 import TodayTab from './components/TodayTab'
 import SchoolTab from './components/SchoolTab'
 import CalendarTab from './components/CalendarTab'
+import FocusTab from './components/FocusTab'
 import AssignmentModal from './components/AssignmentModal'
 import TestModal from './components/TestModal'
 import TaskModal from './components/TaskModal'
@@ -60,12 +61,13 @@ export default function App() {
   return (
     <div className="app">
       <header className="app-header">
-        <h1>{{ today: 'Today', school: 'Academics', calendar: 'Calendar', settings: 'Settings' }[tab]}</h1>
+        <h1>{{ today: 'Today', school: 'Academics', calendar: 'Calendar', focus: 'Focus', settings: 'Settings' }[tab]}</h1>
       </header>
 
       {tab === 'today' && <TodayTab schedule={schedule} />}
       {tab === 'school' && <SchoolTab schedule={schedule} />}
       {tab === 'calendar' && <CalendarTab schedule={schedule} />}
+      {tab === 'focus' && <FocusTab schedule={schedule} />}
       {tab === 'settings' && (
         <SettingsModal
           customColors={schedule.customColors}
@@ -79,7 +81,7 @@ export default function App() {
         />
       )}
 
-      {tab !== 'settings' && (
+      {tab !== 'settings' && tab !== 'focus' && (
         <button className="fab" onClick={() => setAdding('menu')} aria-label="Add">
           <svg className="fab-plus" viewBox="0 0 24 24" width="26" height="26" aria-hidden="true">
             <path d="M12 5v14M5 12h14" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" />

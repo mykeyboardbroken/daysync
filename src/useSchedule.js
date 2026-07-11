@@ -45,6 +45,8 @@ function emptyData() {
     xp: 0, // total XP earned by completing things
     loginStreak: 0, // consecutive days the app was opened
     lastActive: '', // dateKey of the last day the app was opened
+    focusDistractions: [], // apps/sites the user commits to avoiding during focus
+    focusMinutes: 0, // total minutes focused
     theme: 'custom', // appearance is now always a custom accent on a dark/bright base
     // Used when theme === 'custom': primary = the accent colour (the darker
     // hover/pressed shade is derived from it), base = 'dark' | 'bright' (which
@@ -874,6 +876,20 @@ export function useSchedule() {
     setData((prev) => ({ ...prev, workoutSeed: (prev.workoutSeed || 0) + 1 }))
   }, [])
 
+  // ---- Focus timer ----
+  const setFocusDistractions = useCallback((list) => {
+    setData((prev) => ({ ...prev, focusDistractions: list }))
+  }, [])
+
+  // Finish a focus session: log the minutes and award XP (1 XP per minute).
+  const completeFocusSession = useCallback((minutes) => {
+    setData((prev) => ({
+      ...prev,
+      focusMinutes: (prev.focusMinutes || 0) + minutes,
+      xp: (prev.xp || 0) + minutes,
+    }))
+  }, [])
+
   // ---- Backup: export everything as JSON / restore from a backup file ----
   const exportData = useCallback(() => JSON.stringify(data, null, 2), [data])
 
@@ -951,6 +967,10 @@ export function useSchedule() {
     reshuffleWorkout,
     xp: data.xp,
     loginStreak: data.loginStreak,
+    focusDistractions: data.focusDistractions,
+    focusMinutes: data.focusMinutes,
+    setFocusDistractions,
+    completeFocusSession,
     exportData,
     importData,
     addTask,
