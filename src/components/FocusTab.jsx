@@ -13,7 +13,9 @@ export default function FocusTab({ schedule }) {
   const [leftCount, setLeftCount] = useState(0)
   const [doneMsg, setDoneMsg] = useState('')
   const [newItem, setNewItem] = useState('')
+  const [controls, setControls] = useState(false) // exit button visibility in full screen
   const endRef = useRef(0)
+  const hideRef = useRef(null)
 
   const distractions = schedule.focusDistractions || []
   const total = minutes * 60
@@ -50,8 +52,16 @@ export default function FocusTab({ schedule }) {
   function start() {
     setDoneMsg('')
     setLeftCount(0)
+    setControls(false)
     endRef.current = Date.now() + secondsLeft * 1000
     setRunning(true)
+  }
+
+  // Tap the full-screen: briefly show the exit button, then hide it again.
+  function revealControls() {
+    setControls(true)
+    clearTimeout(hideRef.current)
+    hideRef.current = setTimeout(() => setControls(false), 3000)
   }
   function pause() {
     setRunning(false)
@@ -184,6 +194,25 @@ export default function FocusTab({ schedule }) {
           phone's Screen Time / Digital Wellbeing. This keeps you honest and rewards focus.
         </p>
       </section>
+
+      {running && (
+        <div className="focus-fullscreen" onClick={revealControls}>
+          <span className="focus-fs-time">{mm}:{ss}</span>
+          {controls && (
+            <button
+              type="button"
+              className="focus-fs-exit"
+              onClick={(e) => {
+                e.stopPropagation()
+                pause()
+              }}
+              aria-label="Exit focus"
+            >
+              ✕
+            </button>
+          )}
+        </div>
+      )}
     </div>
   )
 }

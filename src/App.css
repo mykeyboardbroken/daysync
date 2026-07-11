@@ -695,6 +695,42 @@
 }
 .focus-note .icon { flex-shrink: 0; margin-top: 1px; }
 
+/* Full-screen focus mode: black + time only, tap to reveal exit */
+.focus-fullscreen {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: #000;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  animation: survey-fade 0.3s ease;
+}
+.focus-fs-time {
+  font-size: clamp(64px, 22vw, 150px);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+.focus-fs-exit {
+  position: absolute;
+  top: max(16px, env(safe-area-inset-top));
+  left: 16px;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.12);
+  border: none;
+  color: #fff;
+  font-size: 20px;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+}
+.focus-fs-exit:hover { background: rgba(255, 255, 255, 0.22); }
+
 /* ---------- Level / XP chip (top-right) ---------- */
 .today-top-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
 .today-top-row .greeting-main { flex: 1; min-width: 0; }
