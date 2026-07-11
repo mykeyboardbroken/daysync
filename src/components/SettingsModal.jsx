@@ -325,14 +325,14 @@ export default function SettingsModal({
             )}
 
             {section === 'backup' && (
-              <div className="color-pickers">
+              <div className="settings-menu">
                 <button type="button" className="settings-row" onClick={handleExport}>
-                  <Icon name="file" size={18} />
+                  <span className="settings-row-icon"><Icon name="file" size={17} /></span>
                   <span className="settings-row-label">Export backup</span>
                   <Icon name="chevronRight" size={18} className="settings-chevron" />
                 </button>
                 <button type="button" className="settings-row" onClick={() => fileRef.current?.click()}>
-                  <Icon name="upload" size={18} />
+                  <span className="settings-row-icon"><Icon name="upload" size={17} /></span>
                   <span className="settings-row-label">Import backup</span>
                   <Icon name="chevronRight" size={18} className="settings-chevron" />
                 </button>
@@ -353,7 +353,7 @@ export default function SettingsModal({
           <div className="settings-menu">
             {SECTIONS.map((s) => (
               <button key={s.key} className="settings-row" onClick={() => setSection(s.key)}>
-                <Icon name={s.icon} size={18} />
+                <span className="settings-row-icon"><Icon name={s.icon} size={17} /></span>
                 <span className="settings-row-label">{s.label}</span>
                 <Icon name="chevronRight" size={18} className="settings-chevron" />
               </button>

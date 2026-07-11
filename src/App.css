@@ -30,22 +30,36 @@
 .settings-btn:hover { color: var(--text); background: var(--surface-2); }
 
 /* Settings — a drill-down menu of categories, each opening its own panel. */
-.settings-menu { display: flex; flex-direction: column; gap: 8px; margin: 6px 0; }
+.settings-menu { display: flex; flex-direction: column; }
 .settings-row {
   display: flex;
   align-items: center;
-  gap: 12px;
-  background: var(--surface-2);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 14px;
+  gap: 14px;
+  width: 100%;
+  background: none;
+  border: none;
+  border-bottom: 1px solid var(--border);
+  padding: 14px 2px;
   cursor: pointer;
   color: var(--text);
   font-size: 15px;
   font-weight: 600;
-  transition: border-color 0.15s;
+  transition: color 0.15s;
 }
-.settings-row:hover { border-color: var(--accent); }
+.settings-menu .settings-row:last-child { border-bottom: none; }
+.settings-row:hover { color: var(--accent); }
+.settings-row:hover .settings-row-icon { background: var(--accent); color: #fff; }
+.settings-row-icon {
+  flex-shrink: 0;
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  display: grid;
+  place-items: center;
+  background: color-mix(in srgb, var(--accent) 14%, var(--surface-2));
+  color: var(--accent);
+  transition: background 0.15s, color 0.15s;
+}
 .settings-row-label { flex: 1; text-align: left; }
 .settings-chevron { color: var(--text-dim); }
 
@@ -162,10 +176,9 @@
   align-items: center;
   gap: 12px;
   width: 100%;
-  background: var(--surface-2);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 12px 14px;
+  background: none;
+  border: none;
+  padding: 14px 2px;
   cursor: pointer;
   text-align: left;
 }
