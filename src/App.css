@@ -628,7 +628,10 @@
   padding: 3px 10px 3px 3px;
   font-size: 12px;
   font-weight: 700;
+  color: var(--text);
+  cursor: pointer;
 }
+.level-chip:hover { border-color: var(--accent); }
 .level-chip-badge {
   position: relative;
   width: 26px;
@@ -649,6 +652,59 @@
 .level-chip-badge .icon { position: relative; z-index: 1; color: var(--accent); }
 .level-chip-lv { color: var(--text); }
 .level-chip-streak { display: inline-flex; align-items: center; gap: 3px; color: #f59e0b; }
+
+/* Level details modal */
+.level-modal-head { display: flex; align-items: center; gap: 14px; margin-bottom: 16px; }
+.level-modal-head h3 { margin: 0 0 2px; }
+.level-modal-badge {
+  position: relative;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  background: conic-gradient(var(--accent) calc(var(--pct) * 1%), var(--surface-2) 0);
+}
+.level-modal-badge::before {
+  content: '';
+  position: absolute;
+  inset: 5px;
+  border-radius: 50%;
+  background: var(--surface);
+}
+.level-modal-badge .icon { position: relative; z-index: 1; color: var(--accent); }
+.level-bar { height: 8px; border-radius: 999px; background: var(--surface-2); overflow: hidden; }
+.level-bar-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: var(--accent);
+  transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.level-modal-stats {
+  font-size: 12px;
+  color: var(--text-dim);
+  font-weight: 600;
+  margin: 8px 0 0;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+.tier-ladder { display: flex; flex-direction: column; gap: 4px; }
+.tier-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 10px;
+  border-radius: 8px;
+  opacity: 0.4;
+}
+.tier-row.unlocked { opacity: 1; }
+.tier-row.current { background: color-mix(in srgb, var(--accent) 16%, var(--surface-2)); }
+.tier-icon { color: var(--accent); display: inline-flex; }
+.tier-name { flex: 1; font-size: 14px; font-weight: 600; color: var(--text); }
+.tier-lv { font-size: 12px; color: var(--text-dim); font-weight: 600; }
 
 /* ---------- Greeting banner ---------- */
 .greeting-main { font-size: 24px; font-weight: 800; margin: 0; letter-spacing: -0.01em; line-height: 1.25; }
