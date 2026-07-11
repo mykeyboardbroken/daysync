@@ -31,7 +31,7 @@ function emptyData() {
     seededRoutinePlus: false, // stretch + hydration defaults seeded once
     seededReading: false, // reading default seeded once
     readingAfternoon: false, // one-time move of Reading back to the afternoon
-    seededJournaling: false, // journaling default seeded once
+    removedJournalingDefault: false, // one-time removal of the auto-seeded journaling default
     seededNightGrooming: false, // night grooming default seeded once
     seededCheckPlans: false, // "check tomorrow's plans" default seeded once
     onboarded: false, // whether the first-open survey has been completed
@@ -321,25 +321,19 @@ function normalize(parsed) {
       ? { ...t, description: READING_DESC }
       : t,
   )
-  // A morning journaling habit (deletable, seeded once).
-  if (!data.seededJournaling) {
-    data.tasks = [
-      ...data.tasks,
-      {
-        id: makeId(),
-        title: 'Journaling',
-        description: 'A few lines to clear your head and set your intentions for the day.',
-        steps: ['Write your thoughts', "Write today's to-do list", "Write what you're grateful for"],
-        bucket: 'morning',
-        category: 'lifestyle',
-        repeat: true,
-        days: [],
-        log: {},
-        due: '',
-        done: false,
-      },
-    ]
-    data.seededJournaling = true
+  // Journaling is no longer auto-seeded (it's opt-in from "Add a default task").
+  // Remove the pristine default copy once, for anyone who got it earlier.
+  if (!data.removedJournalingDefault) {
+    data.tasks = data.tasks.filter(
+      (t) =>
+        !(
+          t.title === 'Journaling' &&
+          t.bucket === 'morning' &&
+          t.category === 'lifestyle' &&
+          t.description === 'A few lines to clear your head and set your intentions for the day.'
+        ),
+    )
+    data.removedJournalingDefault = true
   }
   // A nightly grooming routine (deletable, seeded once).
   if (!data.seededNightGrooming) {
@@ -389,12 +383,6 @@ function normalize(parsed) {
   // Stretch/Move sits first in its bucket (best right after waking up).
   data.tasks = data.tasks.map((t) =>
     t.title === 'Stretch / Move' && t.pinFirst === undefined ? { ...t, pinFirst: true } : t,
-  )
-  // Give the default Journaling task its steps (only if it has none — your edits stay).
-  data.tasks = data.tasks.map((t) =>
-    t.title === 'Journaling' && (!t.steps || t.steps.length === 0)
-      ? { ...t, steps: ['Write your thoughts', "Write today's to-do list", "Write what you're grateful for"] }
-      : t,
   )
   // Reading lives in the afternoon — one-time move for any night copy from before.
   if (!data.readingAfternoon) {
