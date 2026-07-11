@@ -1,9 +1,11 @@
+import Icon from './Icon'
+
 const TABS = [
-  { key: 'today', label: 'Today' },
-  { key: 'school', label: 'Academics' },
-  { key: 'calendar', label: 'Calendar' },
-  { key: 'focus', label: 'Focus' },
-  { key: 'settings', label: 'Settings' },
+  { key: 'today', label: 'Today', icon: 'sun' },
+  { key: 'school', label: 'Academics', icon: 'book' },
+  { key: 'calendar', label: 'Calendar', icon: 'calendar' },
+  { key: 'focus', label: 'Focus', icon: 'clock' },
+  { key: 'settings', label: 'Settings', icon: 'settings' },
 ]
 
 export default function TabBar({ active, onChange }) {
@@ -14,8 +16,10 @@ export default function TabBar({ active, onChange }) {
           key={t.key}
           className={`tab ${active === t.key ? 'active' : ''}`}
           onClick={() => onChange(t.key)}
+          aria-label={t.label}
         >
-          {t.label}
+          <Icon name={t.icon} size={20} />
+          <span className="tab-label">{t.label}</span>
         </button>
       ))}
     </nav>
