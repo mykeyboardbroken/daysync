@@ -668,6 +668,7 @@
 .focus-start { width: 100%; }
 .focus-warn { font-size: 13px; color: var(--warn); font-weight: 600; margin: 0; text-align: center; }
 .focus-done { font-size: 14px; color: var(--accent); font-weight: 700; margin: 0; text-align: center; }
+.focus-total { font-size: 12px; color: var(--text-dim); font-weight: 600; margin: 0; }
 
 .focus-list { list-style: none; margin: 0 0 12px; padding: 0; display: flex; flex-direction: column; gap: 6px; }
 .focus-item {

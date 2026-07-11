@@ -92,11 +92,6 @@ export default function FocusTab({ schedule }) {
 
   return (
     <div className="tab-content">
-      <header className="today-header">
-        <span className="th-date">Focus</span>
-        <span className="subtle">{schedule.focusMinutes || 0} min focused</span>
-      </header>
-
       <section className="card focus-card">
         <div className="focus-ring" style={{ '--pct': pct }}>
           <div className="focus-inner">
@@ -152,6 +147,7 @@ export default function FocusTab({ schedule }) {
           <p className="focus-warn">You left {leftCount} time{leftCount === 1 ? '' : 's'} — get back to it 👀</p>
         )}
         {doneMsg && <p className="focus-done">{doneMsg}</p>}
+        <p className="focus-total">{schedule.focusMinutes || 0} min focused all-time</p>
       </section>
 
       <section className="card">
