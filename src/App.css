@@ -759,22 +759,34 @@
 }
 .workout-steps { margin: 0; }
 .skill-picker { margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid var(--border); }
-.skill-title { font-size: 12px; color: var(--text-dim); margin: 0 0 8px; line-height: 1.4; }
-.skill-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
-.skill-name { flex: 1; font-size: 13px; font-weight: 600; color: var(--text); }
+.skill-title { font-size: 12px; color: var(--text-dim); margin: 0 0 10px; line-height: 1.4; }
+.recommend-title { margin-top: 2px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; }
+.skill-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.skill-info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
+.skill-name { font-size: 13px; font-weight: 700; color: var(--text); }
+.skill-desc { font-size: 11px; color: var(--text-dim); line-height: 1.35; }
 .skill-toggle { display: flex; gap: 4px; flex-shrink: 0; }
 .skill-btn {
   background: var(--surface-2);
   border: 1px solid var(--border);
   color: var(--text-dim);
   border-radius: 7px;
-  padding: 4px 12px;
+  padding: 4px 10px;
   font-size: 12px;
   font-weight: 600;
   cursor: pointer;
 }
 .skill-btn.weak { background: rgba(239, 68, 68, 0.18); border-color: #ef4444; color: #f87171; }
+.skill-btn.okay { background: rgba(245, 158, 11, 0.18); border-color: #f59e0b; color: #fbbf24; }
 .skill-btn.strong { background: rgba(16, 185, 129, 0.18); border-color: #10b981; color: #34d399; }
+
+/* Edit-mode reorder (drag) */
+.assignment.editing,
+.habit-row.editing { cursor: grab; }
+.assignment.dragging,
+.habit-row.dragging { opacity: 0.5; border-color: var(--accent); }
+.edit-controls { display: inline-flex; align-items: center; gap: 6px; flex-shrink: 0; }
+.drag-grip { color: var(--text-dim); cursor: grab; }
 .danger-link {
   background: none;
   border: none;

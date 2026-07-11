@@ -29,6 +29,7 @@ function emptyData() {
     packLifestyle: false, // one-time move of the pack task into the Lifestyle category
     seededChores: false, // whether the extra default tasks (grooming, chores) were seeded once
     seededRoutinePlus: false, // stretch + hydration defaults seeded once
+    seededJournalingFirst: false, // re-seed journaling as the first morning task
     seededReading: false, // reading default seeded once
     readingAfternoon: false, // one-time move of Reading back to the afternoon
     removedJournalingDefault: false, // one-time removal of the auto-seeded journaling default
@@ -173,6 +174,7 @@ function normalize(parsed) {
         category: 'lifestyle',
         repeat: true,
         days: [],
+        pinLast: true, // sits at the end of the night until reordered
         log: {},
         due: '',
         done: false,
@@ -272,7 +274,7 @@ function normalize(parsed) {
         category: 'health',
         repeat: true,
         days: [],
-        pinFirst: true, // best thing to do first after waking up
+        order: -1, // near the top of the morning (just after journaling)
         log: {},
         due: '',
         done: false,
@@ -321,19 +323,30 @@ function normalize(parsed) {
       ? { ...t, description: READING_DESC }
       : t,
   )
-  // Journaling is no longer auto-seeded (it's opt-in from "Add a default task").
-  // Remove the pristine default copy once, for anyone who got it earlier.
-  if (!data.removedJournalingDefault) {
-    data.tasks = data.tasks.filter(
-      (t) =>
-        !(
-          t.title === 'Journaling' &&
-          t.bucket === 'morning' &&
-          t.category === 'lifestyle' &&
-          t.description === 'A few lines to clear your head and set your intentions for the day.'
-        ),
-    )
-    data.removedJournalingDefault = true
+  // Journaling is the first thing in the morning. Ensure it exists and sits first.
+  if (!data.seededJournalingFirst) {
+    if (data.tasks.some((t) => t.title === 'Journaling')) {
+      data.tasks = data.tasks.map((t) => (t.title === 'Journaling' ? { ...t, order: -2 } : t))
+    } else {
+      data.tasks = [
+        ...data.tasks,
+        {
+          id: makeId(),
+          title: 'Journaling',
+          description: 'A few lines to clear your head and set your intentions for the day.',
+          steps: ['Write your thoughts', "Write today's to-do list", "Write what you're grateful for"],
+          bucket: 'morning',
+          category: 'lifestyle',
+          repeat: true,
+          days: [],
+          order: -2, // first thing in the morning
+          log: {},
+          due: '',
+          done: false,
+        },
+      ]
+    }
+    data.seededJournalingFirst = true
   }
   // A nightly grooming routine (deletable, seeded once).
   if (!data.seededNightGrooming) {
@@ -380,9 +393,15 @@ function normalize(parsed) {
   data.tasks = data.tasks.map((t) =>
     t.repeat && (!t.days || t.days.length === 0) ? { ...t, days: [0, 1, 2, 3, 4, 5, 6] } : t,
   )
-  // Stretch/Move sits first in its bucket (best right after waking up).
+  // Stretch/Move sits near the top of the morning (just after journaling).
   data.tasks = data.tasks.map((t) =>
-    t.title === 'Stretch / Move' && t.pinFirst === undefined ? { ...t, pinFirst: true } : t,
+    t.title === 'Stretch / Move' && t.order === undefined ? { ...t, order: -1 } : t,
+  )
+  // Get ready for tomorrow sits at the end (until the user reorders it).
+  data.tasks = data.tasks.map((t) =>
+    t.title === 'Get ready for tomorrow' && t.pinLast === undefined && t.order === undefined
+      ? { ...t, pinLast: true }
+      : t,
   )
   // Reading lives in the afternoon — one-time move for any night copy from before.
   if (!data.readingAfternoon) {
@@ -751,6 +770,7 @@ export function useSchedule() {
           repeat: true,
           days: tpl.days || [0, 1, 2, 3, 4, 5, 6],
           pinFirst: !!tpl.pinFirst,
+          pinLast: !!tpl.pinLast,
           log: {},
           due: '',
           done: false,

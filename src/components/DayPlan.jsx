@@ -4,7 +4,7 @@ import { DAY_PARTS } from '../dayParts'
 import { habitDueOn, habitDoneOn, habitStreak } from '../habits'
 import { categoryMeta } from '../taskCategories'
 import { TASK_TEMPLATES } from '../taskTemplates'
-import { generateSport, generateGeneral, sportAspects } from '../workouts'
+import { generateSport, generateGeneral, sportAspects, sportAspectDesc } from '../workouts'
 import ConfirmDelete from './ConfirmDelete'
 import Icon from './Icon'
 import TaskModal from './TaskModal'
@@ -21,6 +21,7 @@ export default function DayPlan({ schedule }) {
   const [expandedId, setExpandedId] = useState(null)
   const [editing, setEditing] = useState(false)
   const [showTemplates, setShowTemplates] = useState(false)
+  const [dragId, setDragId] = useState(null)
   const { tasks } = schedule
   const todayKey = toKey(new Date())
   const now = new Date()
@@ -44,31 +45,35 @@ export default function DayPlan({ schedule }) {
   // "Stretch / Move" into it — clearer than showing both.
   const morningWorkout = sportBucket === 'morning' || generalBucket === 'morning'
 
+  const SKILL_LEVELS = [
+    { key: 'weak', label: 'Weak' },
+    { key: 'okay', label: 'Okay' },
+    { key: 'strong', label: 'Strong' },
+  ]
   const renderSkillPicker = (sportName) => {
     const focus = profile.sportSkills?.[sportName] || {}
     return (
       <div className="skill-picker" onClick={(e) => e.stopPropagation()}>
-        <p className="skill-title">Mark what you're weak or strong at — drills focus your weak spots.</p>
+        <p className="skill-title">Rate each area — drills focus more on what you're weak at.</p>
         {sportAspects(sportName).map((asp) => {
           const level = focus[asp]
           return (
             <div className="skill-row" key={asp}>
-              <span className="skill-name">{asp}</span>
+              <div className="skill-info">
+                <span className="skill-name">{asp}</span>
+                <span className="skill-desc">{sportAspectDesc(sportName, asp)}</span>
+              </div>
               <div className="skill-toggle">
-                <button
-                  type="button"
-                  className={`skill-btn ${level === 'weak' ? 'weak' : ''}`}
-                  onClick={() => schedule.setSportSkill(sportName, asp, level === 'weak' ? null : 'weak')}
-                >
-                  Weak
-                </button>
-                <button
-                  type="button"
-                  className={`skill-btn ${level === 'strong' ? 'strong' : ''}`}
-                  onClick={() => schedule.setSportSkill(sportName, asp, level === 'strong' ? null : 'strong')}
-                >
-                  Strong
-                </button>
+                {SKILL_LEVELS.map((lv) => (
+                  <button
+                    type="button"
+                    key={lv.key}
+                    className={`skill-btn ${level === lv.key ? lv.key : ''}`}
+                    onClick={() => schedule.setSportSkill(sportName, asp, level === lv.key ? null : lv.key)}
+                  >
+                    {lv.label}
+                  </button>
+                ))}
               </div>
             </div>
           )
@@ -98,16 +103,19 @@ export default function DayPlan({ schedule }) {
           {expanded && (
             <div className="workout-drawer" onClick={(e) => e.stopPropagation()}>
               {skillSport && renderSkillPicker(skillSport)}
+              {skillSport && <p className="skill-title recommend-title">Recommended drills</p>}
               <ol className="task-steps workout-steps">
                 {steps.map((s, i) => <li key={i}>{s}</li>)}
               </ol>
-              <button
-                type="button"
-                className="task-edit-btn"
-                onClick={() => schedule.reshuffleWorkout()}
-              >
-                New workout
-              </button>
+              {!skillSport && (
+                <button
+                  type="button"
+                  className="task-edit-btn"
+                  onClick={() => schedule.reshuffleWorkout()}
+                >
+                  New workout
+                </button>
+              )}
             </div>
           )}
         </div>
@@ -117,16 +125,22 @@ export default function DayPlan({ schedule }) {
   }
 
 
-  // Everything in a bucket, repeating routines first, then one-off to-dos
-  // (undone before done, earliest due first). Repeating tasks only appear on the
-  // days they're actually due.
+  // A task's sort position: an explicit `order` (set by dragging / pins) wins,
+  // otherwise pinFirst floats to the top and pinLast sinks to the bottom.
+  const orderVal = (t) =>
+    typeof t.order === 'number' ? t.order : t.pinFirst ? -1000 : t.pinLast ? 1000 : 0
+
+  // Everything in a bucket, ordered by orderVal, then routines before one-off
+  // to-dos (undone before done, earliest due first). Repeating tasks only appear
+  // on the days they're actually due.
   const tasksIn = (key) =>
     tasks
       .filter((t) => (t.bucket || '') === key)
       .filter((t) => (t.repeat ? habitDueOn(t, now) : true))
       .filter((t) => !(morningWorkout && t.title === 'Stretch / Move'))
       .sort((a, b) => {
-        if (!!a.pinFirst !== !!b.pinFirst) return a.pinFirst ? -1 : 1
+        const d = orderVal(a) - orderVal(b)
+        if (d !== 0) return d
         if (!!a.repeat !== !!b.repeat) return a.repeat ? -1 : 1
         if (!a.repeat) {
           if (a.done !== b.done) return a.done ? 1 : -1
@@ -136,6 +150,20 @@ export default function DayPlan({ schedule }) {
         }
         return 0
       })
+
+  // Drag-to-reorder within a bucket (edit mode). Reassigns `order` on drop.
+  const dropTaskOn = (target) => {
+    if (!dragId || dragId === target.id) return
+    const list = tasksIn(target.bucket || '')
+    const from = list.findIndex((x) => x.id === dragId)
+    const to = list.findIndex((x) => x.id === target.id)
+    if (from < 0 || to < 0) return
+    const arr = [...list]
+    const [moved] = arr.splice(from, 1)
+    arr.splice(to, 0, moved)
+    arr.forEach((x, i) => schedule.updateTask(x.id, { order: i }))
+    setDragId(null)
+  }
 
   // The expanded drawer: steps (if any) + an Edit button. Editing/deleting live
   // here so they're deliberate — no delete button sits on the row itself.
@@ -159,6 +187,18 @@ export default function DayPlan({ schedule }) {
     </>
   )
 
+  // In edit mode a row is draggable to reorder; a tap no longer expands it.
+  const dragProps = (t) =>
+    editing
+      ? {
+          draggable: true,
+          onDragStart: () => setDragId(t.id),
+          onDragEnd: () => setDragId(null),
+          onDragOver: (e) => e.preventDefault(),
+          onDrop: () => dropTaskOn(t),
+        }
+      : {}
+
   const renderOneOff = (t) => {
     const due = dueLabel(t.due)
     const cat = categoryMeta(t.category)
@@ -166,8 +206,9 @@ export default function DayPlan({ schedule }) {
     return (
       <li
         key={t.id}
-        className={`assignment tappable ${t.done ? 'done' : ''} ${expanded ? 'expanded' : ''}`}
-        onClick={() => toggleExpand(t.id)}
+        className={`assignment tappable ${t.done ? 'done' : ''} ${expanded ? 'expanded' : ''} ${editing ? 'editing' : ''} ${dragId === t.id ? 'dragging' : ''}`}
+        onClick={() => !editing && toggleExpand(t.id)}
+        {...dragProps(t)}
       >
         <label className="assignment-check" onClick={(e) => e.stopPropagation()}>
           <input type="checkbox" checked={t.done} onChange={() => schedule.toggleTask(t.id, todayKey)} />
@@ -181,7 +222,10 @@ export default function DayPlan({ schedule }) {
         </div>
         {!t.done && t.due && <span className={`assignment-due tone-${due.tone}`}>{due.text}</span>}
         {editing ? (
-          <ConfirmDelete className="assignment-del" label="Remove task" onDelete={() => schedule.deleteTask(t.id)} />
+          <span className="edit-controls" onClick={(e) => e.stopPropagation()}>
+            <Icon name="grip" size={16} className="drag-grip" />
+            <ConfirmDelete className="assignment-del" label="Remove task" onDelete={() => schedule.deleteTask(t.id)} />
+          </span>
         ) : (
           <Icon name="chevronRight" size={16} className={`task-chevron ${expanded ? 'open' : ''}`} />
         )}
@@ -199,8 +243,9 @@ export default function DayPlan({ schedule }) {
     return (
       <li
         key={t.id}
-        className={`habit-row tappable ${doneToday ? 'done' : ''} ${expanded ? 'expanded' : ''}`}
-        onClick={() => toggleExpand(t.id)}
+        className={`habit-row tappable ${doneToday ? 'done' : ''} ${expanded ? 'expanded' : ''} ${editing ? 'editing' : ''} ${dragId === t.id ? 'dragging' : ''}`}
+        onClick={() => !editing && toggleExpand(t.id)}
+        {...dragProps(t)}
       >
         <label className="assignment-check" onClick={(e) => e.stopPropagation()}>
           <input
@@ -220,7 +265,10 @@ export default function DayPlan({ schedule }) {
           <span className="habit-streak"><Icon name="flame" size={13} /> {streak}</span>
         )}
         {editing ? (
-          <ConfirmDelete className="assignment-del" label="Remove task" onDelete={() => schedule.deleteTask(t.id)} />
+          <span className="edit-controls" onClick={(e) => e.stopPropagation()}>
+            <Icon name="grip" size={16} className="drag-grip" />
+            <ConfirmDelete className="assignment-del" label="Remove task" onDelete={() => schedule.deleteTask(t.id)} />
+          </span>
         ) : (
           <Icon name="chevronRight" size={16} className={`task-chevron ${expanded ? 'open' : ''}`} />
         )}

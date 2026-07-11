@@ -163,6 +163,18 @@ const PATHS = {
   checkmark: <polyline points="20 6 9 17 4 12" />,
   chevronRight: <polyline points="9 18 15 12 9 6" />,
   chevronLeft: <polyline points="15 18 9 12 15 6" />,
+  chevronUp: <polyline points="6 15 12 9 18 15" />,
+  chevronDown: <polyline points="6 9 12 15 18 9" />,
+  grip: (
+    <>
+      <circle cx="9" cy="6" r="1.4" />
+      <circle cx="15" cy="6" r="1.4" />
+      <circle cx="9" cy="12" r="1.4" />
+      <circle cx="15" cy="12" r="1.4" />
+      <circle cx="9" cy="18" r="1.4" />
+      <circle cx="15" cy="18" r="1.4" />
+    </>
+  ),
   palette: (
     <>
       <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.93 0 1.65-.75 1.65-1.69 0-.44-.18-.83-.44-1.12-.29-.29-.44-.65-.44-1.13a1.64 1.64 0 0 1 1.67-1.66h2c3.05 0 5.56-2.5 5.56-5.56C22 6 17.5 2 12 2Z" />

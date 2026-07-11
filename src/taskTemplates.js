@@ -76,6 +76,7 @@ export const TASK_TEMPLATES = [
     bucket: 'night',
     category: 'lifestyle',
     days: ALL,
+    pinLast: true,
   },
   {
     title: "Check tomorrow's plans",
