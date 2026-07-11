@@ -1,14 +1,17 @@
 import { useState, useEffect, useRef } from 'react'
 import Icon from './Icon'
 
-const PRESETS = [15, 25, 50]
+const PRESETS = [30, 60, 120]
+
+// "30 min" / "1 hr" / "1h 30m"
+const fmt = (m) => (m % 60 === 0 ? `${m / 60} hr` : m < 60 ? `${m} min` : `${Math.floor(m / 60)}h ${m % 60}m`)
 
 // A focus (Pomodoro-style) timer. A browser can't actually block other apps, so
 // this keeps you honest instead: your "avoid" list stays in view, it notices
 // when you leave mid-session, and it rewards finishing with XP.
 export default function FocusTab({ schedule }) {
-  const [minutes, setMinutes] = useState(25)
-  const [secondsLeft, setSecondsLeft] = useState(25 * 60)
+  const [minutes, setMinutes] = useState(30)
+  const [secondsLeft, setSecondsLeft] = useState(30 * 60)
   const [running, setRunning] = useState(false)
   const [leftCount, setLeftCount] = useState(0)
   const [doneMsg, setDoneMsg] = useState('')
@@ -32,7 +35,7 @@ export default function FocusTab({ schedule }) {
         setSecondsLeft(0)
         setRunning(false)
         schedule.completeFocusSession(minutes)
-        setDoneMsg(`Nice — ${minutes} focused minutes! +${minutes} XP`)
+        setDoneMsg(`Nice — ${fmt(minutes)} of focus! +${minutes} XP`)
         setSecondsLeft(minutes * 60)
       } else {
         setSecondsLeft(left)
@@ -98,7 +101,7 @@ export default function FocusTab({ schedule }) {
         <div className="focus-ring" style={{ '--pct': pct }}>
           <div className="focus-inner">
             <span className="focus-time">{mm}:{ss}</span>
-            <span className="focus-sub">{running ? 'Stay with it' : `${minutes} min session`}</span>
+            <span className="focus-sub">{running ? 'Stay with it' : `${fmt(minutes)} session`}</span>
           </div>
         </div>
 
@@ -112,7 +115,7 @@ export default function FocusTab({ schedule }) {
                   className={`type-option ${minutes === m ? 'selected' : ''}`}
                   onClick={() => pick(m)}
                 >
-                  {m} min
+                  {fmt(m)}
                 </button>
               ))}
             </div>
@@ -120,14 +123,14 @@ export default function FocusTab({ schedule }) {
               <input
                 type="range"
                 min="5"
-                max="120"
+                max="180"
                 step="5"
                 value={minutes}
                 onChange={(e) => pick(Number(e.target.value))}
                 className="focus-slider"
                 aria-label="Custom focus time"
               />
-              <span className="focus-slider-val">{minutes} min</span>
+              <span className="focus-slider-val">{fmt(minutes)}</span>
             </div>
           </div>
         )}
