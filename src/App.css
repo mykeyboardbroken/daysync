@@ -1084,7 +1084,24 @@
 .survey-option.selected { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 14%, var(--surface-2)); }
 
 .survey-nav { display: flex; align-items: center; gap: 10px; padding-top: 20px; }
-.survey-next { min-width: 96px; }
+.survey-next {
+  min-width: 96px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+/* Hints that Enter works. Hidden on touch, where there's no Enter key to press. */
+.survey-kbd {
+  font-size: 12px;
+  line-height: 1;
+  padding: 3px 5px;
+  border-radius: 5px;
+  background: rgba(255, 255, 255, 0.18);
+}
+@media (hover: none) {
+  .survey-kbd { display: none; }
+}
 
 @keyframes survey-fade { from { opacity: 0; } to { opacity: 1; } }
 @keyframes survey-step {

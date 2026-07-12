@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 // First-open onboarding — a full-screen flow that steps through the questions
 // and hands the collected answers back on Finish.
@@ -24,6 +24,20 @@ export default function SurveyModal({ questions, onComplete }) {
     if (isLast) onComplete(answers)
     else setStep(idx + 1)
   }
+
+  // Enter advances (and finishes on the last question). If an answer option is
+  // focused, Enter still picks that option instead — otherwise keyboard users
+  // could never select one.
+  useEffect(() => {
+    function onKeyDown(e) {
+      if (e.key !== 'Enter') return
+      if (document.activeElement?.classList?.contains('survey-option')) return
+      e.preventDefault() // stops the focused button firing its own click too
+      next()
+    }
+    window.addEventListener('keydown', onKeyDown)
+    return () => window.removeEventListener('keydown', onKeyDown)
+  })
 
   return (
     <div className="survey-screen">
@@ -96,6 +110,7 @@ export default function SurveyModal({ questions, onComplete }) {
           <span className="spacer" />
           <button type="button" className="primary-btn survey-next" onClick={next}>
             {isLast ? 'Finish' : 'Next'}
+            <kbd className="survey-kbd" aria-hidden="true">⏎</kbd>
           </button>
         </div>
       </div>
