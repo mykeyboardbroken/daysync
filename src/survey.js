@@ -9,6 +9,13 @@
 export const SURVEY_QUESTIONS = [
   { id: 'name', type: 'text', question: "What's your name?", placeholder: 'Your name' },
   {
+    id: 'gender',
+    type: 'single',
+    question: 'What gender are you?',
+    hint: 'Kept private on your device. Optional — skip if you like.',
+    options: ['Male', 'Female', 'Other'],
+  },
+  {
     id: 'age',
     type: 'text',
     question: 'How old are you?',

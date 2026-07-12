@@ -237,6 +237,20 @@ export default function SettingsModal({
                   />
                 </label>
 
+                <p className="settings-field-label">Gender</p>
+                <div className="type-select repeat-select habit-days">
+                  {['Male', 'Female', 'Other'].map((g) => (
+                    <button
+                      type="button"
+                      key={g}
+                      className={`type-option ${profile.gender === g ? 'selected' : ''}`}
+                      onClick={() => onSetProfile('gender', g)}
+                    >
+                      {g}
+                    </button>
+                  ))}
+                </div>
+
                 <p className="settings-field-label">Weight units</p>
                 <div className="type-select repeat-select habit-days">
                   {['kg', 'lbs'].map((u) => (
