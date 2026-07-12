@@ -97,7 +97,7 @@ function freshData() {
     task({
       title: 'Hydration check',
       description: 'A reminder to drink water or refill your bottle to keep your energy from dipping.',
-      bucket: 'afternoon',
+      bucket: 'morning',
       category: 'health',
     }),
     task({
@@ -110,6 +110,12 @@ function freshData() {
     task({
       title: 'Meditation',
       description: 'A few quiet minutes of focused breathing to settle your mind.',
+      bucket: 'afternoon',
+      category: 'health',
+    }),
+    task({
+      title: 'Hydration',
+      description: 'Drink some water or refill your bottle to keep your energy steady.',
       bucket: 'night',
       category: 'health',
     }),
