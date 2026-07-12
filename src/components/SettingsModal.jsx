@@ -76,6 +76,8 @@ export default function SettingsModal({
   onExport,
   onImport,
   onReset,
+  account = null,
+  onSignOut,
 }) {
   const toggleProfileArr = (key, opt) => {
     const cur = profile[key] || []
@@ -219,6 +221,27 @@ export default function SettingsModal({
 
             {section === 'profile' && (
               <div className="color-pickers">
+                {account && (
+                  <>
+                    <p className="settings-field-label">Account</p>
+                    <div className="account-card">
+                      <span className="account-avatar" aria-hidden="true">
+                        <Icon name="user" size={18} />
+                      </span>
+                      <span className="account-meta">
+                        <span className="account-name">{account.username || 'Signed in'}</span>
+                        <span className="account-email">{account.email}</span>
+                      </span>
+                    </div>
+                    <p className="settings-field-label">
+                      Your data syncs to this account, so it follows you to any device you sign in on.
+                    </p>
+                    <button type="button" className="ghost-btn auth-signout" onClick={onSignOut}>
+                      Sign out
+                    </button>
+                  </>
+                )}
+
                 <p className="settings-field-label">Personal information</p>
                 <label className="study-field">
                   Name

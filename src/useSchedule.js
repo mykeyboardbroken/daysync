@@ -1,6 +1,7 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { CYCLE_DAYS, isSharedPeriod } from './schoolCalendar'
 import { toKey, keyToDate, addDays } from './dateUtils'
+import { supabase, isCloudEnabled, DATA_TABLE } from './supabase'
 
 // XP awarded for completing each kind of thing.
 const XP = { task: 10, assignment: 15, event: 20, workout: 25 }
@@ -530,12 +531,60 @@ function defaultNeeds(subject) {
   return `${s} Books, Device`
 }
 
-export function useSchedule() {
+// `userId` (from useAuth) turns on cloud sync. Without it the store is local-only,
+// exactly as before.
+export function useSchedule(userId = null) {
   const [data, setData] = useState(load)
 
+  // localStorage stays the offline cache / source of truth on-device, so the app
+  // still works with no signal. The cloud is a mirror on top of it.
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(data))
   }, [data])
+
+  // ---- Cloud sync ----
+  // Latest data without making the pull effect depend on it (which would re-pull
+  // on every keystroke).
+  const dataRef = useRef(data)
+  dataRef.current = data
+  // Only start pushing once we've pulled, or the first save would overwrite the
+  // account's real data with whatever was cached on this device.
+  const [synced, setSynced] = useState(false)
+
+  // Pull on sign-in: adopt the account's data, or seed the account from what's
+  // already on this device (so signing up doesn't throw away an existing setup).
+  useEffect(() => {
+    if (!isCloudEnabled || !userId) return
+    let alive = true
+    setSynced(false)
+    ;(async () => {
+      const { data: row, error } = await supabase
+        .from(DATA_TABLE)
+        .select('data')
+        .eq('user_id', userId)
+        .maybeSingle()
+      if (!alive) return
+      if (error) return // offline or blocked — keep working from the local cache
+      if (row?.data) setData(normalize(row.data))
+      else await supabase.from(DATA_TABLE).upsert({ user_id: userId, data: dataRef.current })
+      if (alive) setSynced(true)
+    })()
+    return () => {
+      alive = false
+    }
+  }, [userId])
+
+  // Push on change, debounced so a burst of edits is one write.
+  useEffect(() => {
+    if (!isCloudEnabled || !userId || !synced) return
+    const t = setTimeout(() => {
+      supabase
+        .from(DATA_TABLE)
+        .upsert({ user_id: userId, data, updated_at: new Date().toISOString() })
+        .then(() => {}, () => {}) // offline writes fail silently; local cache still has it
+    }, 800)
+    return () => clearTimeout(t)
+  }, [data, userId, synced])
 
   // Login streak: bump once per day. Same day = no change; yesterday = +1;
   // a gap resets to 1. Runs once on mount.
@@ -1014,14 +1063,22 @@ export function useSchedule() {
   // boots exactly like a first install (survey + the curated starter routines).
   // Reloading rather than just setState avoids any in-flight save writing the old
   // data straight back, and re-runs the first-open effects (login streak, etc.).
-  const resetAll = useCallback(() => {
+  const resetAll = useCallback(async () => {
+    // Signed in? Drop the cloud row too, or the reload would just pull it all back.
+    if (isCloudEnabled && userId) {
+      try {
+        await supabase.from(DATA_TABLE).delete().eq('user_id', userId)
+      } catch {
+        /* offline — the local wipe below still happens */
+      }
+    }
     try {
       localStorage.removeItem(STORAGE_KEY)
     } catch {
       /* ignore — reload still gives a clean slate */
     }
     window.location.reload()
-  }, [])
+  }, [userId])
 
   // Bulk-set the timetable from an imported screenshot. `grid` is
   // { [cycleDay]: { [periodId]: { subject, room } } }. `mode` 'merge' keeps the

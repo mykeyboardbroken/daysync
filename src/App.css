@@ -63,6 +63,105 @@
 }
 .settings-row-label { flex: 1; text-align: left; }
 .settings-chevron { color: var(--text-dim); }
+/* ---------- Auth (sign in / sign up) ---------- */
+.auth-screen {
+  position: fixed;
+  inset: 0;
+  background: var(--bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: calc(24px + env(safe-area-inset-top)) 20px calc(24px + env(safe-area-inset-bottom));
+  overflow-y: auto;
+  z-index: 300;
+}
+.auth-card {
+  width: 100%;
+  max-width: 380px;
+  display: flex;
+  flex-direction: column;
+}
+.auth-mark {
+  width: 52px;
+  height: 52px;
+  border-radius: 15px;
+  display: grid;
+  place-items: center;
+  color: #fff;
+  background: var(--accent);
+  margin-bottom: 20px;
+}
+.auth-title { font-size: 26px; margin: 0 0 6px; }
+.auth-sub { color: var(--text-dim); font-size: 14px; margin: 0 0 24px; line-height: 1.5; }
+.auth-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--text-dim);
+  margin-bottom: 14px;
+}
+.auth-field input {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 13px 14px;
+  color: var(--text);
+  font-size: 15px;
+  font-family: inherit;
+}
+.auth-field input:focus { outline: none; border-color: var(--accent); }
+.auth-error {
+  color: var(--danger);
+  font-size: 13px;
+  margin: 2px 0 12px;
+  line-height: 1.45;
+}
+.auth-notice {
+  color: var(--accent);
+  font-size: 13px;
+  margin: 2px 0 12px;
+  line-height: 1.45;
+}
+.auth-submit { width: 100%; padding: 14px; margin-top: 6px; font-size: 15px; }
+.auth-swap {
+  border: none;
+  background: none;
+  color: var(--text-dim);
+  font-size: 13px;
+  font-family: inherit;
+  padding: 16px 0 0;
+  cursor: pointer;
+}
+.auth-swap:hover { color: var(--accent); }
+
+/* Signed-in account card in Settings → Profile. */
+.account-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0;
+}
+.account-avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  display: grid;
+  place-items: center;
+  color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 14%, transparent);
+  flex-shrink: 0;
+}
+.account-meta { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.account-name { font-size: 15px; font-weight: 600; }
+.account-email {
+  font-size: 12px;
+  color: var(--text-dim);
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.auth-signout { align-self: flex-start; margin-bottom: 8px; }
+
 /* Destructive row (Reset everything) — reads as dangerous without a boxed look. */
 .settings-row-danger { color: var(--danger); }
 .settings-row-danger .settings-row-icon {

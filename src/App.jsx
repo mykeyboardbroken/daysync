@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useSchedule } from './useSchedule'
+import { useAuth } from './useAuth'
+import AuthScreen from './components/AuthScreen'
 import TabBar from './components/TabBar'
 import SettingsModal from './components/SettingsModal'
 import SurveyModal from './components/SurveyModal'
@@ -32,7 +34,8 @@ function shade(hex, factor) {
 }
 
 export default function App() {
-  const schedule = useSchedule()
+  const auth = useAuth()
+  const schedule = useSchedule(auth.userId)
 
   const [tab, setTab] = useState('today')
   // null = closed; otherwise the add flow: 'menu' | 'assignment' | 'date' | …
@@ -59,6 +62,12 @@ export default function App() {
     setAdding(null)
   }
 
+  // With accounts enabled, nothing loads until we know who you are.
+  if (auth.enabled && auth.loading) return <div className="auth-screen" />
+  if (auth.enabled && !auth.session) {
+    return <AuthScreen onSignIn={auth.signIn} onSignUp={auth.signUp} />
+  }
+
   return (
     <div className="app">
       <header className="app-header">
@@ -80,6 +89,8 @@ export default function App() {
           onExport={schedule.exportData}
           onImport={schedule.importData}
           onReset={schedule.resetAll}
+          account={auth.enabled ? { email: auth.session?.user?.email, username: auth.username } : null}
+          onSignOut={auth.signOut}
         />
       )}
 
