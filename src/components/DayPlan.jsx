@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { dueLabel, toKey } from '../dateUtils'
-import { DAY_PARTS } from '../dayParts'
+import { DAY_PARTS, BUCKET_OPTIONS } from '../dayParts'
 import { habitDueOn, habitDoneOn, habitStreak } from '../habits'
 import { categoryMeta } from '../taskCategories'
 import { TASK_TEMPLATES } from '../taskTemplates'
@@ -337,6 +337,7 @@ export default function DayPlan({ schedule }) {
               {TASK_TEMPLATES.map((tpl) => {
                 const already = tasks.some((t) => t.title === tpl.title)
                 const hint = tpl.description || (tpl.steps || []).join(' · ')
+                const slot = BUCKET_OPTIONS.find((b) => b.key === (tpl.bucket || ''))
                 return (
                   <button
                     key={tpl.title}
@@ -351,6 +352,12 @@ export default function DayPlan({ schedule }) {
                     <span className="add-menu-text">
                       <span className="add-menu-label">{tpl.title}</span>
                       <span className="add-menu-hint">{hint}</span>
+                      {slot && (
+                        <span className="add-menu-slot">
+                          <Icon name={slot.icon} size={13} />
+                          {slot.label}
+                        </span>
+                      )}
                     </span>
                     {already && <Icon name="checkmark" size={18} className="add-menu-check" />}
                   </button>

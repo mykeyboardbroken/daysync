@@ -30,6 +30,24 @@ export const TASK_TEMPLATES = [
     days: ALL,
   },
   {
+    title: 'Sunlight exposure',
+    description:
+      'Spend 5 minutes looking outside or stepping into the sun to lock in your circadian rhythm.',
+    steps: [],
+    bucket: 'morning',
+    category: 'health',
+    days: ALL,
+  },
+  {
+    title: 'Review daily plan',
+    description:
+      "A quick 60-second glance at your schedule so you know exactly what your targets are for the day.",
+    steps: [],
+    bucket: 'morning',
+    category: 'lifestyle',
+    days: ALL,
+  },
+  {
     title: 'Night grooming',
     description: '',
     steps: ['Wash your face', 'Brush your teeth', 'Moisturise / skincare'],
@@ -51,6 +69,14 @@ export const TASK_TEMPLATES = [
     steps: [],
     bucket: 'afternoon',
     category: 'lifestyle',
+    days: ALL,
+  },
+  {
+    title: 'Snack break',
+    description: 'A proper pause to refuel — grab something to eat and take a breather.',
+    steps: [],
+    bucket: 'afternoon',
+    category: 'health',
     days: ALL,
   },
   {
@@ -81,6 +107,15 @@ export const TASK_TEMPLATES = [
   {
     title: "Check tomorrow's plans",
     description: "A quick look at what's on tomorrow so nothing catches you off guard.",
+    steps: [],
+    bucket: 'night',
+    category: 'lifestyle',
+    days: ALL,
+  },
+  {
+    title: 'Charge all devices',
+    description:
+      'Plug in your laptop, phone, and headphones so they sit at 100% when you wake up.',
     steps: [],
     bucket: 'night',
     category: 'lifestyle',
