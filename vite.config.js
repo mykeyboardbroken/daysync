@@ -9,6 +9,11 @@ export default defineConfig({
     VitePWA({
       registerType: 'autoUpdate', // new deploys activate + refresh on next load
       includeAssets: ['icon.svg', 'apple-touch-icon.png'],
+      // Precache the self-hosted font too, or the installed app falls back to a
+      // system font when offline (woff2 isn't in Workbox's default globs).
+      workbox: {
+        globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
+      },
       manifest: {
         name: 'DaySync',
         short_name: 'DaySync',

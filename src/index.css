@@ -15,9 +15,21 @@
   --cal-public: #f87171;
   --cal-public-bg: rgba(248, 113, 113, 0.24);
 
-  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  /* Inter is self-hosted (see main.jsx) so it renders the same everywhere and
+     still works offline in the installed PWA. System fonts are the fallback. */
+  font-family: 'Inter Variable', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  /* Modern numerals: same-width digits so timers/dates don't jitter, plus Inter's
+     nicer single-storey glyph set. */
+  font-feature-settings: 'cv05' 1, 'ss01' 1, 'tnum' 1;
   color: var(--text);
   background: var(--bg);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Headings: tighter tracking is what reads as "modern" at large sizes. */
+h1, h2, h3, h4 {
+  letter-spacing: -0.02em;
 }
 
 /* Colour themes — swap just the accent (dark base) or the whole palette (light). */
