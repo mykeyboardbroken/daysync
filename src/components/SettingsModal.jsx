@@ -46,8 +46,12 @@ const SECTIONS = [
   { key: 'appearance', label: 'Appearance', icon: 'palette' },
   { key: 'tasks', label: 'Tasks', icon: 'check' },
   { key: 'profile', label: 'Profile', icon: 'user' },
+  { key: 'feedback', label: 'Feedback', icon: 'mail' },
   { key: 'backup', label: 'Backup', icon: 'file' },
 ]
+
+// Where feedback emails go (the app maker).
+const FEEDBACK_EMAIL = 'briankimnz@gmail.com'
 
 const SPORT_OPTIONS = [
   'Football / Soccer',
@@ -78,7 +82,13 @@ export default function SettingsModal({
   }
   const [section, setSection] = useState(null)
   const [backupMsg, setBackupMsg] = useState('')
+  const [feedback, setFeedback] = useState('')
   const fileRef = useRef(null)
+
+  function sendFeedback() {
+    const body = encodeURIComponent(feedback.trim())
+    window.location.href = `mailto:${FEEDBACK_EMAIL}?subject=${encodeURIComponent('DaySync feedback')}&body=${body}`
+  }
 
   // The hue slider tracks its own position so dragging is smooth (deriving it
   // from the colour each render makes the thumb snap, since 0° and 360° are the
@@ -321,6 +331,29 @@ export default function SettingsModal({
                     </button>
                   ))}
                 </div>
+              </div>
+            )}
+
+            {section === 'feedback' && (
+              <div className="color-pickers">
+                <p className="settings-field-label">
+                  What do you like, what's missing, any bugs? This opens your email app to send it.
+                </p>
+                <textarea
+                  className="feedback-input"
+                  rows={5}
+                  value={feedback}
+                  onChange={(e) => setFeedback(e.target.value)}
+                  placeholder="Your feedback…"
+                />
+                <button
+                  type="button"
+                  className="primary-btn"
+                  onClick={sendFeedback}
+                  disabled={!feedback.trim()}
+                >
+                  Send feedback
+                </button>
               </div>
             )}
 

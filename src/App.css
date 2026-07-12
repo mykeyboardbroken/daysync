@@ -63,6 +63,21 @@
 }
 .settings-row-label { flex: 1; text-align: left; }
 .settings-chevron { color: var(--text-dim); }
+.feedback-input {
+  width: 100%;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px;
+  color: var(--text);
+  font-size: 14px;
+  font-family: inherit;
+  line-height: 1.45;
+  resize: vertical;
+  min-height: 110px;
+  margin-bottom: 12px;
+}
+.feedback-input:focus { outline: none; border-color: var(--accent); }
 
 .settings-head { display: flex; align-items: center; gap: 6px; margin-bottom: 6px; }
 .settings-head h3 { margin: 0; }
