@@ -276,38 +276,34 @@ export default function SettingsModal({
                   ))}
                 </div>
 
-                <label className="study-field">
-                  Weight
-                  <input
-                    type="text"
-                    value={profile.weight || ''}
-                    placeholder="e.g. 70 kg"
-                    onChange={(e) => onSetProfile('weight', e.target.value)}
-                  />
-                </label>
-                <label className="study-field">
-                  Height
-                  <input
-                    type="text"
-                    value={profile.height || ''}
-                    placeholder="e.g. 175 cm"
-                    onChange={(e) => onSetProfile('height', e.target.value)}
-                  />
-                </label>
-
-                <p className="settings-field-label">Weight units</p>
-                <div className="type-select repeat-select habit-days">
-                  {['kg', 'lbs'].map((u) => (
-                    <button
-                      type="button"
-                      key={u}
-                      className={`type-option ${(settings?.weightUnit || 'kg') === u ? 'selected' : ''}`}
-                      onClick={() => onSetSetting('weightUnit', u)}
-                    >
-                      {u}
-                    </button>
-                  ))}
-                </div>
+                {[
+                  { key: 'weight', label: 'Weight', units: ['kg', 'lb'], ph: 'e.g. 70' },
+                  { key: 'height', label: 'Height', units: ['cm', 'ft'], ph: 'e.g. 175' },
+                ].map((f) => (
+                  <label className="study-field" key={f.key}>
+                    {f.label}
+                    <span className="field-with-unit">
+                      <input
+                        type="text"
+                        value={profile[f.key] || ''}
+                        placeholder={f.ph}
+                        onChange={(e) => onSetProfile(f.key, e.target.value)}
+                      />
+                      <span className="survey-units">
+                        {f.units.map((u) => (
+                          <button
+                            key={u}
+                            type="button"
+                            className={`survey-unit ${(profile[`${f.key}Unit`] || f.units[0]) === u ? 'selected' : ''}`}
+                            onClick={() => onSetProfile(`${f.key}Unit`, u)}
+                          >
+                            {u}
+                          </button>
+                        ))}
+                      </span>
+                    </span>
+                  </label>
+                ))}
 
                 <p className="settings-field-label">Workout location</p>
                 <div className="type-select repeat-select habit-days">

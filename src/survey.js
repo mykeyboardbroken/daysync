@@ -2,9 +2,11 @@
 // them in order and stores answers by `id` into the user's profile.
 //
 // Question types:
-//   { id, type: 'text',   question, hint?, placeholder?, skipLabel? }
+//   { id, type: 'text',   question, hint?, placeholder?, skipLabel?, units? }
 // `skipLabel` on a text question adds a button that clears the answer and moves
 // on (e.g. "Rather not say"), so nobody has to type something they'd rather not.
+// `units` adds a unit toggle beside the input (first one is the default); the
+// choice is stored alongside the answer as `<id>Unit` — e.g. weight + weightUnit.
 //   { id, type: 'single', question, hint?, options: ['A', 'B', ...] }
 //   { id, type: 'multi',  question, hint?, options: ['A', 'B', ...] }
 // A question may also carry `showIf: (answers) => bool` to appear conditionally.
@@ -29,7 +31,8 @@ export const SURVEY_QUESTIONS = [
     type: 'text',
     question: 'What do you weigh?',
     hint: 'Sharing this helps personalise your training. Private — kept on your device.',
-    placeholder: 'e.g. 70 kg',
+    placeholder: 'e.g. 70',
+    units: ['kg', 'lb'],
     skipLabel: 'Rather not say',
   },
   {
@@ -37,7 +40,8 @@ export const SURVEY_QUESTIONS = [
     type: 'text',
     question: 'How tall are you?',
     hint: 'Sharing this helps personalise your training. Private — kept on your device.',
-    placeholder: 'e.g. 175 cm',
+    placeholder: 'e.g. 175',
+    units: ['cm', 'ft'],
     skipLabel: 'Rather not say',
   },
   {

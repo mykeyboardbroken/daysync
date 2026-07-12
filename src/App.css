@@ -1084,6 +1084,34 @@
 .survey-option.selected { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 14%, var(--surface-2)); }
 
 .survey-nav { display: flex; align-items: center; gap: 10px; padding-top: 20px; }
+/* Settings: a profile input with its unit toggle on the right. */
+.field-with-unit { display: flex; align-items: stretch; gap: 8px; }
+.field-with-unit input { flex: 1; min-width: 0; }
+.field-with-unit .survey-unit { padding: 6px 10px; font-size: 13px; }
+
+/* Text answer + optional unit toggle (kg/lb, cm/ft) sitting beside it. */
+.survey-input-row { display: flex; align-items: stretch; gap: 10px; }
+.survey-input-row .survey-input { flex: 1; min-width: 0; }
+.survey-units {
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  align-items: center;
+}
+.survey-unit {
+  border: none;
+  background: none;
+  color: var(--text-dim);
+  font-family: inherit;
+  font-size: 14px;
+  padding: 8px 12px;
+  border-radius: 9px;
+  cursor: pointer;
+}
+.survey-unit.selected { background: var(--accent); color: #fff; }
+
 /* "Rather not say" — a quiet opt-out under an optional text question. */
 .survey-skip {
   align-self: flex-start;

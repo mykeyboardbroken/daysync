@@ -4,7 +4,13 @@ import { useState, useEffect } from 'react'
 // and hands the collected answers back on Finish.
 export default function SurveyModal({ questions, onComplete }) {
   const [step, setStep] = useState(0)
-  const [answers, setAnswers] = useState({})
+  // Unit-bearing questions start on their first unit, so an untouched toggle
+  // still records which unit the typed number is in.
+  const [answers, setAnswers] = useState(() => {
+    const init = {}
+    for (const q of questions) if (q.units) init[`${q.id}Unit`] = q.units[0]
+    return init
+  })
 
   // Only questions whose showIf currently passes are part of the flow.
   const visible = questions.filter((q) => !q.showIf || q.showIf(answers))
@@ -69,14 +75,30 @@ export default function SurveyModal({ questions, onComplete }) {
 
           {q.type === 'text' && (
             <>
-              <input
-                className="survey-input"
-                type="text"
-                value={value || ''}
-                placeholder={q.placeholder || ''}
-                onChange={(e) => setAnswer(e.target.value)}
-                autoFocus
-              />
+              <div className="survey-input-row">
+                <input
+                  className="survey-input"
+                  type="text"
+                  value={value || ''}
+                  placeholder={q.placeholder || ''}
+                  onChange={(e) => setAnswer(e.target.value)}
+                  autoFocus
+                />
+                {q.units && (
+                  <div className="survey-units">
+                    {q.units.map((u) => (
+                      <button
+                        key={u}
+                        type="button"
+                        className={`survey-unit ${(answers[`${q.id}Unit`] || q.units[0]) === u ? 'selected' : ''}`}
+                        onClick={() => setAnswers((a) => ({ ...a, [`${q.id}Unit`]: u }))}
+                      >
+                        {u}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
               {q.skipLabel && (
                 <button type="button" className="survey-skip" onClick={skip}>
                   {q.skipLabel}
