@@ -1694,6 +1694,26 @@ p.weather-strip { font-size: 13px; }
   color: var(--accent);
   background: color-mix(in srgb, var(--accent) 14%, transparent);
 }
+/* Compact one-line rows: icon · title · slot badge (no descriptions). */
+.add-menu-compact .add-menu-item {
+  align-items: center;
+  padding: 10px 12px;
+  gap: 10px;
+}
+.add-menu-compact .add-menu-label { flex: 1; font-size: 15px; font-weight: 600; }
+.add-menu-compact .add-menu-slot { margin-top: 0; align-self: center; }
+/* "More routines" reveal — a quiet, full-width text button under the essentials. */
+.add-menu-more {
+  border: none;
+  background: none;
+  color: var(--accent);
+  font-size: 14px;
+  font-weight: 600;
+  padding: 10px;
+  cursor: pointer;
+  text-align: center;
+}
+.add-menu-more:hover { text-decoration: underline; }
 /* Already-added template: shaded in with a checkmark, not just faded. */
 .add-menu-item.added {
   background: color-mix(in srgb, var(--accent) 16%, var(--surface-2));

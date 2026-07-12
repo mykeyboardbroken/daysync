@@ -12,6 +12,7 @@ export const TASK_TEMPLATES = [
     category: 'health',
     days: ALL,
     pinFirst: true,
+    essential: true,
   },
   {
     title: 'Journaling',
@@ -20,6 +21,7 @@ export const TASK_TEMPLATES = [
     bucket: 'morning',
     category: 'lifestyle',
     days: ALL,
+    essential: true,
   },
   {
     title: 'Morning grooming',
@@ -62,6 +64,7 @@ export const TASK_TEMPLATES = [
     bucket: 'afternoon',
     category: 'health',
     days: ALL,
+    essential: true,
   },
   {
     title: 'Reading',
@@ -70,6 +73,7 @@ export const TASK_TEMPLATES = [
     bucket: 'afternoon',
     category: 'lifestyle',
     days: ALL,
+    essential: true,
   },
   {
     title: 'Snack break',
@@ -103,6 +107,7 @@ export const TASK_TEMPLATES = [
     category: 'lifestyle',
     days: ALL,
     pinLast: true,
+    essential: true,
   },
   {
     title: "Check tomorrow's plans",
@@ -142,8 +147,9 @@ export const TASK_TEMPLATES = [
     title: 'Meditation',
     description: 'A few quiet minutes of focused breathing to settle your mind.',
     steps: [],
-    bucket: '',
+    bucket: 'night',
     category: 'health',
     days: ALL,
+    essential: true,
   },
 ]
