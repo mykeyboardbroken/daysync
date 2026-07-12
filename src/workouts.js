@@ -130,27 +130,6 @@ const ROTATION = [
   { key: 'legs', label: 'Legs day' },
 ]
 
-// Goal-based finishers bolted onto the end of a general workout.
-const CONDITIONING = [
-  'Finisher: 8 min skipping or jog intervals',
-  'Finisher: 10 min brisk incline walk or row',
-  'Finisher: 5 rounds — 30 s burpees / 30 s rest',
-]
-const PLYO = [
-  'Finisher: 3 × 8 squat jumps',
-  'Finisher: 3 × 5 broad jumps',
-  'Finisher: 3 × 10 s explosive step-ups each leg',
-]
-
-// How the user's goal shapes the general workout. `extraMain` adds volume;
-// `finisher` is a pool to tack a closing block on from (null = none).
-function goalTuning(goal) {
-  if (goal === 'Build muscle') return { extraMain: 1, finisher: null }
-  if (goal === 'Lose weight') return { extraMain: 0, finisher: CONDITIONING }
-  if (goal === 'Sport performance') return { extraMain: 0, finisher: PLYO }
-  return { extraMain: 0, finisher: null } // "Stay fit" / unset — balanced
-}
-
 // A gentle, fully-overridable emphasis: which body part gets one extra accessory,
 // reflecting a common training *preference* (not a rule). Reshuffle changes it and
 // anyone can ignore it. '' / unset = no emphasis.
@@ -266,16 +245,12 @@ export function generateGeneral(profile = {}, date = new Date(), seed = 0) {
   const rot = ROTATION[(dayNumber(date) + seed) % ROTATION.length]
   const pool = (part) => GENERAL[part].filter((e) => avail.has(e.eq)).map((e) => e.name)
 
-  const tune = goalTuning(profile.goal)
-  const mainCount = intensityForAge(profile.age).main + tune.extraMain
-
   const steps = [WARMUPS[Math.floor(rand() * WARMUPS.length)]]
-  steps.push(...pickSome(pool(rot.key), mainCount, rand, seen))
+  steps.push(...pickSome(pool(rot.key), intensityForAge(profile.age).main, rand, seen))
   // One extra accessory from the gender-preferred part (if it's not today's part).
   const emph = genderEmphasis(profile.gender)
   if (emph && emph !== rot.key) steps.push(...pickSome(pool(emph), 1, rand, seen))
   steps.push(...pickSome(pool('core'), 1, rand, seen))
-  if (tune.finisher) steps.push(tune.finisher[Math.floor(rand() * tune.finisher.length)])
   steps.push(COOLDOWNS[Math.floor(rand() * COOLDOWNS.length)])
   return { steps, label: rot.label }
 }

@@ -37,13 +37,6 @@ export const SURVEY_QUESTIONS = [
     placeholder: 'e.g. 175 cm',
   },
   {
-    id: 'goal',
-    type: 'single',
-    question: "What's your main fitness goal?",
-    hint: 'Shapes your generated workout — volume, and any finisher.',
-    options: ['Build muscle', 'Stay fit', 'Lose weight', 'Sport performance'],
-  },
-  {
     id: 'sports',
     type: 'multi',
     question: 'What sports do you play?',

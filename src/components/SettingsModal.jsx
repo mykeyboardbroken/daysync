@@ -295,20 +295,6 @@ export default function SettingsModal({
                   />
                 </label>
 
-                <p className="settings-field-label">Fitness goal</p>
-                <div className="type-select repeat-select habit-days goal-select">
-                  {['Build muscle', 'Stay fit', 'Lose weight', 'Sport performance'].map((g) => (
-                    <button
-                      type="button"
-                      key={g}
-                      className={`type-option ${profile.goal === g ? 'selected' : ''}`}
-                      onClick={() => onSetProfile('goal', g)}
-                    >
-                      {g}
-                    </button>
-                  ))}
-                </div>
-
                 <p className="settings-field-label">Weight units</p>
                 <div className="type-select repeat-select habit-days">
                   {['kg', 'lbs'].map((u) => (
