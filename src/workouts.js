@@ -54,6 +54,30 @@ const SPORT_SKILLS = {
     'Net play': { desc: 'Volleys and finishing at the net.', drills: ['Volleys at the net — 10 min', 'Approach & volley — 10 min'] },
     Footwork: { desc: 'Movement and court coverage.', drills: ['Footwork ladder — 5 min', 'Split-step & recovery — 10 min'] },
   },
+  Volleyball: {
+    Passing: { desc: 'Platform control on digs and receives.', drills: ['Wall passing — 10 min', 'Partner digs — 10 min', 'Serve receive — 20 reps'] },
+    Setting: { desc: 'Clean, consistent hands.', drills: ['Wall setting — 8 min', 'Setting to target — 30 reps'] },
+    Serving: { desc: 'Getting the serve in, then getting it tough.', drills: ['Serve practice — 30 serves', 'Serve to zones — 20 serves'] },
+    Hitting: { desc: 'Approach, timing and the swing.', drills: ['Approach footwork — 15 reps', 'Hitting off a toss — 20 swings'] },
+  },
+  Badminton: {
+    Clears: { desc: 'Depth and control to the back court.', drills: ['Overhead clears — 10 min', 'Clear-to-clear rally — 10 min'] },
+    'Net play': { desc: 'Soft hands at the net.', drills: ['Net shots — 10 min', 'Net kill reactions — 5 min'] },
+    Smash: { desc: 'Power and steepness on the attack.', drills: ['Smash practice — 30 reps', 'Jump smash technique — 15 reps'] },
+    Footwork: { desc: 'Covering the court in six directions.', drills: ['Shadow footwork — 6 × 1 min', 'Corner-to-corner movement — 10 min'] },
+  },
+  Hockey: {
+    Passing: { desc: 'Push passes and receiving cleanly.', drills: ['Push-pass against a wall — 10 min', 'Receiving on the move — 10 min'] },
+    Dribbling: { desc: 'Close stick control and beating a defender.', drills: ['Indian dribble — 8 min', 'Dribble through cones — 5 rounds'] },
+    Shooting: { desc: 'Finishing from the circle.', drills: ['Shooting practice — 20 shots', 'Deflections — 15 reps'] },
+    Fitness: { desc: 'Speed and stamina over a full game.', drills: ['Shuttle runs — 8 × 40 m', 'Interval run — 6 × 1 min'] },
+  },
+  Dance: {
+    Technique: { desc: 'Clean lines, control and placement.', drills: ['Technique drill — 15 min', 'Isolations & control — 10 min'] },
+    Flexibility: { desc: 'Range of motion, safely built.', drills: ['Guided stretch flow — 15 min', 'Active mobility — 10 min'] },
+    Choreography: { desc: 'Learning and retaining sequences.', drills: ['Learn 8 counts — 15 min', 'Run the routine — 5 rounds'] },
+    Stamina: { desc: 'Holding quality through a full piece.', drills: ['Full-out run-through — 3 rounds', 'Cardio intervals — 10 min'] },
+  },
 }
 
 // The skill aspects for a sport (for the strong/weak picker).
@@ -130,12 +154,13 @@ const ROTATION = [
   { key: 'legs', label: 'Legs day' },
 ]
 
-// A gentle, fully-overridable emphasis: which body part gets one extra accessory,
-// reflecting a common training *preference* (not a rule). Reshuffle changes it and
-// anyone can ignore it. '' / unset = no emphasis.
-function genderEmphasis(gender) {
-  if (gender === 'Female') return 'legs'
-  if (gender === 'Male') return 'push'
+// Which body part gets one extra accessory. This comes from the user's OWN answer
+// ("Anywhere you'd like to focus?") — never inferred from their gender or body.
+// 'Full body' / unset = no emphasis, just the plain rotation.
+function focusPart(focus, rand) {
+  if (focus === 'Lower body') return 'legs'
+  if (focus === 'Core') return 'core'
+  if (focus === 'Upper body') return rand() < 0.5 ? 'push' : 'pull'
   return null
 }
 
@@ -247,9 +272,9 @@ export function generateGeneral(profile = {}, date = new Date(), seed = 0) {
 
   const steps = [WARMUPS[Math.floor(rand() * WARMUPS.length)]]
   steps.push(...pickSome(pool(rot.key), intensityForAge(profile.age).main, rand, seen))
-  // One extra accessory from the gender-preferred part (if it's not today's part).
-  const emph = genderEmphasis(profile.gender)
-  if (emph && emph !== rot.key) steps.push(...pickSome(pool(emph), 1, rand, seen))
+  // One extra accessory from the part they chose to focus on (if not today's part).
+  const focus = focusPart(profile.focus, rand)
+  if (focus && focus !== rot.key) steps.push(...pickSome(pool(focus), 1, rand, seen))
   steps.push(...pickSome(pool('core'), 1, rand, seen))
   steps.push(COOLDOWNS[Math.floor(rand() * COOLDOWNS.length)])
   return { steps, label: rot.label }

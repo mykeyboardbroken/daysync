@@ -62,9 +62,14 @@ const SPORT_OPTIONS = [
   'Cricket',
   'Swimming',
   'Tennis',
+  'Volleyball',
+  'Badminton',
+  'Hockey',
+  'Dance',
 ]
 const EQUIP_OPTIONS = ['Dumbbells', 'Resistance bands', 'Pull-up bar', 'Kettlebell', 'Skipping rope', 'Just bodyweight']
 const TIME_OPTIONS = ['Morning', 'Afternoon', 'Night', 'Anytime', "I don't"]
+const FOCUS_OPTIONS = ['Full body', 'Upper body', 'Lower body', 'Core']
 
 export default function SettingsModal({
   customColors,
@@ -304,6 +309,20 @@ export default function SettingsModal({
                     </span>
                   </label>
                 ))}
+
+                <p className="settings-field-label">Workout focus</p>
+                <div className="type-select repeat-select habit-days">
+                  {FOCUS_OPTIONS.map((f) => (
+                    <button
+                      type="button"
+                      key={f}
+                      className={`type-option ${(profile.focus || 'Full body') === f ? 'selected' : ''}`}
+                      onClick={() => onSetProfile('focus', f)}
+                    >
+                      {f}
+                    </button>
+                  ))}
+                </div>
 
                 <p className="settings-field-label">Workout location</p>
                 <div className="type-select repeat-select habit-days">

@@ -10,6 +10,11 @@
 //   { id, type: 'single', question, hint?, options: ['A', 'B', ...] }
 //   { id, type: 'multi',  question, hint?, options: ['A', 'B', ...] }
 // A question may also carry `showIf: (answers) => bool` to appear conditionally.
+//
+// Training is OPT-IN and asked, never assumed: "do you work out?" and "do you play
+// sports?" gate everything downstream. Say no to both and the app simply never
+// mentions training again — no nagging, no goals, no body metrics. We also don't
+// ask weight/height here; they live in Settings → Profile for anyone who wants them.
 export const SURVEY_QUESTIONS = [
   { id: 'name', type: 'text', question: "What's your name?", placeholder: 'Your name' },
   {
@@ -26,29 +31,59 @@ export const SURVEY_QUESTIONS = [
     hint: 'Used to right-size your workout — shorter/easier or a bit longer.',
     placeholder: 'e.g. 19',
   },
+
+  // ---- Workout (entirely optional) ----
   {
-    id: 'weight',
-    type: 'text',
-    question: 'What do you weigh?',
-    hint: 'Sharing this helps personalise your training. Private — kept on your device.',
-    placeholder: 'e.g. 70',
-    units: ['kg', 'lb'],
-    skipLabel: 'Rather not say',
+    id: 'worksOut',
+    type: 'single',
+    question: 'Do you work out?',
+    hint: "Totally fine either way — say no and we'll leave workouts out of your day.",
+    options: ['Yes', 'No'],
   },
   {
-    id: 'height',
-    type: 'text',
-    question: 'How tall are you?',
-    hint: 'Sharing this helps personalise your training. Private — kept on your device.',
-    placeholder: 'e.g. 175',
-    units: ['cm', 'ft'],
-    skipLabel: 'Rather not say',
+    id: 'focus',
+    type: 'single',
+    question: "Anywhere you'd like to focus?",
+    hint: 'Your call — this just gets a little extra attention. Change it any time.',
+    options: ['Full body', 'Upper body', 'Lower body', 'Core'],
+    showIf: (a) => a.worksOut === 'Yes',
+  },
+  {
+    id: 'gym',
+    type: 'single',
+    question: 'Do you have access to a gym?',
+    options: ['Yes', 'No'],
+    showIf: (a) => a.worksOut === 'Yes',
+  },
+  {
+    id: 'equipment',
+    type: 'multi',
+    question: 'What equipment do you have at home?',
+    hint: 'Just so workouts fit what you’ve got. Pick any.',
+    options: ['Dumbbells', 'Resistance bands', 'Pull-up bar', 'Kettlebell', 'Skipping rope', 'Just bodyweight'],
+    showIf: (a) => a.worksOut === 'Yes' && a.gym === 'No',
+  },
+  {
+    id: 'workoutTime',
+    type: 'single',
+    question: 'When do you work out?',
+    hint: 'Your workout will sit in this part of your day.',
+    options: ['Morning', 'Afternoon', 'Night', 'Anytime'],
+    showIf: (a) => a.worksOut === 'Yes',
+  },
+
+  // ---- Sport (entirely optional) ----
+  {
+    id: 'playsSport',
+    type: 'single',
+    question: 'Do you play any sports?',
+    options: ['Yes', 'No'],
   },
   {
     id: 'sports',
     type: 'multi',
-    question: 'What sports do you play?',
-    hint: 'Your workout gets sport-specific drills for these. Skip if none.',
+    question: 'Which ones?',
+    hint: 'You get drills specific to these.',
     options: [
       'Football / Soccer',
       'Basketball',
@@ -58,35 +93,19 @@ export const SURVEY_QUESTIONS = [
       'Cricket',
       'Swimming',
       'Tennis',
+      'Volleyball',
+      'Badminton',
+      'Hockey',
+      'Dance',
     ],
-  },
-  {
-    id: 'gym',
-    type: 'single',
-    question: 'Do you have access to a gym?',
-    options: ['Yes', 'No'],
-  },
-  {
-    id: 'equipment',
-    type: 'multi',
-    question: 'What equipment do you have at home?',
-    hint: 'Just so workouts fit what you’ve got. Pick any.',
-    options: ['Dumbbells', 'Resistance bands', 'Pull-up bar', 'Kettlebell', 'Skipping rope', 'Just bodyweight'],
-    showIf: (a) => a.gym === 'No',
+    showIf: (a) => a.playsSport === 'Yes',
   },
   {
     id: 'sportTime',
     type: 'single',
-    question: 'When do you do sport training?',
+    question: 'When do you train for it?',
     hint: 'Your sport drills will sit in this part of your day.',
-    options: ['Morning', 'Afternoon', 'Night', 'Anytime', "I don't"],
-    showIf: (a) => (a.sports || []).length > 0,
-  },
-  {
-    id: 'workoutTime',
-    type: 'single',
-    question: 'When do you do a general workout?',
-    hint: 'Your strength workout will sit in this part of your day.',
-    options: ['Morning', 'Afternoon', 'Night', 'Anytime', "I don't"],
+    options: ['Morning', 'Afternoon', 'Night', 'Anytime'],
+    showIf: (a) => a.playsSport === 'Yes' && (a.sports || []).length > 0,
   },
 ]
