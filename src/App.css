@@ -63,6 +63,13 @@
 }
 .settings-row-label { flex: 1; text-align: left; }
 .settings-chevron { color: var(--text-dim); }
+/* Destructive row (Reset everything) — reads as dangerous without a boxed look. */
+.settings-row-danger { color: var(--danger); }
+.settings-row-danger .settings-row-icon {
+  color: var(--danger);
+  background: color-mix(in srgb, var(--danger) 14%, transparent);
+}
+.settings-row-danger .settings-chevron { color: var(--danger); }
 .feedback-input {
   width: 100%;
   background: var(--surface-2);

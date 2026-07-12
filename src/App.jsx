@@ -79,6 +79,7 @@ export default function App() {
           onSetProfile={schedule.setProfile}
           onExport={schedule.exportData}
           onImport={schedule.importData}
+          onReset={schedule.resetAll}
         />
       )}
 

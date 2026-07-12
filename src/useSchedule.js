@@ -1010,6 +1010,19 @@ export function useSchedule() {
     }
   }, [])
 
+  // Wipe everything and start over: clear storage, then hard-reload so the app
+  // boots exactly like a first install (survey + the curated starter routines).
+  // Reloading rather than just setState avoids any in-flight save writing the old
+  // data straight back, and re-runs the first-open effects (login streak, etc.).
+  const resetAll = useCallback(() => {
+    try {
+      localStorage.removeItem(STORAGE_KEY)
+    } catch {
+      /* ignore — reload still gives a clean slate */
+    }
+    window.location.reload()
+  }, [])
+
   // Bulk-set the timetable from an imported screenshot. `grid` is
   // { [cycleDay]: { [periodId]: { subject, room } } }. `mode` 'merge' keeps the
   // current timetable and fills/overwrites from the grid; 'new' starts from a
@@ -1084,6 +1097,7 @@ export function useSchedule() {
     dismissAlert,
     exportData,
     importData,
+    resetAll,
     addTask,
     toggleTask,
     updateTask,

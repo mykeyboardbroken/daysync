@@ -75,6 +75,7 @@ export default function SettingsModal({
   onSetProfile,
   onExport,
   onImport,
+  onReset,
 }) {
   const toggleProfileArr = (key, opt) => {
     const cur = profile[key] || []
@@ -83,6 +84,7 @@ export default function SettingsModal({
   const [section, setSection] = useState(null)
   const [backupMsg, setBackupMsg] = useState('')
   const [feedback, setFeedback] = useState('')
+  const [confirmReset, setConfirmReset] = useState(false)
   const fileRef = useRef(null)
 
   function sendFeedback() {
@@ -426,6 +428,20 @@ export default function SettingsModal({
                 <p className="settings-field-label">
                   {backupMsg || 'Export saves all your data as a file. Import replaces everything with a backup.'}
                 </p>
+
+                <button
+                  type="button"
+                  className="settings-row settings-row-danger"
+                  onClick={() => setConfirmReset(true)}
+                >
+                  <span className="settings-row-icon"><Icon name="trash" size={17} /></span>
+                  <span className="settings-row-label">Reset everything</span>
+                  <Icon name="chevronRight" size={18} className="settings-chevron" />
+                </button>
+                <p className="settings-field-label">
+                  Erases all your tasks, grades, timetable and settings on this device, and starts
+                  you back at the intro survey. Export a backup first if you want to keep anything.
+                </p>
               </div>
             )}
           </>
@@ -440,6 +456,27 @@ export default function SettingsModal({
             ))}
           </div>
         )}
+
+      {confirmReset && (
+        <div className="modal-overlay" onClick={() => setConfirmReset(false)}>
+          <div className="modal" onClick={(e) => e.stopPropagation()}>
+            <h3>Reset everything?</h3>
+            <p className="modal-sub">
+              This erases every task, grade, timetable entry, reminder and setting on this device,
+              and takes you back to the intro survey. It can't be undone.
+            </p>
+            <div className="modal-actions">
+              <button type="button" className="ghost-btn" onClick={() => setConfirmReset(false)}>
+                Cancel
+              </button>
+              <span className="spacer" />
+              <button type="button" className="danger-btn" onClick={onReset}>
+                Reset everything
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
