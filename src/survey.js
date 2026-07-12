@@ -23,6 +23,27 @@ export const SURVEY_QUESTIONS = [
     placeholder: 'e.g. 19',
   },
   {
+    id: 'weight',
+    type: 'text',
+    question: 'What do you weigh?',
+    hint: 'Optional and private — kept on your device. Skip if you prefer.',
+    placeholder: 'e.g. 70 kg',
+  },
+  {
+    id: 'height',
+    type: 'text',
+    question: 'How tall are you?',
+    hint: 'Optional and private — kept on your device. Skip if you prefer.',
+    placeholder: 'e.g. 175 cm',
+  },
+  {
+    id: 'goal',
+    type: 'single',
+    question: "What's your main fitness goal?",
+    hint: 'Shapes your generated workout — volume, and any finisher.',
+    options: ['Build muscle', 'Stay fit', 'Lose weight', 'Sport performance'],
+  },
+  {
     id: 'sports',
     type: 'multi',
     question: 'What sports do you play?',

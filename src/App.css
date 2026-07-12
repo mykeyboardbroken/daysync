@@ -427,6 +427,8 @@
 }
 .habit-days { flex-wrap: wrap; }
 .habit-days .type-option { flex: 1 1 auto; min-width: 46px; }
+/* Fitness-goal picker: 2-per-row so the longer labels read cleanly. */
+.goal-select .type-option { flex: 1 1 40%; min-width: 120px; }
 /* Even 7-across weekday picker so every day is the same width. */
 .type-select.day-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
 .day-grid .type-option { flex: none; min-width: 0; padding: 10px 2px; }

@@ -251,6 +251,39 @@ export default function SettingsModal({
                   ))}
                 </div>
 
+                <label className="study-field">
+                  Weight
+                  <input
+                    type="text"
+                    value={profile.weight || ''}
+                    placeholder="e.g. 70 kg"
+                    onChange={(e) => onSetProfile('weight', e.target.value)}
+                  />
+                </label>
+                <label className="study-field">
+                  Height
+                  <input
+                    type="text"
+                    value={profile.height || ''}
+                    placeholder="e.g. 175 cm"
+                    onChange={(e) => onSetProfile('height', e.target.value)}
+                  />
+                </label>
+
+                <p className="settings-field-label">Fitness goal</p>
+                <div className="type-select repeat-select habit-days goal-select">
+                  {['Build muscle', 'Stay fit', 'Lose weight', 'Sport performance'].map((g) => (
+                    <button
+                      type="button"
+                      key={g}
+                      className={`type-option ${profile.goal === g ? 'selected' : ''}`}
+                      onClick={() => onSetProfile('goal', g)}
+                    >
+                      {g}
+                    </button>
+                  ))}
+                </div>
+
                 <p className="settings-field-label">Weight units</p>
                 <div className="type-select repeat-select habit-days">
                   {['kg', 'lbs'].map((u) => (
