@@ -121,4 +121,29 @@ export const TASK_TEMPLATES = [
     category: 'lifestyle',
     days: ALL,
   },
+  {
+    title: 'Screen off / wind down',
+    description:
+      'Disconnect from all digital devices 30 minutes before sleep to let your brain rest.',
+    steps: [],
+    bucket: 'night',
+    category: 'health',
+    days: ALL,
+  },
+  {
+    title: 'Hydration',
+    description: 'Drink some water or refill your bottle to keep your energy steady.',
+    steps: [],
+    bucket: '',
+    category: 'health',
+    days: ALL,
+  },
+  {
+    title: 'Meditation',
+    description: 'A few quiet minutes of focused breathing to settle your mind.',
+    steps: [],
+    bucket: '',
+    category: 'health',
+    days: ALL,
+  },
 ]
