@@ -117,7 +117,7 @@
 .theme-option.selected { border-color: var(--accent); }
 .theme-swatch { width: 22px; height: 22px; border-radius: 50%; flex-shrink: 0; }
 .theme-text { flex: 1; display: flex; flex-direction: column; }
-.theme-label { font-weight: 700; font-size: 14px; color: var(--text); }
+.theme-label { font-weight: 600; font-size: 14px; color: var(--text); }
 .theme-base { font-size: 12px; color: var(--text-dim); }
 .theme-check { color: var(--accent); flex-shrink: 0; }
 
@@ -206,7 +206,7 @@
   text-align: left;
 }
 .toggle-text { flex: 1; display: flex; flex-direction: column; gap: 2px; }
-.toggle-label { font-weight: 700; font-size: 14px; color: var(--text); }
+.toggle-label { font-weight: 600; font-size: 14px; color: var(--text); }
 .toggle-hint { font-size: 12px; color: var(--text-dim); }
 .toggle {
   flex-shrink: 0;
@@ -270,7 +270,7 @@
   white-space: nowrap;
   opacity: 0;
   font-size: 14px;
-  font-weight: 700;
+  font-weight: 600;
   transition: max-width 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.25s ease, margin 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 .tab.active .tab-label { max-width: 120px; opacity: 1; margin-left: 8px; }
@@ -283,7 +283,7 @@
 
 /* ---------- Calendar ---------- */
 .cal-head { display: flex; align-items: center; justify-content: space-between; }
-.cal-title { font-size: 18px; font-weight: 700; }
+.cal-title { font-size: 18px; font-weight: 600; }
 .cal-nav { display: flex; align-items: center; gap: 4px; }
 .cal-nav button {
   background: var(--surface-2);
@@ -341,8 +341,8 @@
 .cal-day.today { border-color: var(--accent); }
 .cal-day.selected { background: var(--accent); color: #fff; border-color: var(--accent); }
 .cal-num { font-weight: 600; line-height: 1; }
-.cal-day.weekend .cal-num { color: var(--accent); font-weight: 700; }
-.cal-day.public .cal-num { color: var(--cal-public); font-weight: 700; }
+.cal-day.weekend .cal-num { color: var(--accent); font-weight: 600; }
+.cal-day.public .cal-num { color: var(--cal-public); font-weight: 600; }
 .cal-day.selected .cal-num { color: #fff; }
 .cal-weekday.weekend { color: var(--accent); }
 .cal-dots { display: flex; gap: 3px; }
@@ -380,7 +380,7 @@
 .cal-item-title { font-size: 14px; }
 .cal-item-tag {
   font-size: 11px;
-  font-weight: 700;
+  font-weight: 600;
   color: var(--text-dim);
   background: var(--surface);
   border-radius: 999px;
@@ -397,7 +397,7 @@
   color: var(--text-dim);
   padding: 10px;
   border-radius: 10px;
-  font-weight: 700;
+  font-weight: 600;
   font-size: 14px;
   transition: background 0.15s, color 0.15s, border-color 0.15s;
 }
@@ -425,7 +425,7 @@
   align-items: center;
   gap: 4px;
   font-size: 13px;
-  font-weight: 700;
+  font-weight: 600;
   color: var(--text-dim);
   background: var(--surface);
   padding: 3px 10px;
@@ -454,7 +454,7 @@
 }
 .th-date {
   font-size: 20px;
-  font-weight: 700;
+  font-weight: 600;
 }
 /* The 6-day cycle tracker badge. */
 .cycle-badge {
@@ -471,14 +471,14 @@
 }
 .cycle-label {
   font-size: 10px;
-  font-weight: 700;
+  font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.06em;
   opacity: 0.85;
 }
 .cycle-num {
   font-size: 22px;
-  font-weight: 800;
+  font-weight: 600;
   margin-top: 2px;
 }
 .cycle-badge.off {
@@ -492,7 +492,7 @@
   background: var(--accent);
   color: white;
   font-size: 11px;
-  font-weight: 700;
+  font-weight: 600;
   padding: 2px 8px;
   border-radius: 999px;
   text-transform: uppercase;
@@ -560,7 +560,7 @@
 }
 .dc-weekday {
   font-size: 18px;
-  font-weight: 700;
+  font-weight: 600;
   line-height: 1;
   text-transform: uppercase;
 }
@@ -612,7 +612,7 @@
   align-items: center;
   gap: 7px;
   font-size: 12px;
-  font-weight: 700;
+  font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.04em;
   color: var(--text-dim);
@@ -627,7 +627,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  font-weight: 700;
+  font-weight: 600;
   font-size: 15px;
   color: #f59e0b;
   margin-bottom: 8px;
@@ -689,7 +689,7 @@
   cursor: pointer;
   padding: 0;
 }
-.reminder-title { font-size: 15px; font-weight: 700; color: var(--text); }
+.reminder-title { font-size: 15px; font-weight: 600; color: var(--text); }
 .reminder-repeat { font-size: 12px; color: var(--text-dim); font-weight: 600; }
 .reminder-x {
   flex-shrink: 0;
@@ -726,20 +726,20 @@
   justify-content: center;
   gap: 4px;
 }
-.focus-time { font-size: 44px; font-weight: 800; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+.focus-time { font-size: 44px; font-weight: 600; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
 .focus-sub { font-size: 13px; color: var(--text-dim); font-weight: 600; }
 .focus-setup { width: 100%; display: flex; flex-direction: column; gap: 12px; }
 .focus-presets { display: flex; gap: 8px; }
 .focus-presets .type-option { min-width: 72px; }
 .focus-slider-row { display: flex; align-items: center; gap: 12px; }
 .focus-slider { flex: 1; min-width: 0; height: 20px; accent-color: var(--accent); cursor: pointer; }
-.focus-slider-val { flex-shrink: 0; font-size: 13px; font-weight: 700; color: var(--text); min-width: 54px; text-align: right; }
+.focus-slider-val { flex-shrink: 0; font-size: 13px; font-weight: 600; color: var(--text); min-width: 54px; text-align: right; }
 .focus-actions { display: flex; gap: 10px; width: 100%; }
 .focus-actions .primary-btn,
 .focus-actions .ghost-btn { flex: 1; }
 .focus-start { width: 100%; }
 .focus-warn { font-size: 13px; color: var(--warn); font-weight: 600; margin: 0; text-align: center; }
-.focus-done { font-size: 14px; color: var(--accent); font-weight: 700; margin: 0; text-align: center; }
+.focus-done { font-size: 14px; color: var(--accent); font-weight: 600; margin: 0; text-align: center; }
 .focus-total { font-size: 12px; color: var(--text-dim); font-weight: 600; margin: 0; }
 
 .focus-list { list-style: none; margin: 0 0 12px; padding: 0; display: flex; flex-direction: column; gap: 6px; }
@@ -796,7 +796,7 @@
 }
 .focus-fs-time {
   font-size: clamp(64px, 22vw, 150px);
-  font-weight: 800;
+  font-weight: 600;
   letter-spacing: -0.02em;
   font-variant-numeric: tabular-nums;
 }
@@ -830,7 +830,7 @@
   border-radius: 999px;
   padding: 3px 10px 3px 3px;
   font-size: 12px;
-  font-weight: 700;
+  font-weight: 600;
   color: var(--text);
   cursor: pointer;
 }
@@ -910,7 +910,7 @@
 .tier-lv { font-size: 12px; color: var(--text-dim); font-weight: 600; }
 
 /* ---------- Greeting banner ---------- */
-.greeting-main { font-size: 24px; font-weight: 800; margin: 0; letter-spacing: -0.01em; line-height: 1.25; }
+.greeting-main { font-size: 24px; font-weight: 600; margin: 0; letter-spacing: -0.01em; line-height: 1.25; }
 
 /* ---------- Onboarding survey (full screen) ---------- */
 .survey-screen {
@@ -952,8 +952,8 @@
   justify-content: center;
   animation: survey-step 0.32s ease both;
 }
-.survey-eyebrow { font-size: 15px; color: var(--accent); font-weight: 700; margin: 0 0 10px; }
-.survey-question { font-size: 26px; font-weight: 800; line-height: 1.2; margin: 0; letter-spacing: -0.01em; }
+.survey-eyebrow { font-size: 15px; color: var(--accent); font-weight: 600; margin: 0 0 10px; }
+.survey-question { font-size: 26px; font-weight: 600; line-height: 1.2; margin: 0; letter-spacing: -0.01em; }
 .survey-hint { font-size: 14px; color: var(--text-dim); margin: 10px 0 0; line-height: 1.45; }
 
 .survey-input {
@@ -1055,10 +1055,10 @@
 .workout-steps { margin: 0; }
 .skill-picker { margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid var(--border); }
 .skill-title { font-size: 12px; color: var(--text-dim); margin: 0 0 10px; line-height: 1.4; }
-.recommend-title { margin-top: 2px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; }
+.recommend-title { margin-top: 2px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; }
 .skill-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
 .skill-info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
-.skill-name { font-size: 13px; font-weight: 700; color: var(--text); }
+.skill-name { font-size: 13px; font-weight: 600; color: var(--text); }
 .skill-desc { font-size: 11px; color: var(--text-dim); line-height: 1.35; }
 .skill-toggle { display: flex; gap: 4px; flex-shrink: 0; }
 .skill-btn {
@@ -1105,7 +1105,7 @@
   border: 1px solid var(--border);
   color: var(--text-dim);
   font-size: 11px;
-  font-weight: 700;
+  font-weight: 600;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -1185,7 +1185,7 @@
 
 .due-badge {
   font-size: 12px;
-  font-weight: 700;
+  font-weight: 600;
   color: var(--text-dim);
   background: var(--surface);
   padding: 2px 9px;
@@ -1210,7 +1210,7 @@
 .report-meta span { display: inline-flex; align-items: center; gap: 5px; }
 .file-drop span { display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
 .weather-line { font-size: 14px; color: var(--text); font-weight: 600; }
-.weather-when { color: var(--accent); font-weight: 700; }
+.weather-when { color: var(--accent); font-weight: 600; }
 .weather-advice { font-size: 13px; color: var(--text-dim); margin-top: 2px; }
 p.weather-strip { font-size: 13px; }
 
@@ -1271,7 +1271,7 @@ p.weather-strip { font-size: 13px; }
   border-radius: 8px;
   padding: 6px 4px;
 }
-.period-label { font-weight: 700; font-size: 14px; }
+.period-label { font-weight: 600; font-size: 14px; }
 .period-time {
   font-size: 10px;
   color: var(--text-dim);
@@ -1543,7 +1543,7 @@ p.weather-strip { font-size: 13px; }
 /* Colored subject pill */
 .subject-badge {
   font-size: 11px;
-  font-weight: 700;
+  font-weight: 600;
   color: #fff;
   border-radius: 999px;
   padding: 2px 10px;
@@ -1822,7 +1822,7 @@ p.weather-strip { font-size: 13px; }
   border-radius: 6px;
   padding: 3px 9px;
   font-size: 11px;
-  font-weight: 800;
+  font-weight: 600;
   letter-spacing: 0.02em;
   animation: check-pop 200ms ease;
 }
@@ -1855,7 +1855,7 @@ p.weather-strip { font-size: 13px; }
   color: var(--text-dim);
   margin: 0 0 10px;
 }
-.report-section-label { font-size: 12px; font-weight: 700; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.03em; }
+.report-section-label { font-size: 12px; font-weight: 600; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.03em; }
 .report-progress { margin-bottom: 12px; }
 .report-terms { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
 .report-term {
@@ -1868,7 +1868,7 @@ p.weather-strip { font-size: 13px; }
   padding: 6px 12px;
 }
 .report-term-label { font-size: 10px; font-weight: 600; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.03em; }
-.report-term-grade { font-weight: 700; font-size: 14px; }
+.report-term-grade { font-weight: 600; font-size: 14px; }
 .report-term-overall { background: var(--surface); border: 1px solid var(--accent); }
 .report-results { list-style: none; margin: 0 0 10px; padding: 0; display: flex; flex-direction: column; gap: 6px; }
 .report-result {
@@ -1936,7 +1936,7 @@ p.weather-strip { font-size: 13px; }
   padding: 8px 10px;
   font-size: 13px;
 }
-.import-extra-head { font-weight: 700; font-size: 15px; margin-bottom: 8px; }
+.import-extra-head { font-weight: 600; font-size: 15px; margin-bottom: 8px; }
 .import-extra-label { display: block; font-size: 12px; color: var(--text-dim); margin: 8px 0 4px; }
 .import-extra-area {
   width: 100%;
@@ -1977,7 +1977,7 @@ p.weather-strip { font-size: 13px; }
 .import-subject-name {
   width: 100%;
   font-size: 16px;
-  font-weight: 700;
+  font-weight: 600;
   background: none;
   border: none;
   border-bottom: 1px solid var(--border);
@@ -2012,7 +2012,7 @@ p.weather-strip { font-size: 13px; }
   border-radius: 6px;
   color: var(--text);
   padding: 5px 6px;
-  font-weight: 700;
+  font-weight: 600;
 }
 .import-extra { font-size: 12px; color: var(--text-dim); margin: 10px 0 0; line-height: 1.5; }
 
@@ -2034,7 +2034,7 @@ p.weather-strip { font-size: 13px; }
 
 .tt-review { gap: 16px; }
 .tt-day { background: var(--surface-2); border-radius: 10px; padding: 10px; }
-.tt-day-head { font-weight: 700; font-size: 14px; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+.tt-day-head { font-weight: 600; font-size: 14px; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
 .tt-day.tt-day-empty { opacity: 0.6; }
 .tt-day-tag {
   font-size: 11px;
@@ -2050,7 +2050,7 @@ p.weather-strip { font-size: 13px; }
   flex-shrink: 0;
   width: 34px;
   font-size: 12px;
-  font-weight: 700;
+  font-weight: 600;
   color: var(--text-dim);
 }
 .tt-subject {
@@ -2103,7 +2103,7 @@ p.weather-strip { font-size: 13px; }
   color: #fff;
   border: none;
   font-size: 13px;
-  font-weight: 800;
+  font-weight: 600;
   letter-spacing: 0.02em;
   padding: 5px 12px;
   border-radius: 999px;
@@ -2138,7 +2138,7 @@ p.weather-strip { font-size: 13px; }
 }
 .grade-chip:hover { border-color: var(--grade-color); }
 .grade-chip.selected { border-color: var(--grade-color); background: var(--grade-color); }
-.grade-chip-code { font-size: 17px; font-weight: 800; color: var(--grade-color); }
+.grade-chip-code { font-size: 17px; font-weight: 600; color: var(--grade-color); }
 .grade-chip.selected .grade-chip-code { color: #fff; }
 .grade-chip-band { font-size: 10px; color: var(--text-dim); text-align: center; }
 .grade-chip.selected .grade-chip-band { color: rgba(255, 255, 255, 0.9); }
@@ -2159,7 +2159,7 @@ p.weather-strip { font-size: 13px; }
   align-items: baseline;
   gap: 7px;
   color: #fff;
-  font-weight: 800;
+  font-weight: 600;
   font-size: 15px;
   padding: 4px 12px;
   border-radius: 999px;
@@ -2171,7 +2171,7 @@ p.weather-strip { font-size: 13px; }
 .type-badge {
   flex-shrink: 0;
   font-size: 10px;
-  font-weight: 800;
+  font-weight: 600;
   letter-spacing: 0.04em;
   text-transform: uppercase;
   color: #fff;
@@ -2196,7 +2196,7 @@ p.weather-strip { font-size: 13px; }
   border-radius: 9px;
   padding: 10px;
   color: var(--text);
-  font-weight: 700;
+  font-weight: 600;
   font-size: 14px;
   transition: border-color 0.12s, background 0.12s;
 }
@@ -2210,7 +2210,7 @@ p.weather-strip { font-size: 13px; }
 .repeat-badge {
   flex-shrink: 0;
   font-size: 11px;
-  font-weight: 700;
+  font-weight: 600;
   color: var(--accent);
   background: rgba(99, 102, 241, 0.14);
   padding: 2px 9px;

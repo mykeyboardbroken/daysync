@@ -15,21 +15,24 @@
   --cal-public: #f87171;
   --cal-public-bg: rgba(248, 113, 113, 0.24);
 
-  /* Inter is self-hosted (see main.jsx) so it renders the same everywhere and
-     still works offline in the installed PWA. System fonts are the fallback. */
-  font-family: 'Inter Variable', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-  /* Modern numerals: same-width digits so timers/dates don't jitter, plus Inter's
-     nicer single-storey glyph set. */
-  font-feature-settings: 'cv05' 1, 'ss01' 1, 'tnum' 1;
+  /* Plus Jakarta Sans is self-hosted (see main.jsx) so it renders the same
+     everywhere and still works offline in the installed PWA. It's humanist —
+     rounder and warmer than a grotesque like Inter, so it reads less robotic. */
+  font-family: 'Plus Jakarta Sans Variable', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  /* Same-width digits so the focus timer doesn't jitter as it counts down. */
+  font-feature-settings: 'tnum' 1;
+  font-weight: 400; /* keep body text light — weight is added deliberately, not by default */
   color: var(--text);
   background: var(--bg);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Headings: tighter tracking is what reads as "modern" at large sizes. */
+/* Headings: slightly tighter tracking, and 600 rather than bold — heavy weights
+   are most of what made the old type feel thick. */
 h1, h2, h3, h4 {
-  letter-spacing: -0.02em;
+  letter-spacing: -0.015em;
+  font-weight: 600;
 }
 
 /* Colour themes — swap just the accent (dark base) or the whole palette (light). */
