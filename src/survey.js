@@ -11,19 +11,15 @@
 //   { id, type: 'multi',  question, hint?, options: ['A', 'B', ...] }
 // A question may also carry `showIf: (answers) => bool` to appear conditionally.
 //
+// Every user is treated the same: an ambitious student optimising their time.
+// We do NOT ask for gender, titles, or body metrics — none of it would change what
+// the app does, so asking is just friction (and, for some people, pressure).
+//
 // Training is OPT-IN and asked, never assumed: "do you work out?" and "do you play
 // sports?" gate everything downstream. Say no to both and the app simply never
-// mentions training again — no nagging, no goals, no body metrics. We also don't
-// ask weight/height here; they live in Settings → Profile for anyone who wants them.
+// mentions training again — no nagging, no goals, no body metrics.
 export const SURVEY_QUESTIONS = [
-  { id: 'name', type: 'text', question: "What's your name?", placeholder: 'Your name' },
-  {
-    id: 'gender',
-    type: 'single',
-    question: 'What gender are you?',
-    hint: 'Kept private on your device. Optional — skip if you like.',
-    options: ['Male', 'Female', 'Other'],
-  },
+  { id: 'name', type: 'text', question: 'What should we call you?', placeholder: 'First name or nickname' },
   {
     id: 'age',
     type: 'text',

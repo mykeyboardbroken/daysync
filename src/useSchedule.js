@@ -276,9 +276,9 @@ function normalize(parsed) {
       ...data.tasks,
       {
         id: makeId(),
-        title: 'Morning grooming',
+        title: 'Morning hygiene',
         description: '',
-        steps: ['Gentle wash and moisturiser', 'Brush teeth', 'Hair check'],
+        steps: ['Wash your face', 'Brush your teeth', 'Sort your hair'],
         bucket: 'morning',
         category: 'health',
         repeat: true,
@@ -348,6 +348,33 @@ function normalize(parsed) {
     if (!next.steps || next.steps.length === 0) next.steps = d.steps
     return next
   })
+  // Reframe the old "grooming"/"skincare" defaults as plain hygiene routines, so the
+  // wording reads the same to every student. Steps are only rewritten if they're
+  // still the untouched defaults — anything you've edited yourself is left alone.
+  const HYGIENE_RENAMES = {
+    'Morning grooming': {
+      title: 'Morning hygiene',
+      oldSteps: ['Gentle wash and moisturiser', 'Brush teeth', 'Hair check'],
+      steps: ['Wash your face', 'Brush your teeth', 'Sort your hair'],
+    },
+    'Night grooming': {
+      title: 'Night hygiene',
+      oldSteps: ['Wash your face', 'Brush your teeth', 'Moisturise / skincare'],
+      steps: ['Shower or wash your face', 'Brush your teeth', 'Moisturise'],
+    },
+  }
+  data.tasks = data.tasks.map((t) => {
+    const r = HYGIENE_RENAMES[t.title]
+    if (!r) return t
+    const next = { ...t, title: r.title }
+    if (JSON.stringify(t.steps) === JSON.stringify(r.oldSteps)) next.steps = r.steps
+    return next
+  })
+  // We no longer ask for (or use) gender — drop any copy left in an older profile.
+  if (data.profile && 'gender' in data.profile) {
+    const { gender, ...rest } = data.profile
+    data.profile = rest
+  }
   // A morning stretch + an afternoon hydration nudge (deletable, seeded once).
   if (!data.seededRoutinePlus) {
     data.tasks = [
@@ -442,9 +469,9 @@ function normalize(parsed) {
       ...data.tasks,
       {
         id: makeId(),
-        title: 'Night grooming',
+        title: 'Night hygiene',
         description: '',
-        steps: ['Wash your face', 'Brush your teeth', 'Moisturise / skincare'],
+        steps: ['Shower or wash your face', 'Brush your teeth', 'Moisturise'],
         bucket: 'night',
         category: 'health',
         repeat: true,

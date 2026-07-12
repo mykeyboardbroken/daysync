@@ -24,9 +24,9 @@ export const TASK_TEMPLATES = [
     essential: true,
   },
   {
-    title: 'Morning grooming',
+    title: 'Morning hygiene',
     description: '',
-    steps: ['Gentle wash and moisturiser', 'Brush teeth', 'Hair check'],
+    steps: ['Wash your face', 'Brush your teeth', 'Sort your hair'],
     bucket: 'morning',
     category: 'health',
     days: ALL,
@@ -50,9 +50,9 @@ export const TASK_TEMPLATES = [
     days: ALL,
   },
   {
-    title: 'Night grooming',
+    title: 'Night hygiene',
     description: '',
-    steps: ['Wash your face', 'Brush your teeth', 'Moisturise / skincare'],
+    steps: ['Shower or wash your face', 'Brush your teeth', 'Moisturise'],
     bucket: 'night',
     category: 'health',
     days: ALL,

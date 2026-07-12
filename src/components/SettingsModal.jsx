@@ -253,7 +253,7 @@ export default function SettingsModal({
                   <input
                     type="text"
                     value={profile.name || ''}
-                    placeholder="Your name"
+                    placeholder="First name or nickname"
                     onChange={(e) => onSetProfile('name', e.target.value)}
                   />
                 </label>
@@ -266,20 +266,6 @@ export default function SettingsModal({
                     onChange={(e) => onSetProfile('age', e.target.value)}
                   />
                 </label>
-
-                <p className="settings-field-label">Gender</p>
-                <div className="type-select repeat-select habit-days">
-                  {['Male', 'Female', 'Other'].map((g) => (
-                    <button
-                      type="button"
-                      key={g}
-                      className={`type-option ${profile.gender === g ? 'selected' : ''}`}
-                      onClick={() => onSetProfile('gender', g)}
-                    >
-                      {g}
-                    </button>
-                  ))}
-                </div>
 
                 {[
                   { key: 'weight', label: 'Weight', units: ['kg', 'lb'], ph: 'e.g. 70' },
