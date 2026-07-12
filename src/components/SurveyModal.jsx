@@ -25,6 +25,16 @@ export default function SurveyModal({ questions, onComplete }) {
     else setStep(idx + 1)
   }
 
+  // "Rather not say" — drop any answer for this question and move on, so a value
+  // typed then reconsidered isn't left behind.
+  function skip() {
+    const rest = { ...answers }
+    delete rest[q.id]
+    setAnswers(rest)
+    if (isLast) onComplete(rest)
+    else setStep(idx + 1)
+  }
+
   // Enter advances (and finishes on the last question). If an answer option is
   // focused, Enter still picks that option instead — otherwise keyboard users
   // could never select one.
@@ -58,14 +68,21 @@ export default function SurveyModal({ questions, onComplete }) {
           {q.hint && <p className="survey-hint">{q.hint}</p>}
 
           {q.type === 'text' && (
-            <input
-              className="survey-input"
-              type="text"
-              value={value || ''}
-              placeholder={q.placeholder || ''}
-              onChange={(e) => setAnswer(e.target.value)}
-              autoFocus
-            />
+            <>
+              <input
+                className="survey-input"
+                type="text"
+                value={value || ''}
+                placeholder={q.placeholder || ''}
+                onChange={(e) => setAnswer(e.target.value)}
+                autoFocus
+              />
+              {q.skipLabel && (
+                <button type="button" className="survey-skip" onClick={skip}>
+                  {q.skipLabel}
+                </button>
+              )}
+            </>
           )}
 
           {q.type === 'single' && (

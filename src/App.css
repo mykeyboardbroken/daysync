@@ -1084,6 +1084,21 @@
 .survey-option.selected { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 14%, var(--surface-2)); }
 
 .survey-nav { display: flex; align-items: center; gap: 10px; padding-top: 20px; }
+/* "Rather not say" — a quiet opt-out under an optional text question. */
+.survey-skip {
+  align-self: flex-start;
+  margin-top: 14px;
+  padding: 9px 14px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: none;
+  color: var(--text-dim);
+  font-size: 13px;
+  font-family: inherit;
+  cursor: pointer;
+}
+.survey-skip:hover { border-color: var(--accent); color: var(--accent); }
+
 .survey-next {
   min-width: 96px;
   display: inline-flex;

@@ -2,7 +2,9 @@
 // them in order and stores answers by `id` into the user's profile.
 //
 // Question types:
-//   { id, type: 'text',   question, hint?, placeholder? }
+//   { id, type: 'text',   question, hint?, placeholder?, skipLabel? }
+// `skipLabel` on a text question adds a button that clears the answer and moves
+// on (e.g. "Rather not say"), so nobody has to type something they'd rather not.
 //   { id, type: 'single', question, hint?, options: ['A', 'B', ...] }
 //   { id, type: 'multi',  question, hint?, options: ['A', 'B', ...] }
 // A question may also carry `showIf: (answers) => bool` to appear conditionally.
@@ -26,15 +28,17 @@ export const SURVEY_QUESTIONS = [
     id: 'weight',
     type: 'text',
     question: 'What do you weigh?',
-    hint: 'Optional and private — kept on your device. Skip if you prefer.',
+    hint: 'Sharing this helps personalise your training. Private — kept on your device.',
     placeholder: 'e.g. 70 kg',
+    skipLabel: 'Rather not say',
   },
   {
     id: 'height',
     type: 'text',
     question: 'How tall are you?',
-    hint: 'Optional and private — kept on your device. Skip if you prefer.',
+    hint: 'Sharing this helps personalise your training. Private — kept on your device.',
     placeholder: 'e.g. 175 cm',
+    skipLabel: 'Rather not say',
   },
   {
     id: 'sports',
