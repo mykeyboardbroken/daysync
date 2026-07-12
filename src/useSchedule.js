@@ -59,6 +59,76 @@ function emptyData() {
   }
 }
 
+// A brand-new install starts with a small, curated set of everyday routines so
+// there's something to do from minute one. All are deletable like any task.
+// Every `seeded*` flag is pre-set true so the one-time migration seeders below
+// never pile extra copies on top of these.
+function freshData() {
+  const base = emptyData()
+  const allWeek = [0, 1, 2, 3, 4, 5, 6]
+  const task = (t) => ({
+    id: makeId(),
+    description: '',
+    steps: [],
+    repeat: true,
+    days: allWeek,
+    log: {},
+    due: '',
+    done: false,
+    ...t,
+  })
+  base.tasks = [
+    task({
+      title: 'Journaling',
+      description: 'A few lines to clear your head and set your intentions for the day.',
+      steps: ['Write your thoughts', "Write today's to-do list", "Write what you're grateful for"],
+      bucket: 'morning',
+      category: 'lifestyle',
+      order: -2,
+    }),
+    task({
+      title: 'Stretch / Move',
+      description:
+        'Five minutes of light movement or stretching to get the blood flowing and shake off morning stiffness.',
+      bucket: 'morning',
+      category: 'health',
+      order: -1,
+    }),
+    task({
+      title: 'Hydration check',
+      description: 'A reminder to drink water or refill your bottle to keep your energy from dipping.',
+      bucket: 'afternoon',
+      category: 'health',
+    }),
+    task({
+      title: 'Reading',
+      description:
+        'Time with a book — read as much or as little as you like; what matters is that you read.',
+      bucket: 'afternoon',
+      category: 'lifestyle',
+    }),
+    task({
+      title: 'Meditation',
+      description: 'A few quiet minutes of focused breathing to settle your mind.',
+      bucket: 'night',
+      category: 'health',
+    }),
+    task({
+      title: 'Get ready for tomorrow',
+      description: 'A quick evening routine so the morning runs smoothly.',
+      steps: ["Lay out tomorrow's clothes", 'Pack your bag', 'Charge your devices', 'Set your alarm'],
+      bucket: 'night',
+      category: 'lifestyle',
+      pinLast: true,
+    }),
+  ]
+  // Mark every one-time seeder as already done so migrations add nothing more.
+  for (const k of Object.keys(base)) {
+    if (k.startsWith('seeded') || k === 'packLifestyle' || k === 'readingAfternoon') base[k] = true
+  }
+  return base
+}
+
 // Take a parsed (possibly older / partial) data object and bring it up to the
 // current shape — filling defaults and running every migration. Shared by
 // load() (from localStorage) and importData() (from a backup file).
@@ -430,7 +500,7 @@ function normalize(parsed) {
 function load() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY)
-    if (!raw) return emptyData()
+    if (!raw) return freshData() // brand-new install → curated starter routines
     return normalize(JSON.parse(raw))
   } catch {
     return emptyData()
