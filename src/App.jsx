@@ -11,6 +11,7 @@ import FocusTab from './components/FocusTab'
 import AssignmentModal from './components/AssignmentModal'
 import TestModal from './components/TestModal'
 import TaskModal from './components/TaskModal'
+import AlertModal from './components/AlertModal'
 import DateModal from './components/DateModal'
 import NoteModal from './components/NoteModal'
 import BringModal from './components/BringModal'
@@ -122,6 +123,10 @@ export default function App() {
           showStreaks={schedule.settings?.showStreaks}
           onClose={closeAdd}
         />
+      )}
+
+      {adding === 'reminder' && (
+        <AlertModal onAdd={schedule.addAlert} onClose={closeAdd} />
       )}
 
       {adding === 'date' && (

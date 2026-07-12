@@ -639,6 +639,45 @@
 }
 .error-card .primary-btn { margin-top: 6px; }
 
+/* ---------- Reminders (top-of-Today banners) ---------- */
+.reminders { display: flex; flex-direction: column; gap: 8px; }
+.reminder-banner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: color-mix(in srgb, var(--accent) 16%, var(--surface));
+  border: 1px solid var(--accent);
+  border-radius: 12px;
+  padding: 12px 14px;
+  animation: survey-step 0.3s ease both;
+}
+.reminder-icon { color: var(--accent); flex-shrink: 0; }
+.reminder-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  background: none;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+  padding: 0;
+}
+.reminder-title { font-size: 15px; font-weight: 700; color: var(--text); }
+.reminder-repeat { font-size: 12px; color: var(--text-dim); font-weight: 600; }
+.reminder-x {
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  color: var(--text-dim);
+  font-size: 16px;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 6px;
+}
+.reminder-x:hover { color: var(--danger); background: var(--surface-2); }
+
 /* ---------- Focus timer ---------- */
 .focus-card { display: flex; flex-direction: column; align-items: center; gap: 18px; }
 .focus-ring {

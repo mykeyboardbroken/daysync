@@ -8,6 +8,7 @@ const OPTIONS = {
   test: { icon: 'cap', label: 'Test', hint: 'An assessment or exam — track its grade' },
   bring: { icon: 'bag', label: 'To bring', hint: 'Extra items for your packing list' },
   task: { icon: 'check', label: 'Task', hint: 'A to-do — set it to repeat for a routine' },
+  reminder: { icon: 'clock', label: 'Reminder', hint: 'A timed nudge that pops on Today' },
   date: { icon: 'calendar', label: 'Date', hint: 'An important day to remember' },
   note: { icon: 'note', label: 'Note', hint: 'A quick jot — add a deadline for a reminder' },
 }
@@ -15,7 +16,7 @@ const OPTIONS = {
 // Which kinds show per context.
 const MENUS = {
   school: ['assignment', 'homework', 'test', 'bring'],
-  personal: ['task', 'date', 'note'],
+  personal: ['task', 'reminder', 'date', 'note'],
   calendar: ['date', 'task'], // only things that land on a day
 }
 

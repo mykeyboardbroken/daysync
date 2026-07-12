@@ -1,6 +1,8 @@
+import { useState, useEffect } from 'react'
 import { toKey, addDays, prettyDate, isToday } from '../dateUtils'
 import { cycleDay } from '../schoolCalendar'
 import { bannerLine } from '../greeting'
+import { dueAlerts, repeatLabel } from '../alerts'
 import { useWeather } from '../useWeather'
 import { trainingWarnings } from '../trainingAlert'
 import Icon from './Icon'
@@ -8,6 +10,7 @@ import DayPlan from './DayPlan'
 import WeatherStrip from './WeatherStrip'
 import NotesList from './NotesList'
 import LevelBar from './LevelBar'
+import AlertModal from './AlertModal'
 
 // The day-focused view: today's date (+ cycle day), your plan for the day,
 // notes, and the weather. Classes, packing & what's-due live on the School tab.
@@ -15,6 +18,15 @@ export default function TodayTab({ schedule }) {
   const date = new Date()
   const cycle = cycleDay(date)
   const banner = bannerLine(date, schedule.profile?.name)
+
+  // Re-check due reminders every 20s while the tab is open.
+  const [, setTick] = useState(0)
+  useEffect(() => {
+    const id = setInterval(() => setTick((t) => t + 1), 20000)
+    return () => clearInterval(id)
+  }, [])
+  const [editingAlert, setEditingAlert] = useState(null)
+  const due = dueAlerts(schedule.alerts, Date.now())
 
   // Weather: after 8pm, switch to tomorrow's so you can plan the next day.
   const showTomorrowWeather = date.getHours() >= 20
@@ -33,6 +45,28 @@ export default function TodayTab({ schedule }) {
 
   return (
     <div className="tab-content">
+      {due.length > 0 && (
+        <div className="reminders">
+          {due.map((a) => (
+            <div key={a.id} className="reminder-banner">
+              <Icon name="clock" size={17} className="reminder-icon" />
+              <button type="button" className="reminder-text" onClick={() => setEditingAlert(a)}>
+                <span className="reminder-title">{a.text}</span>
+                {a.repeat > 0 && <span className="reminder-repeat">{repeatLabel(a.repeat)}</span>}
+              </button>
+              <button
+                type="button"
+                className="reminder-x"
+                onClick={() => schedule.dismissAlert(a.id)}
+                aria-label="Dismiss"
+              >
+                ✕
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+
       <div className="today-top-row">
         <h1 className="greeting-main">{banner}</h1>
         <LevelBar xp={schedule.xp} loginStreak={schedule.loginStreak} />
@@ -76,6 +110,18 @@ export default function TodayTab({ schedule }) {
 
       {schedule.notes.length > 0 && (
         <NotesList notes={schedule.notes} onDelete={schedule.deleteNote} />
+      )}
+
+      {editingAlert && (
+        <AlertModal
+          initial={editingAlert}
+          onAdd={(fields) => schedule.updateAlert(editingAlert.id, fields)}
+          onDelete={() => {
+            schedule.deleteAlert(editingAlert.id)
+            setEditingAlert(null)
+          }}
+          onClose={() => setEditingAlert(null)}
+        />
       )}
     </div>
   )

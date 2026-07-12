@@ -47,6 +47,9 @@ function emptyData() {
     lastActive: '', // dateKey of the last day the app was opened
     focusDistractions: [], // apps/sites the user commits to avoiding during focus
     focusMinutes: 0, // total minutes focused
+    // Reminders: timed nudges that banner on Today. `repeat` = minutes between
+    // fires (0 = once, min 30); `endDate` stops the repeat; `ackUntil` = dismissed-up-to.
+    alerts: [],
     theme: 'custom', // appearance is now always a custom accent on a dark/bright base
     // Used when theme === 'custom': primary = the accent colour (the darker
     // hover/pressed shade is derived from it), base = 'dark' | 'bright' (which
@@ -876,6 +879,33 @@ export function useSchedule() {
     setData((prev) => ({ ...prev, workoutSeed: (prev.workoutSeed || 0) + 1 }))
   }, [])
 
+  // ---- Reminders ----
+  const addAlert = useCallback(({ text, start, repeat = 0, endDate = '' }) => {
+    setData((prev) => ({
+      ...prev,
+      alerts: [...prev.alerts, { id: makeId(), text, start, repeat, endDate, ackUntil: 0 }],
+    }))
+  }, [])
+
+  const updateAlert = useCallback((id, fields) => {
+    setData((prev) => ({
+      ...prev,
+      alerts: prev.alerts.map((a) => (a.id === id ? { ...a, ...fields } : a)),
+    }))
+  }, [])
+
+  const deleteAlert = useCallback((id) => {
+    setData((prev) => ({ ...prev, alerts: prev.alerts.filter((a) => a.id !== id) }))
+  }, [])
+
+  // Dismiss the current occurrence; a repeating reminder returns next interval.
+  const dismissAlert = useCallback((id) => {
+    setData((prev) => ({
+      ...prev,
+      alerts: prev.alerts.map((a) => (a.id === id ? { ...a, ackUntil: Date.now() } : a)),
+    }))
+  }, [])
+
   // ---- Focus timer ----
   const setFocusDistractions = useCallback((list) => {
     setData((prev) => ({ ...prev, focusDistractions: list }))
@@ -971,6 +1001,11 @@ export function useSchedule() {
     focusMinutes: data.focusMinutes,
     setFocusDistractions,
     completeFocusSession,
+    alerts: data.alerts,
+    addAlert,
+    updateAlert,
+    deleteAlert,
+    dismissAlert,
     exportData,
     importData,
     addTask,
