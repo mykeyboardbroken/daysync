@@ -38,7 +38,8 @@ function emptyData() {
     readingAfternoon: false, // one-time move of Reading back to the afternoon
     removedJournalingDefault: false, // one-time removal of the auto-seeded journaling default
     seededNightGrooming: false, // night grooming default seeded once
-    seededCheckPlans: false, // "check tomorrow's plans" default seeded once
+    seededCheckPlans: false, // "check tomorrow's plans" default seeded once (legacy)
+    seededNightMerge: false, // folded check-plans + charge-devices into Get-ready once
     onboarded: false, // whether the first-open survey has been completed
     profile: {}, // answers from the onboarding survey, keyed by question id
     workoutLog: {}, // per-day done state for the generated workout ({ dateKey: true })
@@ -123,7 +124,13 @@ function freshData() {
     task({
       title: 'Get ready for tomorrow',
       description: 'A quick evening routine so the morning runs smoothly.',
-      steps: ["Lay out tomorrow's clothes", 'Pack your bag', 'Charge your devices', 'Set your alarm'],
+      steps: [
+        "Check tomorrow's plans",
+        "Lay out tomorrow's clothes",
+        'Pack your bag',
+        'Charge your devices',
+        'Set your alarm',
+      ],
       bucket: 'night',
       category: 'lifestyle',
       pinLast: true,
@@ -208,7 +215,17 @@ function normalize(parsed) {
   // The default nightly "get ready" task: a general description plus steps.
   const READY_TITLE = 'Get ready for tomorrow'
   const READY_DESC = 'A quick evening routine so the morning runs smoothly.'
+  // The whole night routine in one task — checking tomorrow's plans and charging
+  // devices used to be separate defaults, which made the night a list of chores.
   const READY_STEPS = [
+    "Check tomorrow's plans",
+    "Lay out tomorrow's clothes",
+    'Pack your bag',
+    'Charge your devices',
+    'Set your alarm',
+  ]
+  // What the steps were before those two were folded in.
+  const PRE_MERGE_READY_STEPS = [
     "Lay out tomorrow's clothes",
     'Pack your bag',
     'Charge your devices',
@@ -241,14 +258,32 @@ function normalize(parsed) {
     }
     return next
   })
-  // "Check tomorrow's plans" is now its own task — drop it from Get-ready's steps
-  // (only when the steps are still the default set, so edits are preserved).
-  const OLD_READY_STEPS = [...READY_STEPS, "Check tomorrow's plans"]
-  data.tasks = data.tasks.map((t) =>
-    t.title === READY_TITLE && JSON.stringify(t.steps) === JSON.stringify(OLD_READY_STEPS)
-      ? { ...t, steps: READY_STEPS }
-      : t,
-  )
+  // Fold the standalone "Check tomorrow's plans" and "Charge all devices" defaults
+  // back into Get-ready-for-tomorrow as steps, so the night is one routine instead
+  // of three chores. Runs once (the flag), and only removes a copy that's still the
+  // untouched default — anything you've reworded is yours and stays put.
+  if (!data.seededNightMerge) {
+    const FOLDED_IN = {
+      "Check tomorrow's plans":
+        "A quick look at what's on tomorrow so nothing catches you off guard.",
+      'Charge all devices':
+        'Plug in your laptop, phone, and headphones so they sit at 100% when you wake up.',
+    }
+    data.tasks = data.tasks.filter((t) => {
+      const def = FOLDED_IN[t.title]
+      if (def === undefined) return true
+      const untouched = (!t.description || t.description === def) && !(t.steps?.length)
+      return !untouched
+    })
+    // Bring an untouched Get-ready up to the merged step list.
+    data.tasks = data.tasks.map((t) =>
+      t.title === READY_TITLE &&
+      JSON.stringify(t.steps) === JSON.stringify(PRE_MERGE_READY_STEPS)
+        ? { ...t, steps: READY_STEPS }
+        : t,
+    )
+    data.seededNightMerge = true
+  }
   // Seed it once. Only added a single time — delete it and it stays gone.
   if (!data.seededPackTask) {
     data.tasks = [
@@ -483,26 +518,8 @@ function normalize(parsed) {
     ]
     data.seededNightGrooming = true
   }
-  // A nightly "check tomorrow's plans" task (deletable, seeded once).
-  if (!data.seededCheckPlans) {
-    data.tasks = [
-      ...data.tasks,
-      {
-        id: makeId(),
-        title: "Check tomorrow's plans",
-        description: "A quick look at what's on tomorrow so nothing catches you off guard.",
-        steps: [],
-        bucket: 'night',
-        category: 'lifestyle',
-        repeat: true,
-        days: [],
-        log: {},
-        due: '',
-        done: false,
-      },
-    ]
-    data.seededCheckPlans = true
-  }
+  // ("Check tomorrow's plans" used to be seeded here as its own nightly task. It's
+  // now a step inside Get-ready-for-tomorrow, so there's nothing to seed.)
   // New task model: blank weekdays = one-off. Give every-day repeats explicit
   // all-week days so an empty picker unambiguously means a one-off.
   data.tasks = data.tasks.map((t) =>
@@ -912,7 +929,12 @@ export function useSchedule(userId = null) {
 
   // Check a task off. One-offs flip `done`; repeating ones toggle `dateKey` in
   // their log (per-day completion, for streaks).
-  const toggleTask = useCallback((id, dateKey) => {
+  // `part` is the day-section you were looking at when you ticked it ('morning' |
+  // 'afternoon' | 'night'). It only matters for Anytime tasks, which float across
+  // every tab until they're done and then settle onto the tab you did them on.
+  // Stored in place of `true` in the log — every reader is a truthiness check, so
+  // an old `true` keeps working.
+  const toggleTask = useCallback((id, dateKey, part = '') => {
     setData((prev) => {
       let delta = 0
       const tasks = prev.tasks.map((t) => {
@@ -923,13 +945,13 @@ export function useSchedule(userId = null) {
             delete log[dateKey]
             delta = -XP.task
           } else {
-            log[dateKey] = true
+            log[dateKey] = part || true
             delta = XP.task
           }
           return { ...t, log }
         }
         delta = t.done ? -XP.task : XP.task
-        return { ...t, done: !t.done }
+        return { ...t, done: !t.done, doneIn: t.done ? '' : part }
       })
       return { ...prev, tasks, xp: Math.max(0, (prev.xp || 0) + delta) }
     })

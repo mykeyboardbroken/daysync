@@ -148,11 +148,28 @@ export default function DayPlan({ schedule }) {
   // Everything in a bucket, ordered by orderVal, then routines before one-off
   // to-dos (undone before done, earliest due first). Repeating tasks only appear
   // on the days they're actually due.
+  // Where an Anytime task was ticked off today ('' = not done, so it's still
+  // floating on every tab). Repeating tasks record it in the day's log; one-off
+  // tasks carry it on `doneIn`. Legacy entries stored `true`, which has no home
+  // tab — those keep showing everywhere, which is the old behaviour.
+  const doneInPart = (t) => {
+    const mark = t.repeat ? t.log?.[todayKey] : t.done && t.doneIn
+    return typeof mark === 'string' ? mark : ''
+  }
+
   const tasksIn = (key) =>
     tasks
       .filter((t) => (t.bucket || '') === key)
       .filter((t) => (t.repeat ? habitDueOn(t, now) : true))
       .filter((t) => !(morningWorkout && t.title === 'Stretch / Move'))
+      // An Anytime task shows on every tab while it's outstanding. Once you tick it
+      // off, it settles onto the tab you were on — so it stays visibly done where
+      // you did it, instead of following you around the day as a checked-off row.
+      .filter((t) => {
+        if (key !== '' || editing) return true // edit mode shows every row, or a
+        const home = doneInPart(t)              // hidden one would scramble reorder
+        return !home || home === part
+      })
       .sort((a, b) => {
         const d = orderVal(a) - orderVal(b)
         if (d !== 0) return d
@@ -271,7 +288,7 @@ export default function DayPlan({ schedule }) {
         {...dragProps(t)}
       >
         <label className="assignment-check" onClick={(e) => e.stopPropagation()}>
-          <input type="checkbox" checked={t.done} onChange={() => schedule.toggleTask(t.id, todayKey)} />
+          <input type="checkbox" checked={t.done} onChange={() => schedule.toggleTask(t.id, todayKey, part)} />
           <span className="checkmark" />
         </label>
         {cat && <span className="task-cat" title={cat.label}><Icon name={cat.icon} size={15} /></span>}
@@ -313,7 +330,7 @@ export default function DayPlan({ schedule }) {
           <input
             type="checkbox"
             checked={doneToday}
-            onChange={() => schedule.toggleTask(t.id, todayKey)}
+            onChange={() => schedule.toggleTask(t.id, todayKey, part)}
           />
           <span className="checkmark" />
         </label>

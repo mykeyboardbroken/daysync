@@ -2,7 +2,13 @@
 // mode (so if you delete one you can drop it back in). `days` [0..6] = every day.
 const ALL = [0, 1, 2, 3, 4, 5, 6]
 
-export const TASK_TEMPLATES = [
+// Templates are listed chronologically — morning, then afternoon, then night, with
+// the time-agnostic ones last. The sort happens on export (see the bottom of the
+// file) so you can add a template anywhere in the list below without worrying
+// where it lands in the picker.
+const BUCKET_ORDER = { morning: 0, afternoon: 1, night: 2, '': 3 }
+
+const TEMPLATES = [
   {
     title: 'Stretch / Move',
     description:
@@ -102,29 +108,18 @@ export const TASK_TEMPLATES = [
   {
     title: 'Get ready for tomorrow',
     description: 'A quick evening routine so the morning runs smoothly.',
-    steps: ["Lay out tomorrow's clothes", 'Pack your bag', 'Charge your devices', 'Set your alarm'],
+    steps: [
+      "Check tomorrow's plans",
+      "Lay out tomorrow's clothes",
+      'Pack your bag',
+      'Charge your devices',
+      'Set your alarm',
+    ],
     bucket: 'night',
     category: 'lifestyle',
     days: ALL,
     pinLast: true,
     essential: true,
-  },
-  {
-    title: "Check tomorrow's plans",
-    description: "A quick look at what's on tomorrow so nothing catches you off guard.",
-    steps: [],
-    bucket: 'night',
-    category: 'lifestyle',
-    days: ALL,
-  },
-  {
-    title: 'Charge all devices',
-    description:
-      'Plug in your laptop, phone, and headphones so they sit at 100% when you wake up.',
-    steps: [],
-    bucket: 'night',
-    category: 'lifestyle',
-    days: ALL,
   },
   {
     title: 'Screen off / wind down',
@@ -154,3 +149,9 @@ export const TASK_TEMPLATES = [
     essential: true,
   },
 ]
+
+// Sorted by time of day. Array.prototype.sort is stable, so templates sharing a
+// bucket keep the order they're written in above.
+export const TASK_TEMPLATES = [...TEMPLATES].sort(
+  (a, b) => BUCKET_ORDER[a.bucket || ''] - BUCKET_ORDER[b.bucket || ''],
+)
