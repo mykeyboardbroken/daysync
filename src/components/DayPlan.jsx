@@ -21,7 +21,6 @@ export default function DayPlan({ schedule }) {
   const [expandedId, setExpandedId] = useState(null)
   const [editing, setEditing] = useState(false)
   const [showTemplates, setShowTemplates] = useState(false)
-  const [showMoreTemplates, setShowMoreTemplates] = useState(false)
   const [dragId, setDragId] = useState(null)
   const { tasks } = schedule
   const todayKey = toKey(new Date())
@@ -436,7 +435,7 @@ export default function DayPlan({ schedule }) {
         {bucketSection('', 'clock', 'Anytime', false)}
 
         {editing && (
-          <button type="button" className="add-step-btn plan-add-templates" onClick={() => { setShowMoreTemplates(false); setShowTemplates(true) }}>
+          <button type="button" className="add-step-btn plan-add-templates" onClick={() => setShowTemplates(true)}>
             + Add a default task
           </button>
         )}
@@ -448,10 +447,7 @@ export default function DayPlan({ schedule }) {
             <h3>Add a default task</h3>
             <p className="modal-sub">Drop one of the built-in routines back into your day.</p>
             <div className="add-menu add-menu-compact">
-              {(showMoreTemplates
-                ? TASK_TEMPLATES
-                : TASK_TEMPLATES.filter((t) => t.essential)
-              ).map((tpl) => {
+              {TASK_TEMPLATES.map((tpl) => {
                 const already = tasks.some((t) => t.title === tpl.title)
                 const slot = BUCKET_OPTIONS.find((b) => b.key === (tpl.bucket || ''))
                 return (
@@ -476,15 +472,6 @@ export default function DayPlan({ schedule }) {
                   </button>
                 )
               })}
-              {!showMoreTemplates && (
-                <button
-                  type="button"
-                  className="add-menu-more"
-                  onClick={() => setShowMoreTemplates(true)}
-                >
-                  + More routines ({TASK_TEMPLATES.filter((t) => !t.essential).length})
-                </button>
-              )}
             </div>
             <div className="modal-actions">
               <span className="spacer" />

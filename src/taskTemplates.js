@@ -1,14 +1,27 @@
-// The built-in default tasks, offered as re-addable templates in the Today edit
-// mode (so if you delete one you can drop it back in). `days` [0..6] = every day.
+// The built-in default tasks. These are exactly the routines a new install is
+// seeded with (see freshData() in useSchedule.js), and the picker in Today's edit
+// mode offers them back — so its only job is "I deleted one, put it back".
+//
+// Keep this list and freshData() in step: every seeded task must have a template
+// here, or it can't be restored once deleted.
+//
+// `days` [0..6] = every day.
 const ALL = [0, 1, 2, 3, 4, 5, 6]
 
-// Templates are listed chronologically — morning, then afternoon, then night, with
-// the time-agnostic ones last. The sort happens on export (see the bottom of the
-// file) so you can add a template anywhere in the list below without worrying
-// where it lands in the picker.
+// Listed chronologically — morning, then afternoon, then night. The sort happens on
+// export (bottom of the file), so a new template can be added anywhere below.
 const BUCKET_ORDER = { morning: 0, afternoon: 1, night: 2, '': 3 }
 
 const TEMPLATES = [
+  // ---- Morning ----
+  {
+    title: 'Morning hygiene',
+    description: '',
+    steps: ['Wash your face', 'Brush your teeth', 'Sort your hair'],
+    bucket: 'morning',
+    category: 'health',
+    days: ALL,
+  },
   {
     title: 'Stretch / Move',
     description:
@@ -18,53 +31,18 @@ const TEMPLATES = [
     category: 'health',
     days: ALL,
     pinFirst: true,
-    essential: true,
-  },
-  {
-    title: 'Journaling',
-    description: 'A few lines to clear your head and set your intentions for the day.',
-    steps: ['Write your thoughts', "Write today's to-do list", "Write what you're grateful for"],
-    bucket: 'morning',
-    category: 'lifestyle',
-    days: ALL,
-  },
-  {
-    title: 'Morning hygiene',
-    description: '',
-    steps: ['Wash your face', 'Brush your teeth', 'Sort your hair'],
-    bucket: 'morning',
-    category: 'health',
-    days: ALL,
-    essential: true,
-  },
-  {
-    title: 'Sunlight exposure',
-    description:
-      'Spend 5 minutes looking outside or stepping into the sun to lock in your circadian rhythm.',
-    steps: [],
-    bucket: 'morning',
-    category: 'health',
-    days: ALL,
   },
   {
     title: 'Review daily plan',
     description:
-      "A quick 60-second glance at your schedule so you know exactly what your targets are for the day.",
+      'A quick 60-second glance at your schedule so you know exactly what your targets are for the day.',
     steps: [],
     bucket: 'morning',
     category: 'lifestyle',
     days: ALL,
-    essential: true,
   },
-  {
-    title: 'Night hygiene',
-    description: '',
-    steps: ['Shower or wash your face', 'Brush your teeth', 'Moisturise'],
-    bucket: 'night',
-    category: 'health',
-    days: ALL,
-    essential: true,
-  },
+
+  // ---- Afternoon ----
   {
     title: 'Hydration check',
     description: 'A reminder to drink water or refill your bottle to keep your energy from dipping.',
@@ -72,16 +50,6 @@ const TEMPLATES = [
     bucket: 'afternoon',
     category: 'health',
     days: ALL,
-    essential: true,
-  },
-  {
-    title: 'Reading',
-    description: 'Time with a book — read as much or as little as you like; what matters is that you read.',
-    steps: [],
-    bucket: 'afternoon',
-    category: 'lifestyle',
-    days: ALL,
-    essential: true,
   },
   {
     title: 'Snack break',
@@ -90,23 +58,33 @@ const TEMPLATES = [
     bucket: 'afternoon',
     category: 'health',
     days: ALL,
-    essential: true,
   },
   {
-    title: 'Clean your room',
-    description: '',
-    steps: ['Tidy the floor', 'Clear the desk', 'Wipe down surfaces'],
+    title: 'Reading',
+    description:
+      'Time with a book — read as much or as little as you like; what matters is that you read.',
+    steps: [],
     bucket: 'afternoon',
     category: 'lifestyle',
-    days: [0], // Sunday
+    days: ALL,
+  },
+
+  // ---- Night ----
+  {
+    title: 'Night hygiene',
+    description: '',
+    steps: ['Shower or wash your face', 'Brush your teeth', 'Moisturise'],
+    bucket: 'night',
+    category: 'health',
+    days: ALL,
   },
   {
-    title: 'Organise your wardrobe',
-    description: '',
-    steps: ['Sort your clothes', 'Fold the clean ones', 'Clear anything left out'],
-    bucket: 'afternoon',
-    category: 'lifestyle',
-    days: [6], // Saturday
+    title: 'Meditation',
+    description: 'A few quiet minutes of focused breathing to settle your mind.',
+    steps: [],
+    bucket: 'night',
+    category: 'health',
+    days: ALL,
   },
   {
     title: 'Get ready for tomorrow',
@@ -122,25 +100,6 @@ const TEMPLATES = [
     category: 'lifestyle',
     days: ALL,
     pinLast: true,
-    essential: true,
-  },
-  {
-    title: 'Screen off / wind down',
-    description:
-      'Disconnect from all digital devices 30 minutes before sleep to let your brain rest.',
-    steps: [],
-    bucket: 'night',
-    category: 'health',
-    days: ALL,
-  },
-  {
-    title: 'Meditation',
-    description: 'A few quiet minutes of focused breathing to settle your mind.',
-    steps: [],
-    bucket: 'night',
-    category: 'health',
-    days: ALL,
-    essential: true,
   },
 ]
 
