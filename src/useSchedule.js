@@ -97,9 +97,15 @@ function freshData() {
       order: -1,
     }),
     task({
+      title: 'Morning hygiene',
+      steps: ['Wash your face', 'Brush your teeth', 'Sort your hair'],
+      bucket: 'morning',
+      category: 'health',
+    }),
+    task({
       title: 'Hydration check',
       description: 'A reminder to drink water or refill your bottle to keep your energy from dipping.',
-      bucket: 'morning',
+      bucket: 'afternoon',
       category: 'health',
     }),
     task({
@@ -112,7 +118,7 @@ function freshData() {
     task({
       title: 'Meditation',
       description: 'A few quiet minutes of focused breathing to settle your mind.',
-      bucket: 'afternoon',
+      bucket: 'night',
       category: 'health',
     }),
     task({
