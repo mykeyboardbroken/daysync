@@ -24,10 +24,6 @@ export default function DayPlan({ schedule }) {
   const [showMoreTemplates, setShowMoreTemplates] = useState(false)
   const [dragId, setDragId] = useState(null)
 
-  const { tasks } = schedule
-  const todayKey = toKey(new Date())
-  const now = new Date()
-
   // Which part of the day it is right now — that section opens by default, the
   // others sit collapsed so the page is one short scroll instead of a wall.
   const hour = now.getHours()
@@ -41,6 +37,9 @@ export default function DayPlan({ schedule }) {
       else next.add(key)
       return next
     })
+  const { tasks } = schedule
+  const todayKey = toKey(new Date())
+  const now = new Date()
 
   const toggleExpand = (id) => setExpandedId((cur) => (cur === id ? null : id))
 
