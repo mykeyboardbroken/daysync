@@ -295,6 +295,12 @@ export default function SettingsModal({
                   </label>
                 ))}
 
+                <p className="settings-section-head">Training</p>
+                <p className="settings-field-label">
+                  Optional. Nothing shows on your day until you pick a time below —
+                  leave it alone and DaySync stays a plain planner.
+                </p>
+
                 <p className="settings-field-label">Workout location</p>
                 <div className="type-select repeat-select habit-days">
                   {[
