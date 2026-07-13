@@ -27,6 +27,12 @@ export default function DayPlan({ schedule }) {
   const todayKey = toKey(new Date())
   const now = new Date()
 
+  // Sub-tabs: show one part of the day at a time, starting on the part you're
+  // actually in. (Declared after `now` — reading it above would be a TDZ crash.)
+  const hour = now.getHours()
+  const nowPart = hour < 12 ? 'morning' : hour < 17 ? 'afternoon' : 'night'
+  const [part, setPart] = useState(nowPart)
+
   const toggleExpand = (id) => setExpandedId((cur) => (cur === id ? null : id))
 
   // The one calm line under a title. A real description if there is one, otherwise
@@ -289,6 +295,13 @@ export default function DayPlan({ schedule }) {
     )
   }
 
+  // How much is still undone in a bucket — shown on its tab so nothing gets
+  // forgotten just because it's on another tab.
+  const leftIn = (key) =>
+    tasksIn(key).filter((t) => (t.repeat ? !habitDoneOn(t, todayKey) : !t.done)).length +
+    (sport && sportBucket === key && !schedule.workoutLog?.[`${todayKey}|sport`] ? 1 : 0) +
+    (general && generalBucket === key && !schedule.workoutLog?.[`${todayKey}|general`] ? 1 : 0)
+
   const bucketSection = (key, icon, label, alwaysShow) => {
     const items = tasksIn(key)
     const showSport = sport && sportBucket === key
@@ -296,7 +309,10 @@ export default function DayPlan({ schedule }) {
     if (!alwaysShow && items.length === 0 && !showSport && !showGeneral) return null
     return (
       <div className="plan-section" key={key || 'anytime'}>
-        <div className="plan-section-head"><Icon name={icon} size={15} /> {label}</div>
+        {/* The active tab already names the time bucket, so it passes no label. */}
+        {label && (
+          <div className="plan-section-head"><Icon name={icon} size={15} /> {label}</div>
+        )}
         {items.length === 0 && !showSport && !showGeneral ? (
           <p className="plan-empty">Nothing planned</p>
         ) : (
@@ -332,8 +348,31 @@ export default function DayPlan({ schedule }) {
             {editing ? 'Done' : 'Edit'}
           </button>
         </div>
+        <div className="plan-tabs" role="tablist">
+          {DAY_PARTS.map((p) => {
+            const left = leftIn(p.key)
+            return (
+              <button
+                key={p.key}
+                type="button"
+                role="tab"
+                aria-selected={part === p.key}
+                className={`plan-tab ${part === p.key ? 'active' : ''}`}
+                onClick={() => setPart(p.key)}
+              >
+                <Icon name={p.icon} size={14} />
+                <span className="plan-tab-label">{p.label}</span>
+                {left > 0 && <span className="plan-tab-count">{left}</span>}
+              </button>
+            )
+          })}
+        </div>
+
+        {bucketSection(part, DAY_PARTS.find((p) => p.key === part)?.icon, '', true)}
+        {/* Anytime isn't tied to a clock, so it sits under whichever tab you're on
+            rather than hiding behind one. Only rendered when it has something. */}
         {bucketSection('', 'clock', 'Anytime', false)}
-        {DAY_PARTS.map((p) => bucketSection(p.key, p.icon, p.label, true))}
+
         {editing && (
           <button type="button" className="add-step-btn plan-add-templates" onClick={() => { setShowMoreTemplates(false); setShowTemplates(true) }}>
             + Add a default task

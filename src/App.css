@@ -715,6 +715,58 @@
   color: var(--text-dim);
   margin-bottom: 10px;
 }
+/* Morning / Afternoon / Night sub-tabs inside Today's plan. */
+.plan-tabs {
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  margin-bottom: 16px;
+  border-radius: 12px;
+  background: var(--surface-2);
+}
+.plan-tab {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 9px 6px;
+  border: none;
+  border-radius: 9px;
+  background: none;
+  color: var(--text-dim);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.18s, color 0.18s;
+}
+.plan-tab:hover { color: var(--text); }
+.plan-tab.active {
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.18);
+}
+/* How much is still left on a tab you're not looking at — so nothing gets
+   forgotten just because it's behind another tab. */
+.plan-tab-count {
+  min-width: 17px;
+  height: 17px;
+  padding: 0 4px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 16%, transparent);
+}
+.plan-tab.active .plan-tab-count { color: #fff; background: var(--accent); }
+@media (max-width: 380px) {
+  .plan-tab-label { display: none; } /* icons + counts only on narrow phones */
+}
+
 .plan-empty { color: var(--text-dim); font-size: 13px; margin: 0; opacity: 0.65; }
 .task-cat { display: inline-flex; align-items: center; color: var(--text-dim); flex-shrink: 0; }
 
