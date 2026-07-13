@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { dueLabel, toKey } from '../dateUtils'
 import { DAY_PARTS, BUCKET_OPTIONS } from '../dayParts'
 import { habitDueOn, habitDoneOn, habitStreak } from '../habits'
@@ -202,6 +202,31 @@ export default function DayPlan({ schedule }) {
   // stray swipe on the row can't reorder anything.
   const dragging = useRef(null) // id of the task currently being dragged
 
+  const endDrag = () => {
+    dragging.current = null
+    setDragId(null)
+  }
+
+  // A drag can end somewhere the grip never hears about: you lift your finger off
+  // the edge of the screen, the browser cancels the gesture, or edit mode closes
+  // and unmounts the grip mid-drag. Any of those left `dragId` set forever, so the
+  // row kept its highlighted "being dragged" styling with nothing dragging it.
+  // Watch for the end of the gesture on the window, and always clear on leaving
+  // edit mode.
+  useEffect(() => {
+    if (!editing) {
+      endDrag()
+      return
+    }
+    window.addEventListener('pointerup', endDrag)
+    window.addEventListener('pointercancel', endDrag)
+    return () => {
+      window.removeEventListener('pointerup', endDrag)
+      window.removeEventListener('pointercancel', endDrag)
+      endDrag() // edit mode is closing — never leave a row stuck mid-drag
+    }
+  }, [editing])
+
   const gripDown = (e, t) => {
     e.preventDefault()
     e.stopPropagation()
@@ -230,8 +255,7 @@ export default function DayPlan({ schedule }) {
     if (e.currentTarget.hasPointerCapture?.(e.pointerId)) {
       e.currentTarget.releasePointerCapture(e.pointerId)
     }
-    dragging.current = null
-    setDragId(null)
+    endDrag()
   }
 
   const gripProps = (t) => ({
@@ -282,7 +306,7 @@ export default function DayPlan({ schedule }) {
     return (
       <li
         key={t.id}
-        className={`assignment tappable ${t.done ? 'done' : ''} ${expanded ? 'expanded' : ''} ${editing ? 'editing' : ''} ${dragId === t.id ? 'dragging' : ''}`}
+        className={`assignment tappable ${t.done ? 'done' : ''} ${expanded ? 'expanded' : ''} ${editing ? 'editing' : ''} ${editing && dragId === t.id ? 'dragging' : ''}`}
         onClick={() => !editing && toggleExpand(t.id)}
         {...dragProps(t)}
       >
@@ -321,7 +345,7 @@ export default function DayPlan({ schedule }) {
     return (
       <li
         key={t.id}
-        className={`habit-row tappable ${doneToday ? 'done' : ''} ${expanded ? 'expanded' : ''} ${editing ? 'editing' : ''} ${dragId === t.id ? 'dragging' : ''}`}
+        className={`habit-row tappable ${doneToday ? 'done' : ''} ${expanded ? 'expanded' : ''} ${editing ? 'editing' : ''} ${editing && dragId === t.id ? 'dragging' : ''}`}
         onClick={() => !editing && toggleExpand(t.id)}
         {...dragProps(t)}
       >
