@@ -97,7 +97,9 @@ export default function CalendarTab({ schedule }) {
           ].join(' ')
           return (
             <button key={key} className={classes} onClick={() => setSelectedKey(key)} title={pub || brk || ''}>
-              {pub && <span className="cal-pub" aria-hidden="true" />}
+              {/* A public holiday is shown by its tinted cell + coloured date, the same
+                  way a school break is. It used to also carry a corner dot, which said
+                  the same thing a third time. */}
               <span className="cal-num">{d.getDate()}</span>
               {count > 0 && (
                 <span className="cal-dots">
