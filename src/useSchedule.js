@@ -62,8 +62,15 @@ function emptyData() {
   }
 }
 
-// A brand-new install starts with a small, curated set of everyday routines so
-// there's something to do from minute one. All are deletable like any task.
+// A brand-new install starts with exactly THREE routines — one per tab, so no part
+// of the day looks empty on first open, and the app doesn't greet a new person with
+// a seven-item chore list.
+//
+// They're deliberately neutral: things everyone already does (wash, drink water,
+// sort tomorrow's bag). DaySync is a school planner, so it shouldn't open by
+// prescribing a lifestyle — journaling, meditation, stretching and reading are all
+// one tap away in "Add a default task" for anyone who wants them.
+//
 // Every `seeded*` flag is pre-set true so the one-time migration seeders below
 // never pile extra copies on top of these.
 function freshData() {
@@ -82,22 +89,6 @@ function freshData() {
   })
   base.tasks = [
     task({
-      title: 'Journaling',
-      description: 'A few lines to clear your head and set your intentions for the day.',
-      steps: ['Write your thoughts', "Write today's to-do list", "Write what you're grateful for"],
-      bucket: 'morning',
-      category: 'lifestyle',
-      order: -2,
-    }),
-    task({
-      title: 'Stretch / Move',
-      description:
-        'Five minutes of light movement or stretching to get the blood flowing and shake off morning stiffness.',
-      bucket: 'morning',
-      category: 'health',
-      order: -1,
-    }),
-    task({
       title: 'Morning hygiene',
       steps: ['Wash your face', 'Brush your teeth', 'Sort your hair'],
       bucket: 'morning',
@@ -107,19 +98,6 @@ function freshData() {
       title: 'Hydration check',
       description: 'A reminder to drink water or refill your bottle to keep your energy from dipping.',
       bucket: 'afternoon',
-      category: 'health',
-    }),
-    task({
-      title: 'Reading',
-      description:
-        'Time with a book — read as much or as little as you like; what matters is that you read.',
-      bucket: 'afternoon',
-      category: 'lifestyle',
-    }),
-    task({
-      title: 'Meditation',
-      description: 'A few quiet minutes of focused breathing to settle your mind.',
-      bucket: 'night',
       category: 'health',
     }),
     task({
