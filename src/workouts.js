@@ -137,6 +137,28 @@ const GENERAL = {
     { name: 'Leg raises — 3 × 15', eq: 'bodyweight' },
     { name: 'Hanging leg raises — 3 × 12', eq: 'pullupBar' },
   ],
+  // Cardio needs almost no kit — you can always run. The rope and gym machines are
+  // bonuses if you have them.
+  cardio: [
+    { name: 'Easy run — 25 min', eq: 'bodyweight' },
+    { name: 'Interval run — 8 × 1 min hard / 1 min easy', eq: 'bodyweight' },
+    { name: 'Hill sprints — 6 × 30 s', eq: 'bodyweight' },
+    { name: 'Shuttle runs — 8 × 40 m', eq: 'bodyweight' },
+    { name: 'Stair sprints — 8 rounds', eq: 'bodyweight' },
+    { name: 'Tempo run — 3 × 5 min', eq: 'bodyweight' },
+    { name: 'Skipping — 10 × 1 min', eq: 'skippingRope' },
+    { name: 'Skipping intervals — 5 × 2 min', eq: 'skippingRope' },
+    { name: 'Rowing machine — 15 min', eq: 'gym' },
+    { name: 'Treadmill intervals — 8 × 400 m', eq: 'gym' },
+    { name: 'Stationary bike — 20 min', eq: 'gym' },
+  ],
+  // Short, sharp finishers to close a cardio day out.
+  burner: [
+    { name: 'Burpees — 5 × 10', eq: 'bodyweight' },
+    { name: 'Mountain climbers — 4 × 30 s', eq: 'bodyweight' },
+    { name: 'Jump squats — 3 × 15', eq: 'bodyweight' },
+    { name: 'High knees — 4 × 30 s', eq: 'bodyweight' },
+  ],
 }
 
 const EQUIPMENT_KEY = {
@@ -147,17 +169,23 @@ const EQUIPMENT_KEY = {
   'Skipping rope': 'skippingRope',
 }
 
-// The push/pull/legs rotation the general workout cycles through.
+// The rotation the workout cycles through, one day at a time. Cardio is a day of
+// its own rather than a finisher bolted onto every session — that way it gets a
+// full effort instead of being the tired thing you skip at the end.
 const ROTATION = [
   { key: 'push', label: 'Push day' },
   { key: 'pull', label: 'Pull day' },
   { key: 'legs', label: 'Legs day' },
+  { key: 'cardio', label: 'Cardio day' },
 ]
 
+// Warm-ups are equipment-tagged too — the skipping one used to be offered to people
+// who don't own a rope.
 const WARMUPS = [
-  'Warm-up: 5 min light jog + dynamic stretches',
-  'Warm-up: 3 min skipping + arm & leg swings',
-  'Warm-up: 5 min brisk walk + mobility drills',
+  { name: 'Warm-up: 5 min light jog + dynamic stretches', eq: 'bodyweight' },
+  { name: 'Warm-up: 5 min brisk walk + mobility drills', eq: 'bodyweight' },
+  { name: 'Warm-up: arm & leg swings + 20 jumping jacks', eq: 'bodyweight' },
+  { name: 'Warm-up: 3 min skipping + arm & leg swings', eq: 'skippingRope' },
 ]
 const COOLDOWNS = [
   'Cool-down: 5 min easy walk + stretching',
@@ -191,6 +219,12 @@ function pickSome(pool, n, rand, seen) {
 
 function dayNumber(date) {
   return Math.floor((date - new Date(date.getFullYear(), 0, 0)) / 86400000)
+}
+
+// A warm-up you can actually do with the kit you have.
+function pickWarmup(avail, rand) {
+  const usable = WARMUPS.filter((w) => avail.has(w.eq)).map((w) => w.name)
+  return usable[Math.floor(rand() * usable.length)]
 }
 
 // Equipment the user can train with (bodyweight always available).
@@ -240,7 +274,7 @@ export function generateSport(profile = {}, date = new Date(), seed = 0) {
   const weakAspects = aspects.filter((a) => focus[a] === 'weak')
   const sequence = [...aspects, ...weakAspects]
 
-  const steps = [WARMUPS[Math.floor(rand() * WARMUPS.length)]]
+  const steps = [pickWarmup(availableEquip(profile), rand)]
   let i = 0
   while (steps.length < count + 1 && i < sequence.length * 3) {
     const drill = pickSome(skills[sequence[i % sequence.length]].drills, 1, rand, seen)[0]
@@ -260,8 +294,15 @@ export function generateGeneral(profile = {}, date = new Date(), seed = 0) {
   const rot = ROTATION[(dayNumber(date) + seed) % ROTATION.length]
   const pool = (part) => GENERAL[part].filter((e) => avail.has(e.eq)).map((e) => e.name)
 
-  const steps = [WARMUPS[Math.floor(rand() * WARMUPS.length)]]
-  steps.push(...pickSome(pool(rot.key), intensityForAge(profile.age).main, rand, seen))
+  const steps = [pickWarmup(avail, rand)]
+  if (rot.key === 'cardio') {
+    // A cardio session is ONE main effort — nobody does three separate runs — so it's
+    // a single piece of work plus a short burner, rather than a list of them.
+    steps.push(...pickSome(pool('cardio'), 1, rand, seen))
+    steps.push(...pickSome(pool('burner'), 1, rand, seen))
+  } else {
+    steps.push(...pickSome(pool(rot.key), intensityForAge(profile.age).main, rand, seen))
+  }
   steps.push(...pickSome(pool('core'), 1, rand, seen))
   steps.push(COOLDOWNS[Math.floor(rand() * COOLDOWNS.length)])
   return { steps, label: rot.label }

@@ -46,6 +46,7 @@ const SECTIONS = [
   { key: 'appearance', label: 'Appearance', icon: 'palette' },
   { key: 'tasks', label: 'Tasks', icon: 'check' },
   { key: 'profile', label: 'Profile', icon: 'user' },
+  { key: 'exercise', label: 'Exercise', icon: 'activity' },
   { key: 'feedback', label: 'Feedback', icon: 'mail' },
   { key: 'backup', label: 'Backup', icon: 'file' },
 ]
@@ -310,13 +311,39 @@ export default function SettingsModal({
                   </label>
                 ))}
 
-                <p className="settings-section-head">Training</p>
+              </div>
+            )}
+
+            {/* Exercise: workout AND sport training in one place. Both are opt-in —
+                nothing appears on your day until a time is picked below. */}
+            {section === 'exercise' && (
+              <div className="color-pickers">
                 <p className="settings-field-label">
-                  Optional. Nothing shows on your day until you pick a time below —
-                  leave it alone and DaySync stays a plain planner.
+                  All optional. Nothing shows on your day until you pick a time — leave
+                  this alone and DaySync stays a plain planner.
                 </p>
 
-                <p className="settings-field-label">Workout location</p>
+                <p className="settings-section-head">Workout</p>
+                <p className="settings-field-label">
+                  Strength that rotates push → pull → legs → cardio, using only the kit
+                  you have.
+                </p>
+
+                <p className="settings-field-label">When</p>
+                <div className="type-select repeat-select habit-days">
+                  {TIME_OPTIONS.map((o) => (
+                    <button
+                      type="button"
+                      key={o}
+                      className={`type-option ${profile.workoutTime === o ? 'selected' : ''}`}
+                      onClick={() => onSetProfile('workoutTime', o)}
+                    >
+                      {o}
+                    </button>
+                  ))}
+                </div>
+
+                <p className="settings-field-label">Where</p>
                 <div className="type-select repeat-select habit-days">
                   {[
                     { label: 'Gym', gym: 'Yes' },
@@ -335,7 +362,7 @@ export default function SettingsModal({
 
                 {profile.gym !== 'Yes' && (
                   <>
-                    <p className="settings-field-label">Home equipment</p>
+                    <p className="settings-field-label">What you've got at home</p>
                     <div className="type-select repeat-select habit-days">
                       {EQUIP_OPTIONS.map((o) => (
                         <button
@@ -351,7 +378,13 @@ export default function SettingsModal({
                   </>
                 )}
 
-                <p className="settings-field-label">Sports</p>
+                <p className="settings-section-head">Sport training</p>
+                <p className="settings-field-label">
+                  Drills for the sports you play, one sport a day. Rate your skills on the
+                  task itself and the drills lean toward what you're weak at.
+                </p>
+
+                <p className="settings-field-label">Sports you play</p>
                 <div className="type-select repeat-select habit-days">
                   {SPORT_OPTIONS.map((o) => (
                     <button
@@ -367,7 +400,7 @@ export default function SettingsModal({
 
                 {(profile.sports || []).length > 0 && (
                   <>
-                    <p className="settings-field-label">Sport training time</p>
+                    <p className="settings-field-label">When</p>
                     <div className="type-select repeat-select habit-days">
                       {TIME_OPTIONS.map((o) => (
                         <button
@@ -382,20 +415,6 @@ export default function SettingsModal({
                     </div>
                   </>
                 )}
-
-                <p className="settings-field-label">Workout time</p>
-                <div className="type-select repeat-select habit-days">
-                  {TIME_OPTIONS.map((o) => (
-                    <button
-                      type="button"
-                      key={o}
-                      className={`type-option ${profile.workoutTime === o ? 'selected' : ''}`}
-                      onClick={() => onSetProfile('workoutTime', o)}
-                    >
-                      {o}
-                    </button>
-                  ))}
-                </div>
               </div>
             )}
 
