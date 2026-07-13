@@ -345,6 +345,19 @@
   /* Cap the inner width & pin the first/last tabs to the edges so they stay put. */
   padding: 8px max(14px, calc(50% - 220px)) calc(8px + env(safe-area-inset-bottom));
 }
+/* Paint the bar's surface through to the very bottom of the screen. If the browser
+   reports a bottom inset the bar doesn't cover (home indicator, gesture bar), the
+   page background would otherwise show as a dark strip under the bar. This sits
+   below it and is simply off-screen when there's no gap to fill. */
+.tab-bar::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 100%;
+  height: 120px;
+  background: var(--surface);
+}
 /* One easing for the whole bar so the pill, the label and the icon all move as a
    single object. This curve decelerates hard at the end — it's what makes the
    motion read as "settling" rather than "stopping". */
@@ -627,6 +640,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
+  min-width: 0; /* let the whole strip shrink instead of pushing off-screen */
 }
 .week-arrow {
   background: var(--surface);
@@ -646,6 +660,9 @@
   grid-template-columns: repeat(7, 1fr);
   gap: 6px;
   flex: 1;
+  /* A flex item won't shrink below its content unless you say so. Without this the
+     seven 44px circles + gaps force the strip wider than the phone. */
+  min-width: 0;
 }
 .day-circle {
   display: flex;
@@ -654,8 +671,12 @@
   justify-content: center;
   gap: 1px;
   justify-self: center;
-  width: 44px;
-  height: 44px;
+  /* Fluid, but never bigger than 44px and always a circle. A fixed width here was
+     what made the strip overflow on a narrow phone. */
+  width: 100%;
+  max-width: 44px;
+  aspect-ratio: 1;
+  min-width: 0;
   background: var(--surface);
   border: 1px solid var(--border);
   color: var(--text);
@@ -664,6 +685,12 @@
   transition: background 0.15s, border-color 0.15s;
 }
 .day-circle:hover { border-color: var(--accent); }
+/* On a narrow phone the circles shrink, so shrink what's inside them too. */
+@media (max-width: 390px) {
+  .week-arrow { width: 26px; }
+  .dc-weekday { font-size: 15px; }
+  .dc-date { font-size: 9px; }
+}
 .dc-date {
   font-size: 10px;
   line-height: 1;
