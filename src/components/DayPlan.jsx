@@ -29,8 +29,14 @@ export default function DayPlan({ schedule }) {
 
   const toggleExpand = (id) => setExpandedId((cur) => (cur === id ? null : id))
 
-  // Fall back to "Routine for <category>" when there's no description.
-  const descOf = (t) => t.description || `Routine for ${categoryMeta(t.category)?.label || 'this'}`
+  // The one calm line under a title. A real description if there is one, otherwise
+  // just how many steps are hiding inside — never the steps themselves. A glance
+  // should feel effortless; the detail is a tap away.
+  const descOf = (t) => {
+    if (t.description) return t.description
+    const n = t.steps?.length || 0
+    return n ? `${n} step${n > 1 ? 's' : ''}` : ''
+  }
 
   // Generated workouts (free, offline). Sport training and the general workout
   // each sit in their own chosen bucket (they can differ, or be "I don't").
@@ -101,24 +107,26 @@ export default function DayPlan({ schedule }) {
         <div className="habit-body">
           <span className="habit-title">{title}</span>
           <span className="task-desc">{subtitle}</span>
-          {expanded && (
-            <div className="workout-drawer" onClick={(e) => e.stopPropagation()}>
-              {skillSport && renderSkillPicker(skillSport)}
-              {skillSport && <p className="skill-title recommend-title">Recommended drills</p>}
-              <ol className="task-steps workout-steps">
-                {steps.map((s, i) => <li key={i}>{s}</li>)}
-              </ol>
-              {!skillSport && (
-                <button
-                  type="button"
-                  className="task-edit-btn"
-                  onClick={() => schedule.reshuffleWorkout()}
-                >
-                  New workout
-                </button>
-              )}
+          <div className="task-drawer">
+            <div className="task-drawer-inner">
+              <div className="workout-drawer" onClick={(e) => e.stopPropagation()}>
+                {skillSport && renderSkillPicker(skillSport)}
+                {skillSport && <p className="skill-title recommend-title">Recommended drills</p>}
+                <ol className="task-steps workout-steps">
+                  {steps.map((s, i) => <li key={i}>{s}</li>)}
+                </ol>
+                {!skillSport && (
+                  <button
+                    type="button"
+                    className="task-edit-btn"
+                    onClick={() => schedule.reshuffleWorkout()}
+                  >
+                    New workout
+                  </button>
+                )}
+              </div>
             </div>
-          )}
+          </div>
         </div>
         <Icon name="chevronRight" size={16} className={`task-chevron ${expanded ? 'open' : ''}`} />
       </li>
@@ -168,24 +176,28 @@ export default function DayPlan({ schedule }) {
 
   // The expanded drawer: steps (if any) + an Edit button. Editing/deleting live
   // here so they're deliberate — no delete button sits on the row itself.
+  // Always rendered, so opening/closing can animate its height (see .task-drawer);
+  // a conditional mount would just pop.
   const expandedDrawer = (t) => (
-    <>
-      {t.steps?.length > 0 && (
-        <ol className="task-steps">
-          {t.steps.map((s, i) => <li key={i}>{s}</li>)}
-        </ol>
-      )}
-      <button
-        type="button"
-        className="task-edit-btn"
-        onClick={(e) => {
-          e.stopPropagation()
-          setEditingTask(t)
-        }}
-      >
-        Edit
-      </button>
-    </>
+    <div className="task-drawer">
+      <div className="task-drawer-inner">
+        {t.steps?.length > 0 && (
+          <ol className="task-steps">
+            {t.steps.map((s, i) => <li key={i}>{s}</li>)}
+          </ol>
+        )}
+        <button
+          type="button"
+          className="task-edit-btn"
+          onClick={(e) => {
+            e.stopPropagation()
+            setEditingTask(t)
+          }}
+        >
+          Edit
+        </button>
+      </div>
+    </div>
   )
 
   // In edit mode a row is draggable to reorder; a tap no longer expands it.
@@ -219,7 +231,7 @@ export default function DayPlan({ schedule }) {
         <div className="assignment-body">
           <span className="assignment-title">{t.title}</span>
           <span className="task-desc">{descOf(t)}</span>
-          {expanded && expandedDrawer(t)}
+          {expandedDrawer(t)}
         </div>
         {!t.done && t.due && <span className={`assignment-due tone-${due.tone}`}>{due.text}</span>}
         {editing ? (
@@ -260,7 +272,7 @@ export default function DayPlan({ schedule }) {
         <div className="habit-body">
           <span className="habit-title">{t.title}</span>
           <span className="task-desc">{descOf(t)}</span>
-          {expanded && expandedDrawer(t)}
+          {expandedDrawer(t)}
         </div>
         {streak > 0 && (
           <span className="habit-streak"><Icon name="flame" size={13} /> {streak}</span>

@@ -37,14 +37,6 @@ export const SURVEY_QUESTIONS = [
     options: ['Yes', 'No'],
   },
   {
-    id: 'focus',
-    type: 'single',
-    question: "Anywhere you'd like to focus?",
-    hint: 'Your call — this just gets a little extra attention. Change it any time.',
-    options: ['Full body', 'Upper body', 'Lower body', 'Core'],
-    showIf: (a) => a.worksOut === 'Yes',
-  },
-  {
     id: 'gym',
     type: 'single',
     question: 'Do you have access to a gym?',

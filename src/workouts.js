@@ -154,16 +154,6 @@ const ROTATION = [
   { key: 'legs', label: 'Legs day' },
 ]
 
-// Which body part gets one extra accessory. This comes from the user's OWN answer
-// ("Anywhere you'd like to focus?") — never inferred from their gender or body.
-// 'Full body' / unset = no emphasis, just the plain rotation.
-function focusPart(focus, rand) {
-  if (focus === 'Lower body') return 'legs'
-  if (focus === 'Core') return 'core'
-  if (focus === 'Upper body') return rand() < 0.5 ? 'push' : 'pull'
-  return null
-}
-
 const WARMUPS = [
   'Warm-up: 5 min light jog + dynamic stretches',
   'Warm-up: 3 min skipping + arm & leg swings',
@@ -272,9 +262,6 @@ export function generateGeneral(profile = {}, date = new Date(), seed = 0) {
 
   const steps = [WARMUPS[Math.floor(rand() * WARMUPS.length)]]
   steps.push(...pickSome(pool(rot.key), intensityForAge(profile.age).main, rand, seen))
-  // One extra accessory from the part they chose to focus on (if not today's part).
-  const focus = focusPart(profile.focus, rand)
-  if (focus && focus !== rot.key) steps.push(...pickSome(pool(focus), 1, rand, seen))
   steps.push(...pickSome(pool('core'), 1, rand, seen))
   steps.push(COOLDOWNS[Math.floor(rand() * COOLDOWNS.length)])
   return { steps, label: rot.label }

@@ -1165,9 +1165,53 @@
 /* Expanded: show the whole description. */
 .expanded .task-desc { white-space: pre-wrap; overflow: visible; text-overflow: clip; }
 .assignment.done .task-desc { text-decoration: line-through; }
-/* Steps checklist shown on a task */
-.task-steps { margin: 5px 0 0; padding-left: 18px; font-size: 12px; color: var(--text-dim); line-height: 1.5; }
-.task-steps li { padding-left: 2px; }
+/* Click-to-expand drawer. The 0fr → 1fr grid trick animates to the content's own
+   height — you can't transition to `auto`, and hard-coding a max-height either
+   clips long lists or makes short ones feel laggy. */
+.task-drawer {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 260ms cubic-bezier(0.32, 0.72, 0, 1);
+}
+.task-drawer-inner {
+  overflow: hidden;
+  min-height: 0;
+  opacity: 0;
+  transition: opacity 140ms ease;
+}
+.expanded .task-drawer { grid-template-rows: 1fr; }
+.expanded .task-drawer-inner { opacity: 1; transition: opacity 200ms ease 90ms; }
+@media (prefers-reduced-motion: reduce) {
+  .task-drawer, .task-drawer-inner { transition: none; }
+}
+
+/* Steps checklist shown on a task — quiet, minimal, no bullets shouting numbers. */
+.task-steps {
+  margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: 13px;
+  color: var(--text-dim);
+  line-height: 1.5;
+}
+.task-steps li {
+  padding: 7px 0 7px 16px;
+  position: relative;
+  border-top: 1px solid var(--border);
+}
+.task-steps li:first-child { border-top: none; }
+/* A small dot instead of a number — reads as a list, not a workout prescription. */
+.task-steps li::before {
+  content: '';
+  position: absolute;
+  left: 2px;
+  top: 14px;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--text-dim);
+  opacity: 0.5;
+}
 .assignment.done .task-steps { text-decoration: line-through; opacity: 0.8; }
 /* Tap-to-expand chevron + Edit button in the drawer */
 .task-chevron { color: var(--text-dim); flex-shrink: 0; opacity: 0.55; transition: transform 0.15s; }

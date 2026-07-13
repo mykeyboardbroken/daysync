@@ -31,6 +31,14 @@ export default function SurveyModal({ questions, onComplete }) {
     else setStep(idx + 1)
   }
 
+  // A clicked option keeps keyboard focus, which made Enter re-fire its click and
+  // toggle the answer instead of advancing. Dropping focus after a pointer click
+  // hands Enter back to the "next question" handler below. Keyboard users who
+  // *tab* to an option are unaffected: no pointer, so we leave focus alone.
+  const pick = (e) => {
+    if (e.detail > 0) e.currentTarget.blur() // detail === 0 means it came from the keyboard
+  }
+
   // "Rather not say" — drop any answer for this question and move on, so a value
   // typed then reconsidered isn't left behind.
   function skip() {
@@ -115,7 +123,10 @@ export default function SurveyModal({ questions, onComplete }) {
                   type="button"
                   className={`survey-option ${value === o ? 'selected' : ''}`}
                   style={{ animationDelay: `${i * 0.03}s` }}
-                  onClick={() => setAnswer(o)}
+                  onClick={(e) => {
+                    setAnswer(o)
+                    pick(e)
+                  }}
                 >
                   {o}
                 </button>
@@ -131,7 +142,10 @@ export default function SurveyModal({ questions, onComplete }) {
                   type="button"
                   className={`survey-option ${(value || []).includes(o) ? 'selected' : ''}`}
                   style={{ animationDelay: `${i * 0.03}s` }}
-                  onClick={() => toggleMulti(o)}
+                  onClick={(e) => {
+                    toggleMulti(o)
+                    pick(e)
+                  }}
                 >
                   {o}
                 </button>
