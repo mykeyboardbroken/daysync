@@ -256,6 +256,21 @@ export default function SettingsModal({
                     onChange={(e) => onSetProfile('name', e.target.value)}
                   />
                 </label>
+
+                <p className="settings-field-label">Gender</p>
+                <div className="type-select repeat-select habit-days">
+                  {['Male', 'Female', 'Other', 'Rather not say'].map((g) => (
+                    <button
+                      type="button"
+                      key={g}
+                      className={`type-option ${profile.gender === g ? 'selected' : ''}`}
+                      onClick={() => onSetProfile('gender', g)}
+                    >
+                      {g}
+                    </button>
+                  ))}
+                </div>
+
                 <label className="study-field">
                   Age
                   <input

@@ -23,6 +23,13 @@ export const SURVEY_QUESTIONS = [
     placeholder: 'First name or nickname',
   },
   {
+    id: 'gender',
+    type: 'single',
+    question: 'What gender are you?',
+    hint: "Kept private on your device. It doesn't change your tasks or workouts.",
+    options: ['Male', 'Female', 'Other', 'Rather not say'],
+  },
+  {
     id: 'age',
     type: 'text',
     question: 'How old are you?',

@@ -441,11 +441,6 @@ function normalize(parsed) {
     if (JSON.stringify(t.steps) === JSON.stringify(r.oldSteps)) next.steps = r.steps
     return next
   })
-  // We no longer ask for (or use) gender — drop any copy left in an older profile.
-  if (data.profile && 'gender' in data.profile) {
-    const { gender, ...rest } = data.profile
-    data.profile = rest
-  }
   // A morning stretch + an afternoon hydration nudge (deletable, seeded once).
   if (!data.seededRoutinePlus) {
     data.tasks = [
