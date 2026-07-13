@@ -704,53 +704,17 @@
 .plan-section + .plan-section {
   margin-top: 18px;
 }
-/* Section header doubles as the collapse toggle for that part of the day. */
 .plan-section-head {
   display: flex;
   align-items: center;
   gap: 7px;
-  width: 100%;
   font-size: 12px;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.04em;
   color: var(--text-dim);
-  font-family: inherit;
-  background: none;
-  border: none;
-  padding: 6px 0;
-  margin-bottom: 4px;
-  cursor: pointer;
-  text-align: left;
+  margin-bottom: 10px;
 }
-.plan-section.open .plan-section-head { margin-bottom: 10px; }
-.plan-section-label { flex-shrink: 0; }
-/* "now" pill marks the part of the day you're actually in. */
-.plan-now {
-  font-size: 10px;
-  letter-spacing: 0.02em;
-  padding: 2px 7px;
-  border-radius: 999px;
-  color: var(--accent);
-  background: color-mix(in srgb, var(--accent) 15%, transparent);
-  text-transform: none;
-}
-/* Collapsed summary: "3 left" / "All done" — enough to know without opening. */
-.plan-section-count {
-  margin-left: auto;
-  font-size: 11px;
-  font-weight: 500;
-  text-transform: none;
-  letter-spacing: 0;
-  opacity: 0.75;
-}
-.plan-caret {
-  margin-left: auto;
-  opacity: 0.5;
-  transition: transform 0.2s;
-}
-.plan-section-count + .plan-caret { margin-left: 6px; }
-.plan-caret.open { transform: rotate(90deg); }
 .plan-empty { color: var(--text-dim); font-size: 13px; margin: 0; opacity: 0.65; }
 .task-cat { display: inline-flex; align-items: center; color: var(--text-dim); flex-shrink: 0; }
 
@@ -1227,13 +1191,6 @@
 }
 .expanded .task-drawer { grid-template-rows: 1fr; }
 .expanded .task-drawer-inner { opacity: 1; transition: opacity 200ms ease 90ms; }
-/* A day section reuses the same drawer to collapse. Direct-child selectors only —
-   a descendant match would also fling open every task drawer nested inside it. */
-.plan-section.open > .task-drawer { grid-template-rows: 1fr; }
-.plan-section.open > .task-drawer > .task-drawer-inner {
-  opacity: 1;
-  transition: opacity 200ms ease 90ms;
-}
 @media (prefers-reduced-motion: reduce) {
   .task-drawer, .task-drawer-inner { transition: none; }
 }

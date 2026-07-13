@@ -23,20 +23,6 @@ export default function DayPlan({ schedule }) {
   const [showTemplates, setShowTemplates] = useState(false)
   const [showMoreTemplates, setShowMoreTemplates] = useState(false)
   const [dragId, setDragId] = useState(null)
-
-  // Which part of the day it is right now — that section opens by default, the
-  // others sit collapsed so the page is one short scroll instead of a wall.
-  const hour = now.getHours()
-  const nowPart = hour < 12 ? 'morning' : hour < 17 ? 'afternoon' : 'night'
-  // 'Anytime' ('') is open too: it isn't tied to a time, so it'd never open itself.
-  const [openBuckets, setOpenBuckets] = useState(() => new Set([nowPart, '']))
-  const toggleBucket = (key) =>
-    setOpenBuckets((cur) => {
-      const next = new Set(cur)
-      if (next.has(key)) next.delete(key)
-      else next.add(key)
-      return next
-    })
   const { tasks } = schedule
   const todayKey = toKey(new Date())
   const now = new Date()
@@ -308,62 +294,31 @@ export default function DayPlan({ schedule }) {
     const showSport = sport && sportBucket === key
     const showGeneral = general && generalBucket === key
     if (!alwaysShow && items.length === 0 && !showSport && !showGeneral) return null
-
-    const empty = items.length === 0 && !showSport && !showGeneral
-    // While editing, everything is open — you can't drag a task into a section you
-    // can't see.
-    const open = editing || openBuckets.has(key)
-    // Collapsed summary: what's actually still left to do here.
-    const left =
-      items.filter((t) => (t.repeat ? !habitDoneOn(t, todayKey) : !t.done)).length +
-      (showSport && !schedule.workoutLog?.[`${todayKey}|sport`] ? 1 : 0) +
-      (showGeneral && !schedule.workoutLog?.[`${todayKey}|general`] ? 1 : 0)
-
     return (
-      <div className={`plan-section ${open ? 'open' : ''}`} key={key || 'anytime'}>
-        <button
-          type="button"
-          className="plan-section-head"
-          onClick={() => !editing && toggleBucket(key)}
-          aria-expanded={open}
-        >
-          <Icon name={icon} size={15} />
-          <span className="plan-section-label">{label}</span>
-          {key === nowPart && <span className="plan-now">now</span>}
-          {!open && (
-            <span className="plan-section-count">
-              {left > 0 ? `${left} left` : empty ? 'Nothing planned' : 'All done'}
-            </span>
-          )}
-          <Icon name="chevronRight" size={15} className={`plan-caret ${open ? 'open' : ''}`} />
-        </button>
-
-        <div className="task-drawer">
-          <div className="task-drawer-inner">
-            {empty ? (
-              <p className="plan-empty">Nothing planned</p>
-            ) : (
-              <ul className="assignment-list">
-                {items.map((t) => (t.repeat ? renderRepeating(t) : renderOneOff(t)))}
-                {showSport &&
-                  renderWorkoutRow({
-                    id: 'sport',
-                    title: 'Sport training',
-                    subtitle: `${sport.label} drills`,
-                    steps: sport.steps,
-                    skillSport: sport.label,
-                  })}
-                {showGeneral &&
-                  renderWorkoutRow({
-                    id: 'general',
-                    title: 'Workout',
-                    subtitle: general.label,
-                    steps: general.steps,
-                  })}
-              </ul>
-            )}
-          </div>
-        </div>
+      <div className="plan-section" key={key || 'anytime'}>
+        <div className="plan-section-head"><Icon name={icon} size={15} /> {label}</div>
+        {items.length === 0 && !showSport && !showGeneral ? (
+          <p className="plan-empty">Nothing planned</p>
+        ) : (
+          <ul className="assignment-list">
+            {items.map((t) => (t.repeat ? renderRepeating(t) : renderOneOff(t)))}
+            {showSport &&
+              renderWorkoutRow({
+                id: 'sport',
+                title: 'Sport training',
+                subtitle: `${sport.label} drills`,
+                steps: sport.steps,
+                skillSport: sport.label,
+              })}
+            {showGeneral &&
+              renderWorkoutRow({
+                id: 'general',
+                title: 'Workout',
+                subtitle: general.label,
+                steps: general.steps,
+              })}
+          </ul>
+        )}
       </div>
     )
   }
