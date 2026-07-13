@@ -83,30 +83,36 @@ export default function App() {
   }
 
   return (
-    <div className={`app ${justOnboarded ? 'app-reveal' : ''}`}>
-      <header className="app-header">
-        <h1>{{ today: 'Today', school: 'Academics', calendar: 'Calendar', focus: 'Focus', settings: 'Settings' }[tab]}</h1>
-      </header>
+    <div className="app">
+      {/* The post-survey reveal animates a TRANSFORM, and a transformed element
+          becomes the containing block for its position:fixed descendants. So it has
+          to wrap the page content only — put the tab bar or the FAB inside it and
+          they'd stop being pinned to the viewport and slide up with the animation. */}
+      <div className={justOnboarded ? 'app-reveal' : undefined}>
+        <header className="app-header">
+          <h1>{{ today: 'Today', school: 'Academics', calendar: 'Calendar', focus: 'Focus', settings: 'Settings' }[tab]}</h1>
+        </header>
 
-      {tab === 'today' && <TodayTab schedule={schedule} />}
-      {tab === 'school' && <SchoolTab schedule={schedule} />}
-      {tab === 'calendar' && <CalendarTab schedule={schedule} />}
-      {tab === 'focus' && <FocusTab schedule={schedule} />}
-      {tab === 'settings' && (
-        <SettingsModal
-          customColors={schedule.customColors}
-          onSetCustomColor={schedule.setCustomColor}
-          settings={schedule.settings}
-          onSetSetting={schedule.setSetting}
-          profile={schedule.profile}
-          onSetProfile={schedule.setProfile}
-          onExport={schedule.exportData}
-          onImport={schedule.importData}
-          onReset={schedule.resetAll}
-          account={auth.enabled ? { email: auth.session?.user?.email, username: auth.username } : null}
-          onSignOut={auth.signOut}
-        />
-      )}
+        {tab === 'today' && <TodayTab schedule={schedule} />}
+        {tab === 'school' && <SchoolTab schedule={schedule} />}
+        {tab === 'calendar' && <CalendarTab schedule={schedule} />}
+        {tab === 'focus' && <FocusTab schedule={schedule} />}
+        {tab === 'settings' && (
+          <SettingsModal
+            customColors={schedule.customColors}
+            onSetCustomColor={schedule.setCustomColor}
+            settings={schedule.settings}
+            onSetSetting={schedule.setSetting}
+            profile={schedule.profile}
+            onSetProfile={schedule.setProfile}
+            onExport={schedule.exportData}
+            onImport={schedule.importData}
+            onReset={schedule.resetAll}
+            account={auth.enabled ? { email: auth.session?.user?.email, username: auth.username } : null}
+            onSignOut={auth.signOut}
+          />
+        )}
+      </div>
 
       {tab !== 'settings' && tab !== 'focus' && (
         <button className="fab" onClick={() => setAdding('menu')} aria-label="Add">
