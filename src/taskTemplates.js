@@ -132,15 +132,6 @@ const TEMPLATES = [
     days: ALL,
   },
   {
-    title: 'Hydration',
-    description: 'Drink some water or refill your bottle to keep your energy steady.',
-    steps: [],
-    bucket: 'night',
-    category: 'health',
-    days: ALL,
-    essential: true,
-  },
-  {
     title: 'Meditation',
     description: 'A few quiet minutes of focused breathing to settle your mind.',
     steps: [],

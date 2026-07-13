@@ -40,6 +40,7 @@ function emptyData() {
     seededNightGrooming: false, // night grooming default seeded once
     seededCheckPlans: false, // "check tomorrow's plans" default seeded once (legacy)
     seededNightMerge: false, // folded check-plans + charge-devices into Get-ready once
+    seededHydrationTrim: false, // removed the stray nightly "Hydration" duplicate once
     onboarded: false, // whether the first-open survey has been completed
     profile: {}, // answers from the onboarding survey, keyed by question id
     workoutLog: {}, // per-day done state for the generated workout ({ dateKey: true })
@@ -118,12 +119,6 @@ function freshData() {
     task({
       title: 'Meditation',
       description: 'A few quiet minutes of focused breathing to settle your mind.',
-      bucket: 'night',
-      category: 'health',
-    }),
-    task({
-      title: 'Hydration',
-      description: 'Drink some water or refill your bottle to keep your energy steady.',
       bucket: 'night',
       category: 'health',
     }),
@@ -289,6 +284,21 @@ function normalize(parsed) {
         : t,
     )
     data.seededNightMerge = true
+  }
+  // There was briefly a second, nightly "Hydration" task alongside the afternoon
+  // "Hydration check". One hydration nudge is enough — drop the stray, unless it's
+  // been reworded or given steps, in which case it's the user's own and it stays.
+  if (!data.seededHydrationTrim) {
+    const STRAY_DESC = 'Drink some water or refill your bottle to keep your energy steady.'
+    data.tasks = data.tasks.filter(
+      (t) =>
+        !(
+          t.title === 'Hydration' &&
+          (!t.description || t.description === STRAY_DESC) &&
+          !(t.steps?.length)
+        ),
+    )
+    data.seededHydrationTrim = true
   }
   // Seed it once. Only added a single time — delete it and it stays gone.
   if (!data.seededPackTask) {
