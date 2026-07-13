@@ -27,7 +27,6 @@ const TEMPLATES = [
     bucket: 'morning',
     category: 'lifestyle',
     days: ALL,
-    essential: true,
   },
   {
     title: 'Morning hygiene',
@@ -55,6 +54,7 @@ const TEMPLATES = [
     bucket: 'morning',
     category: 'lifestyle',
     days: ALL,
+    essential: true,
   },
   {
     title: 'Night hygiene',
@@ -63,6 +63,7 @@ const TEMPLATES = [
     bucket: 'night',
     category: 'health',
     days: ALL,
+    essential: true,
   },
   {
     title: 'Hydration check',
@@ -89,6 +90,7 @@ const TEMPLATES = [
     bucket: 'afternoon',
     category: 'health',
     days: ALL,
+    essential: true,
   },
   {
     title: 'Clean your room',
