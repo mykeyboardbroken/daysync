@@ -49,18 +49,20 @@ export default function TodayTab({ schedule }) {
         <div className="reminders">
           {due.map((a) => (
             <div key={a.id} className="reminder-banner">
-              <Icon name="clock" size={17} className="reminder-icon" />
+              {/* Check it off when it hits. A one-off is done for good; a repeating
+                  one clears now and comes back at its next interval. */}
+              <label className="assignment-check reminder-check">
+                <input
+                  type="checkbox"
+                  checked={false}
+                  onChange={() => schedule.dismissAlert(a.id)}
+                  aria-label={`Check off: ${a.text}`}
+                />
+                <span className="checkmark" />
+              </label>
               <button type="button" className="reminder-text" onClick={() => setEditingAlert(a)}>
                 <span className="reminder-title">{a.text}</span>
                 {a.repeat > 0 && <span className="reminder-repeat">{repeatLabel(a.repeat)}</span>}
-              </button>
-              <button
-                type="button"
-                className="reminder-x"
-                onClick={() => schedule.dismissAlert(a.id)}
-                aria-label="Dismiss"
-              >
-                ✕
               </button>
             </div>
           ))}

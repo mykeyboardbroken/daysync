@@ -813,8 +813,14 @@
 }
 .error-card .primary-btn { margin-top: 6px; }
 
+/* Custom reminder interval: a number + its unit. */
+.custom-repeat { display: flex; align-items: stretch; gap: 8px; }
+.custom-repeat-n { width: 84px; flex-shrink: 0; }
+.custom-repeat-warn { color: var(--warn); font-size: 12px; margin: 8px 0 0; line-height: 1.45; }
+
 /* ---------- Reminders (top-of-Today banners) ---------- */
 .reminders { display: flex; flex-direction: column; gap: 8px; }
+.reminder-check { margin-right: 2px; }
 .reminder-banner {
   display: flex;
   align-items: center;
