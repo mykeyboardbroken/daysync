@@ -62,14 +62,10 @@ function emptyData() {
   }
 }
 
-// A brand-new install starts with exactly THREE routines — one per tab, so no part
-// of the day looks empty on first open, and the app doesn't greet a new person with
-// a seven-item chore list.
-//
-// They're deliberately neutral: things everyone already does (wash, drink water,
-// sort tomorrow's bag). DaySync is a school planner, so it shouldn't open by
-// prescribing a lifestyle — journaling, meditation, stretching and reading are all
-// one tap away in "Add a default task" for anyone who wants them.
+// A brand-new install starts with a full day already mapped out — several routines
+// per part of the day, so nobody opens the app to an empty page and has to figure
+// out what a planner is even for. All of them are deletable like any other task,
+// and more are one tap away in "Add a default task".
 //
 // Every `seeded*` flag is pre-set true so the one-time migration seeders below
 // never pile extra copies on top of these.
@@ -93,11 +89,40 @@ function freshData() {
       steps: ['Wash your face', 'Brush your teeth', 'Sort your hair'],
       bucket: 'morning',
       category: 'health',
+      order: -2,
+    }),
+    task({
+      title: 'Stretch / Move',
+      description:
+        'Five minutes of light movement or stretching to get the blood flowing and shake off morning stiffness.',
+      bucket: 'morning',
+      category: 'health',
+      order: -1,
+    }),
+    task({
+      title: 'Review daily plan',
+      description:
+        "A quick 60-second glance at your schedule so you know exactly what your targets are for the day.",
+      bucket: 'morning',
+      category: 'lifestyle',
     }),
     task({
       title: 'Hydration check',
       description: 'A reminder to drink water or refill your bottle to keep your energy from dipping.',
       bucket: 'afternoon',
+      category: 'health',
+    }),
+    task({
+      title: 'Reading',
+      description:
+        'Time with a book — read as much or as little as you like; what matters is that you read.',
+      bucket: 'afternoon',
+      category: 'lifestyle',
+    }),
+    task({
+      title: 'Night hygiene',
+      steps: ['Shower or wash your face', 'Brush your teeth', 'Moisturise'],
+      bucket: 'night',
       category: 'health',
     }),
     task({
