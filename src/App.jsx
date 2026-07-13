@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useSchedule } from './useSchedule'
 import { useAuth } from './useAuth'
 import AuthScreen from './components/AuthScreen'
@@ -41,6 +41,20 @@ export default function App() {
   // null = closed; otherwise the add flow: 'menu' | 'assignment' | 'date' | …
   const [adding, setAdding] = useState(null)
 
+  // The moment the survey completes, ease the app in behind it rather than having
+  // it snap into place as the overlay unmounts.
+  const wasOnboarded = useRef(schedule.onboarded)
+  const [justOnboarded, setJustOnboarded] = useState(false)
+  useEffect(() => {
+    if (!wasOnboarded.current && schedule.onboarded) {
+      setJustOnboarded(true)
+      const t = setTimeout(() => setJustOnboarded(false), 900)
+      wasOnboarded.current = true
+      return () => clearTimeout(t)
+    }
+    wasOnboarded.current = schedule.onboarded
+  }, [schedule.onboarded])
+
   // Apply the chosen colour theme to the whole document. A "custom" theme layers
   // the user's own primary/secondary on top via inline CSS variables.
   useEffect(() => {
@@ -69,7 +83,7 @@ export default function App() {
   }
 
   return (
-    <div className="app">
+    <div className={`app ${justOnboarded ? 'app-reveal' : ''}`}>
       <header className="app-header">
         <h1>{{ today: 'Today', school: 'Academics', calendar: 'Calendar', focus: 'Focus', settings: 'Settings' }[tab]}</h1>
       </header>

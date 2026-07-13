@@ -1,9 +1,16 @@
 import { useState, useEffect } from 'react'
+import Icon from './Icon'
+
+// How long the "you're all set" beat plays before we hand control to the app.
+// Must outlast the survey-exit animation in App.css, or the screen would pop away
+// mid-dissolve.
+const OUTRO_MS = 1500
 
 // First-open onboarding — a full-screen flow that steps through the questions
 // and hands the collected answers back on Finish.
 export default function SurveyModal({ questions, onComplete }) {
   const [step, setStep] = useState(0)
+  const [finishing, setFinishing] = useState(false)
   // Unit-bearing questions start on their first unit, so an untouched toggle
   // still records which unit the typed number is in.
   const [answers, setAnswers] = useState(() => {
@@ -26,8 +33,16 @@ export default function SurveyModal({ questions, onComplete }) {
       return { ...a, [q.id]: cur.includes(opt) ? cur.filter((x) => x !== opt) : [...cur, opt] }
     })
 
+  // Play the outro, then hand the answers over. Guarded so a double Enter on the
+  // last question can't fire onComplete twice.
+  function complete(final) {
+    if (finishing) return
+    setFinishing(true)
+    setTimeout(() => onComplete(final), OUTRO_MS)
+  }
+
   function next() {
-    if (isLast) onComplete(answers)
+    if (isLast) complete(answers)
     else setStep(idx + 1)
   }
 
@@ -45,7 +60,7 @@ export default function SurveyModal({ questions, onComplete }) {
     const rest = { ...answers }
     delete rest[q.id]
     setAnswers(rest)
-    if (isLast) onComplete(rest)
+    if (isLast) complete(rest)
     else setStep(idx + 1)
   }
 
@@ -55,6 +70,7 @@ export default function SurveyModal({ questions, onComplete }) {
   useEffect(() => {
     function onKeyDown(e) {
       if (e.key !== 'Enter') return
+      if (finishing) return // the outro is playing; don't queue up another finish
       if (document.activeElement?.classList?.contains('survey-option')) return
       e.preventDefault() // stops the focused button firing its own click too
       next()
@@ -62,6 +78,24 @@ export default function SurveyModal({ questions, onComplete }) {
     window.addEventListener('keydown', onKeyDown)
     return () => window.removeEventListener('keydown', onKeyDown)
   })
+
+  // Outro: a check that pops in, then the whole screen dissolves into the app.
+  if (finishing) {
+    const name = (answers.name || '').trim()
+    return (
+      <div className="survey-screen finishing">
+        <div className="survey-done">
+          <span className="survey-done-ring">
+            <Icon name="checkmark" size={38} />
+          </span>
+          <h2 className="survey-done-title">
+            You're all set{name ? `, ${name}` : ''}
+          </h2>
+          <p className="survey-done-sub">Let's get your day sorted.</p>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="survey-screen">

@@ -19,7 +19,8 @@ export default function TabBar({ active, onChange }) {
           aria-label={t.label}
         >
           <Icon name={t.icon} size={20} />
-          <span className="tab-label">{t.label}</span>
+          {/* Inner span so the label can animate to its OWN width (see .tab-label). */}
+          <span className="tab-label"><span>{t.label}</span></span>
         </button>
       ))}
     </nav>

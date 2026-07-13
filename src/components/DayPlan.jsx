@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { dueLabel, toKey } from '../dateUtils'
 import { DAY_PARTS, BUCKET_OPTIONS } from '../dayParts'
 import { habitDueOn, habitDoneOn, habitStreak } from '../habits'
@@ -166,19 +166,64 @@ export default function DayPlan({ schedule }) {
         return 0
       })
 
-  // Drag-to-reorder within a bucket (edit mode). Reassigns `order` on drop.
-  const dropTaskOn = (target) => {
-    if (!dragId || dragId === target.id) return
+  // Move `draggedId` to sit where `target` currently is, within its bucket, and
+  // write the new positions back as `order`.
+  const moveTaskOnto = (draggedId, target) => {
+    if (!draggedId || draggedId === target.id) return
     const list = tasksIn(target.bucket || '')
-    const from = list.findIndex((x) => x.id === dragId)
+    const from = list.findIndex((x) => x.id === draggedId)
     const to = list.findIndex((x) => x.id === target.id)
     if (from < 0 || to < 0) return
     const arr = [...list]
     const [moved] = arr.splice(from, 1)
     arr.splice(to, 0, moved)
     arr.forEach((x, i) => schedule.updateTask(x.id, { order: i }))
+  }
+
+  // Reorder via POINTER events, not HTML5 drag-and-drop — `draggable` simply does
+  // not fire on touch screens, so the grip was dead on a phone. Pointer events
+  // cover finger, pen and mouse with one path. Dragging is by the grip only, so a
+  // stray swipe on the row can't reorder anything.
+  const dragging = useRef(null) // id of the task currently being dragged
+
+  const gripDown = (e, t) => {
+    e.preventDefault()
+    e.stopPropagation()
+    e.currentTarget.setPointerCapture(e.pointerId)
+    dragging.current = t.id
+    setDragId(t.id)
+  }
+
+  const gripMove = (e) => {
+    const heldId = dragging.current
+    if (!heldId) return
+    // Pointer capture sends every move here, so ask the document what's under the
+    // finger instead of relying on the event target.
+    const row = document.elementFromPoint(e.clientX, e.clientY)?.closest('[data-task-id]')
+    const overId = row?.getAttribute('data-task-id')
+    if (!overId || overId === heldId) return
+    const target = tasks.find((x) => x.id === overId)
+    const held = tasks.find((x) => x.id === heldId)
+    // Reordering is within a bucket; dragging across time-of-day would silently
+    // change when a task happens, which isn't what a grip implies.
+    if (!target || !held || (target.bucket || '') !== (held.bucket || '')) return
+    moveTaskOnto(heldId, target) // live reorder, so the row follows your finger
+  }
+
+  const gripUp = (e) => {
+    if (e.currentTarget.hasPointerCapture?.(e.pointerId)) {
+      e.currentTarget.releasePointerCapture(e.pointerId)
+    }
+    dragging.current = null
     setDragId(null)
   }
+
+  const gripProps = (t) => ({
+    onPointerDown: (e) => gripDown(e, t),
+    onPointerMove: gripMove,
+    onPointerUp: gripUp,
+    onPointerCancel: gripUp,
+  })
 
   // The expanded drawer: steps (if any) + an Edit button. Editing/deleting live
   // here so they're deliberate — no delete button sits on the row itself.
@@ -206,15 +251,11 @@ export default function DayPlan({ schedule }) {
     </div>
   )
 
-  // In edit mode a row is draggable to reorder; a tap no longer expands it.
+  // Rows just need to be identifiable under the finger; the grip does the work.
   const dragProps = (t) =>
     editing
       ? {
-          draggable: true,
-          onDragStart: () => setDragId(t.id),
-          onDragEnd: () => setDragId(null),
-          onDragOver: (e) => e.preventDefault(),
-          onDrop: () => dropTaskOn(t),
+          'data-task-id': t.id,
         }
       : {}
 
@@ -242,7 +283,9 @@ export default function DayPlan({ schedule }) {
         {!t.done && t.due && <span className={`assignment-due tone-${due.tone}`}>{due.text}</span>}
         {editing ? (
           <span className="edit-controls" onClick={(e) => e.stopPropagation()}>
-            <Icon name="grip" size={16} className="drag-grip" />
+            <span className="drag-grip" {...gripProps(t)} aria-label="Drag to reorder">
+              <Icon name="grip" size={16} />
+            </span>
             <ConfirmDelete className="assignment-del" label="Remove task" onDelete={() => schedule.deleteTask(t.id)} />
           </span>
         ) : (
@@ -285,7 +328,9 @@ export default function DayPlan({ schedule }) {
         )}
         {editing ? (
           <span className="edit-controls" onClick={(e) => e.stopPropagation()}>
-            <Icon name="grip" size={16} className="drag-grip" />
+            <span className="drag-grip" {...gripProps(t)} aria-label="Drag to reorder">
+              <Icon name="grip" size={16} />
+            </span>
             <ConfirmDelete className="assignment-del" label="Remove task" onDelete={() => schedule.deleteTask(t.id)} />
           </span>
         ) : (
