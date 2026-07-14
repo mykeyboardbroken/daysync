@@ -152,7 +152,7 @@ export default function App() {
           never finds the timetable, homework or focus timer — and never installs the
           app, which is how iOS quietly eats their data. */}
       {schedule.onboarded && !schedule.introDone && (
-        <IntroTour onDone={schedule.finishIntro} />
+        <IntroTour onDone={schedule.finishIntro} schedule={schedule} />
       )}
 
 

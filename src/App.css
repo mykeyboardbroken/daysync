@@ -657,19 +657,31 @@
   gap: 8px;
   min-width: 0; /* let the whole strip shrink instead of pushing off-screen */
 }
+/* Circles, the same size as the day circles they sit beside. They used to be 32×56px
+   rounded rectangles — fine when the days were a fixed 44px, but the days are fluid
+   now (~33px on a phone) and the arrows towered over them. */
 .week-arrow {
-  background: var(--surface);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  align-self: center;
+  background: none;
   border: 1px solid var(--border);
-  color: var(--text);
-  width: 32px;
-  height: 56px;
-  border-radius: 10px;
-  font-size: 20px;
+  color: var(--text-dim);
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border-radius: 50%;
+  font-size: 15px;
   line-height: 1;
   flex-shrink: 0;
-  transition: background 0.15s;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
 }
-.week-arrow:hover { background: var(--surface-2); }
+.week-arrow:hover {
+  background: var(--surface-2);
+  color: var(--text);
+  border-color: var(--accent);
+}
 .week-days {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
@@ -702,7 +714,7 @@
 .day-circle:hover { border-color: var(--accent); }
 /* On a narrow phone the circles shrink, so shrink what's inside them too. */
 @media (max-width: 390px) {
-  .week-arrow { width: 26px; }
+  .week-arrow { width: 26px; height: 26px; font-size: 13px; }
   .dc-weekday { font-size: 15px; }
   .dc-date { font-size: 9px; }
 }
@@ -1399,6 +1411,16 @@
   letter-spacing: -0.01em;
 }
 .intro-text { font-size: 15px; color: var(--text-dim); line-height: 1.55; margin: 0; }
+/* The switch on the sport card — a real control inside the tour, not a picture of one. */
+.intro-toggle {
+  margin-top: 26px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface-2);
+  padding: 14px;
+}
+.intro-toggle:hover { border-color: var(--accent); }
+
 .intro-dots { display: flex; gap: 6px; justify-content: center; padding: 20px 0; }
 .intro-dot {
   width: 7px;

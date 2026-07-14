@@ -80,16 +80,16 @@ export default function TimetableImportModal({ onImport, onClose }) {
         {stage === 'pick' && (
           <>
             <p className="modal-sub">
-              Your classes rotate on a 6-day cycle, but each screenshot only shows one week (Mon–Fri).
-              So pick <strong>two screenshots from two different weeks</strong> — together they cover all
-              of Day 1–6. It reads the dates to slot each day correctly. Everything stays on your device.
+              Best is <strong>one screenshot showing the whole Day 1–6 cycle</strong> — that's
+              everything in one go. Everything stays on your device.
             </p>
             <label className="file-drop">
               <input type="file" accept="image/*" multiple onChange={handleFiles} />
-              <span><Icon name="image" size={18} /> Choose two screenshots…</span>
+              <span><Icon name="image" size={18} /> Choose a screenshot…</span>
             </label>
             <p className="type-hint">
-              Tip: you can also add just one now and upload the other week later — it merges.
+              If your timetable only shows one week at a time (Mon–Fri), add two from different
+              weeks instead — together they cover all six days, and they merge.
             </p>
           </>
         )}
@@ -130,7 +130,7 @@ export default function TimetableImportModal({ onImport, onClose }) {
                     {filled.length > 0 ? (
                       <>
                         Read <strong>{count} classes</strong> into Day {filled.join(', ')}.
-                        {empty.length > 0 && ` Day ${empty.join(', ')} not in this screenshot — upload another week to fill ${empty.length === 1 ? 'it' : 'them'}.`}
+                        {empty.length > 0 && ` Day ${empty.join(', ')} wasn't in it — fill ${empty.length === 1 ? 'it' : 'them'} in below, or upload another screenshot.`}
                         {' '}Check &amp; fix, then save.
                       </>
                     ) : (

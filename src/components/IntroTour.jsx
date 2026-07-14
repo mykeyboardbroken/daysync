@@ -1,6 +1,14 @@
 import { useState } from 'react'
 import Icon from './Icon'
 
+// "Netball", "Netball and Dance", "Netball, Dance and Hockey" — reads like a person
+// wrote it, not like a database dumped an array.
+function listSports(list) {
+  if (list.length === 1) return list[0]
+  if (list.length === 2) return `${list[0]} and ${list[1]}`
+  return `${list.slice(0, -1).join(', ')} and ${list[list.length - 1]}`
+}
+
 // Shown once, straight after the survey. A new user otherwise lands on Today, sees a
 // task list, and concludes DaySync is a to-do app — never discovering the timetable,
 // homework, grades or focus timer sitting one tab away. This is the only moment we
@@ -36,12 +44,37 @@ const INSTALL = {
 // mid-dissolve.
 const EXIT_MS = 460
 
-export default function IntroTour({ onDone }) {
+export default function IntroTour({ onDone, schedule }) {
+  const profile = schedule?.profile || {}
+  const sports = profile.sports || []
+
   // Only worth asking to install if they're in a browser tab, not already installed.
   const installed =
     window.matchMedia?.('(display-mode: standalone)')?.matches || window.navigator.standalone
   const isIOS = /iphone|ipad|ipod/i.test(window.navigator.userAgent)
-  const cards = installed || !isIOS ? CARDS : [...CARDS, INSTALL]
+
+  // The sport card only exists if they told us they play something — there's nothing
+  // to introduce otherwise. It's ON already (the survey set it), so the switch is
+  // there to turn it OFF; tapping Next without touching it keeps it on, which is what
+  // they implied by naming a sport in the first place.
+  const sportCard = sports.length
+    ? {
+        icon: 'activity',
+        title: 'Drills for your sport',
+        body: `You said you play ${listSports(sports)}. DaySync can put a short drill session in your day — one sport at a time, leaning toward whatever you rate yourself weakest at. Leave it on, or switch it off here.`,
+        toggle: true,
+      }
+    : null
+
+  const cards = [
+    ...CARDS,
+    ...(sportCard ? [sportCard] : []),
+    ...(installed || !isIOS ? [] : [INSTALL]),
+  ]
+
+  const sportOn = !!profile.sportTime && profile.sportTime !== "I don't"
+  const toggleSport = () =>
+    schedule.setProfile('sportTime', sportOn ? "I don't" : 'Afternoon')
 
   const [i, setI] = useState(0)
   const [leaving, setLeaving] = useState(false)
@@ -70,6 +103,21 @@ export default function IntroTour({ onDone }) {
           </span>
           <h2 className="intro-title">{card.title}</h2>
           <p className="intro-text">{card.body}</p>
+
+          {/* A switch you can just walk past. Next keeps whatever it's set to. */}
+          {card.toggle && (
+            <button type="button" className="toggle-row intro-toggle" onClick={toggleSport}>
+              <span className="toggle-text">
+                <span className="toggle-label">Sport training on my day</span>
+                <span className="toggle-hint">
+                  {sportOn ? 'In your afternoon — change it in Settings' : 'Off'}
+                </span>
+              </span>
+              <span className={`toggle ${sportOn ? 'on' : ''}`}>
+                <span className="toggle-knob" />
+              </span>
+            </button>
+          )}
         </div>
 
         <div className="intro-dots" aria-hidden="true">
