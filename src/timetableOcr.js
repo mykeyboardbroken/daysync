@@ -96,6 +96,72 @@ function nearest(centers, v) {
   return bi
 }
 
+// ---- Which cycle day is each row? ----
+// Timetables come in two shapes and we must handle both:
+//   a) Rows labelled "Day 1".."Day 6" — the cycle day is written right there.
+//   b) Rows labelled with dates ("Monday 3 March") — convert the date to a cycle day.
+// Reading only (b) meant a Day 1–6 screenshot imported NOTHING at all, and any dated
+// row landing inside a term break resolved to null (no cycle day exists on a holiday)
+// and was silently dropped.
+// Exported so it can be tested without running OCR.
+export function rowCyclesFrom({ rowCenters, dWords = [], cWords = [], lineH = 16 }) {
+  const allWords = [...dWords, ...cWords]
+
+  // (a) A "Day N" label on this row. OCR may return it merged ("Day3") or split
+  // ("Day", "3"), so handle both.
+  const dayFromLabel = (rowCy) => {
+    const onRow = allWords
+      .filter((w) => Math.abs(w.cy - rowCy) < lineH * 1.2)
+      .sort((a, b) => a.x0 - b.x0)
+    for (let i = 0; i < onRow.length; i++) {
+      const merged = /^day\s*([1-6])$/i.exec(onRow[i].text)
+      if (merged) return Number(merged[1])
+      if (/^day$/i.test(onRow[i].text)) {
+        const next = onRow[i + 1]
+        const n = next && /^([1-6])$/.exec(next.text.replace(/[.,:]/g, ''))
+        if (n) return Number(n[1])
+      }
+    }
+    return null
+  }
+
+  // (b) A date on this row, anchored on the weekday word.
+  const weekdayRe = /^(mon|tues|wednes|thurs|fri)day/i
+  const anchors = dWords.filter((w) => weekdayRe.test(w.text))
+  const dayFromDate = (rowCy) => {
+    const anchor = anchors.reduce(
+      (best, a) => (!best || Math.abs(a.cy - rowCy) < Math.abs(best.cy - rowCy) ? a : best),
+      null,
+    )
+    if (!anchor) return null
+    const parts = []
+    for (const w of dWords
+      .filter((w) => Math.abs(w.cy - anchor.cy) < lineH * 0.7 && w.x0 >= anchor.x0 - 2)
+      .sort((a, b) => a.x0 - b.x0)) {
+      if (/^tutor|^pd\b|^pd\d|\(/i.test(w.text)) break
+      parts.push(w.text)
+    }
+    const text = parts.join(' ')
+    const m = /(\d{1,2})(?:st|nd|rd|th)?\s+([A-Za-z]+)/.exec(text)
+    if (!m) return null
+    const mi = MONTHS.indexOf(m[2].toLowerCase())
+    if (mi < 0) return null
+    const ym = /\b(20\d{2})\b/.exec(text)
+    const year = ym ? Number(ym[1]) : new Date().getFullYear()
+    return cycleDay(new Date(year, mi, Number(m[1])))
+  }
+
+  const cycles = rowCenters.map((rowCy) => dayFromLabel(rowCy) ?? dayFromDate(rowCy))
+
+  // (c) Last resort: a 6-row grid with no readable row labels IS a cycle timetable,
+  // and those always run Day 1 → Day 6 top to bottom. Importing it beats handing back
+  // an empty grid because the OCR couldn't read a header.
+  if (rowCenters.length === CYCLE_DAYS.length && cycles.every((c) => !c)) {
+    return CYCLE_DAYS.slice()
+  }
+  return cycles
+}
+
 // OCR a timetable screenshot and reconstruct the grid, keyed by CYCLE DAY (1–6).
 // Each row's date is read and converted to its cycle day, so a Mon–Fri weekly
 // screenshot drops into the right Day 1–6 slots. Returns { grid, rawText }.
@@ -143,32 +209,7 @@ export async function extractTimetable(file) {
     return c
   }
 
-  // Each row's cycle day, from its date (grayscale pass). Anchor on the weekday
-  // word, read the date to its right, parse day/month/year → cycleDay().
-  const weekdayRe = /^(mon|tues|wednes|thurs|fri)day/i
-  const anchors = dWords.filter((w) => weekdayRe.test(w.text))
-  const rowCycle = rowCenters.map((rowCy) => {
-    const anchor = anchors.reduce(
-      (best, a) => (!best || Math.abs(a.cy - rowCy) < Math.abs(best.cy - rowCy) ? a : best),
-      null,
-    )
-    if (!anchor) return null
-    const parts = []
-    for (const w of dWords
-      .filter((w) => Math.abs(w.cy - anchor.cy) < lineH * 0.7 && w.x0 >= anchor.x0 - 2)
-      .sort((a, b) => a.x0 - b.x0)) {
-      if (/^tutor|^pd\b|^pd\d|\(/i.test(w.text)) break
-      parts.push(w.text)
-    }
-    const text = parts.join(' ')
-    const m = /(\d{1,2})(?:st|nd|rd|th)?\s+([A-Za-z]+)/.exec(text)
-    if (!m) return null
-    const mi = MONTHS.indexOf(m[2].toLowerCase())
-    if (mi < 0) return null
-    const ym = /\b(20\d{2})\b/.exec(text)
-    const year = ym ? Number(ym[1]) : new Date().getFullYear()
-    return cycleDay(new Date(year, mi, Number(m[1])))
-  })
+  const rowCycle = rowCyclesFrom({ rowCenters, dWords, cWords, lineH })
 
   for (const room of rooms) {
     const col = colOf(room.cx)
