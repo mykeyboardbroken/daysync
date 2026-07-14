@@ -45,6 +45,7 @@ function emptyData() {
     seededHydrationTrim: false, // removed the stray nightly "Hydration" duplicate once
     seededLegacyTitleFix: false, // one-time rename/reword of old seeded tasks, by title
     onboarded: false, // whether the first-open survey has been completed
+    introDone: false, // whether the post-survey feature intro has been seen
     profile: {}, // answers from the onboarding survey, keyed by question id
     workoutLog: {}, // per-day done state for the generated workout ({ dateKey: true })
     workoutSeed: 0, // bumped to reshuffle today's generated workout
@@ -1125,6 +1126,10 @@ export function useSchedule(userId = null) {
     setData((prev) => ({ ...prev, onboarded: false }))
   }, [])
 
+  const finishIntro = useCallback(() => {
+    setData((prev) => ({ ...prev, introDone: true }))
+  }, [])
+
   // Update a single profile field (edited from Settings → Profile).
   const setProfile = useCallback((key, value) => {
     setData((prev) => ({ ...prev, profile: { ...prev.profile, [key]: value } }))
@@ -1292,6 +1297,8 @@ export function useSchedule(userId = null) {
     onboarded: data.onboarded,
     profile: data.profile,
     finishSurvey,
+    finishIntro,
+    introDone: data.introDone,
     restartSurvey,
     setProfile,
     setSportSkill,

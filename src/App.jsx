@@ -6,6 +6,7 @@ import AuthScreen from './components/AuthScreen'
 import TabBar from './components/TabBar'
 import SettingsModal from './components/SettingsModal'
 import SurveyModal from './components/SurveyModal'
+import IntroTour from './components/IntroTour'
 import { SURVEY_QUESTIONS } from './survey'
 import TodayTab from './components/TodayTab'
 import SchoolTab from './components/SchoolTab'
@@ -143,6 +144,13 @@ export default function App() {
 
       {!schedule.onboarded && SURVEY_QUESTIONS.length > 0 && (
         <SurveyModal questions={SURVEY_QUESTIONS} onComplete={schedule.finishSurvey} />
+      )}
+
+      {/* Straight after the survey, once. Without it a new user meets a task list and
+          never finds the timetable, homework or focus timer — and never installs the
+          app, which is how iOS quietly eats their data. */}
+      {schedule.onboarded && !schedule.introDone && (
+        <IntroTour onDone={schedule.finishIntro} />
       )}
 
 

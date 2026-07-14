@@ -1318,6 +1318,72 @@
   .survey-kbd { display: none; }
 }
 
+/* ---------- Post-survey intro ---------- */
+.intro-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: var(--bg);
+  color: var(--text);
+  display: flex;
+  justify-content: center;
+  overflow-y: auto;
+  padding: max(24px, env(safe-area-inset-top)) 22px calc(24px + env(safe-area-inset-bottom));
+  animation: survey-fade 0.35s ease;
+}
+.intro-inner {
+  width: 100%;
+  max-width: 440px;
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+.intro-skip-top {
+  align-self: flex-end;
+  background: none;
+  border: none;
+  color: var(--text-dim);
+  font-family: inherit;
+  font-size: 14px;
+  padding: 6px 2px;
+  cursor: pointer;
+}
+.intro-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  animation: survey-step 0.32s ease both;
+}
+.intro-icon {
+  width: 62px;
+  height: 62px;
+  border-radius: 17px;
+  display: grid;
+  place-items: center;
+  color: #fff;
+  background: var(--accent);
+  margin-bottom: 22px;
+}
+.intro-title {
+  font-size: 27px;
+  font-weight: 600;
+  line-height: 1.2;
+  margin: 0 0 12px;
+  letter-spacing: -0.01em;
+}
+.intro-text { font-size: 15px; color: var(--text-dim); line-height: 1.55; margin: 0; }
+.intro-dots { display: flex; gap: 6px; justify-content: center; padding: 20px 0; }
+.intro-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--surface-2);
+  transition: background 0.2s, width 0.2s;
+}
+.intro-dot.on { background: var(--accent); width: 20px; border-radius: 999px; }
+.intro-next { width: 100%; padding: 14px; font-size: 15px; }
+
 /* ---------- Survey outro → app ---------- */
 /* The screen holds the "all set" beat, then dissolves outward. The app underneath
    eases in at the same moment (.app-reveal), so it reads as one handoff rather
