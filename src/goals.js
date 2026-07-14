@@ -13,9 +13,9 @@
 // timeframe is a wish. Shared by the survey, the Today card and Settings so the three
 // can't drift apart.
 export const HORIZONS = [
-  { key: 'short', label: 'This week', placeholder: 'e.g. finish the history essay' },
-  { key: 'medium', label: 'This term', placeholder: 'e.g. get my maths up to an A' },
-  { key: 'long', label: 'This year', placeholder: 'e.g. make the first XI' },
+  { key: 'short', label: 'Short term', placeholder: 'e.g. finish the history essay' },
+  { key: 'medium', label: 'Mid term', placeholder: 'e.g. get my maths up to an A' },
+  { key: 'long', label: 'Long term', placeholder: 'e.g. make the first XI' },
 ]
 
 export const GOALS = [
