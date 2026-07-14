@@ -48,7 +48,7 @@ export const SURVEY_QUESTIONS = [
     id: 'myGoals',
     type: 'goals',
     question: 'What are you working on?',
-    hint: 'Write as many or as few as you like. You can change them any time.',
+    hint: "Anything — confidence, grades, fitness, friends, a habit you want to break. As many or as few as you like, and you can change them any time.",
     horizons: HORIZONS,
   },
   {

@@ -12,10 +12,13 @@
 // The user's OWN goals, in their own words, over three horizons. A goal with no
 // timeframe is a wish. Shared by the survey, the Today card and Settings so the three
 // can't drift apart.
+// The examples deliberately aren't all about grades. A goal can be about who you want
+// to be, not just what you want to score — and the placeholder is the only hint most
+// people will ever read, so it has to show that range.
 export const HORIZONS = [
-  { key: 'short', label: 'Short term', placeholder: 'e.g. finish the history essay' },
-  { key: 'medium', label: 'Mid term', placeholder: 'e.g. get my maths up to an A' },
-  { key: 'long', label: 'Long term', placeholder: 'e.g. make the first XI' },
+  { key: 'short', label: 'Short term', placeholder: 'e.g. talk to someone new this week' },
+  { key: 'medium', label: 'Mid term', placeholder: 'e.g. be more confident speaking up' },
+  { key: 'long', label: 'Long term', placeholder: 'e.g. stop caring what people think' },
 ]
 
 export const GOALS = [
