@@ -33,8 +33,32 @@ export const SURVEY_QUESTIONS = [
     id: 'age',
     type: 'text',
     question: 'How old are you?',
-    hint: 'Only used to size a workout, if you ever switch training on in Settings.',
+    hint: 'Only used to size a session if you turn training on.',
     placeholder: 'e.g. 14',
     skipLabel: 'Rather not say',
+  },
+  // Sport IS a school thing — half a year group plays one — so it earns its place in
+  // onboarding in a way a gym question never would. One question, skippable, and it
+  // powers the drills. Training time defaults to the afternoon (see finishSurvey),
+  // because that's when school sport actually happens.
+  {
+    id: 'sports',
+    type: 'multi',
+    question: 'Do you play any sports?',
+    hint: 'You get drills for these. Pick any, or skip — plenty of people don’t.',
+    options: [
+      'Football / Soccer',
+      'Basketball',
+      'Netball',
+      'Rugby',
+      'Volleyball',
+      'Hockey',
+      'Dance',
+      'Running / Athletics',
+      'Swimming',
+      'Tennis',
+      'Badminton',
+      'Cricket',
+    ],
   },
 ]

@@ -1114,7 +1114,11 @@ export function useSchedule(userId = null) {
 
   // ---- Onboarding survey ----
   const finishSurvey = useCallback((answers) => {
-    setData((prev) => ({ ...prev, profile: { ...prev.profile, ...answers }, onboarded: true }))
+    const profile = { ...answers }
+    // School sport happens after school, so don't make them answer a second question
+    // for it. They can move it in Settings → Exercise.
+    if (profile.sports?.length && !profile.sportTime) profile.sportTime = 'Afternoon'
+    setData((prev) => ({ ...prev, profile: { ...prev.profile, ...profile }, onboarded: true }))
   }, [])
 
   const restartSurvey = useCallback(() => {

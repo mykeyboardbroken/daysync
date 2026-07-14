@@ -425,23 +425,47 @@ export default function SettingsModal({
 
                 <p className="settings-section-head">Workout</p>
                 <p className="settings-field-label">
-                  Bodyweight only — no gym, no gear, nothing to buy. Rotates push → pull →
+                  Off by default. Bodyweight only — no gym, no gear. Rotates push → pull →
                   legs → rest → cardio → core → rest, so recovery is built in.
                 </p>
 
-                <p className="settings-field-label">When</p>
-                <div className="type-select repeat-select habit-days">
-                  {TIME_OPTIONS.map((o) => (
-                    <button
-                      type="button"
-                      key={o}
-                      className={`type-option ${profile.workoutTime === o ? 'selected' : ''}`}
-                      onClick={() => onSetProfile('workoutTime', o)}
-                    >
-                      {o}
-                    </button>
-                  ))}
+                {/* The whole workout lives behind this one switch. Off, and it does not
+                    exist anywhere in the app — no task, no time picker, nothing. */}
+                <div className="settings-menu">
+                  <button
+                    type="button"
+                    className="toggle-row"
+                    onClick={() =>
+                      onSetProfile('workoutTime', profile.workoutTime ? '' : 'Night')
+                    }
+                  >
+                    <span className="toggle-text">
+                      <span className="toggle-label">Show a workout on my day</span>
+                      <span className="toggle-hint">Adds a daily bodyweight session</span>
+                    </span>
+                    <span className={`toggle ${profile.workoutTime ? 'on' : ''}`}>
+                      <span className="toggle-knob" />
+                    </span>
+                  </button>
                 </div>
+
+                {profile.workoutTime && (
+                  <>
+                    <p className="settings-field-label">When</p>
+                    <div className="type-select repeat-select habit-days">
+                      {['Morning', 'Afternoon', 'Night', 'Anytime'].map((o) => (
+                        <button
+                          type="button"
+                          key={o}
+                          className={`type-option ${profile.workoutTime === o ? 'selected' : ''}`}
+                          onClick={() => onSetProfile('workoutTime', o)}
+                        >
+                          {o}
+                        </button>
+                      ))}
+                    </div>
+                  </>
+                )}
 
                 <p className="settings-section-head">Sport training</p>
                 <p className="settings-field-label">

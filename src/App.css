@@ -824,48 +824,6 @@
   .plan-tab-label { display: none; } /* icons + counts only on narrow phones */
 }
 
-/* The workout entry point. Deliberately NOT a task row — no checkbox, no "unfinished"
-   state, nothing counting it against you. Just a door you can walk through or not. */
-.workout-btn {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  width: 100%;
-  margin-top: 14px;
-  padding: 13px 14px;
-  border: 1px dashed var(--border);
-  border-radius: 12px;
-  background: none;
-  color: var(--text);
-  font-family: inherit;
-  cursor: pointer;
-  text-align: left;
-  transition: border-color 0.18s, background 0.18s;
-}
-.workout-btn:hover {
-  border-color: var(--accent);
-  background: color-mix(in srgb, var(--accent) 6%, transparent);
-}
-.workout-btn-icon {
-  width: 34px;
-  height: 34px;
-  border-radius: 9px;
-  display: grid;
-  place-items: center;
-  flex-shrink: 0;
-  color: var(--accent);
-  background: color-mix(in srgb, var(--accent) 13%, transparent);
-}
-.workout-btn-text { display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 0; }
-.workout-btn-title { font-size: 14px; font-weight: 600; }
-.workout-btn-sub { font-size: 12px; color: var(--text-dim); }
-.workout-btn-chevron { color: var(--text-dim); opacity: 0.5; flex-shrink: 0; }
-.workout-btn-check { color: var(--accent); flex-shrink: 0; }
-.workout-btn.done { border-style: solid; border-color: color-mix(in srgb, var(--accent) 45%, var(--border)); }
-.workout-btn.done .workout-btn-title { color: var(--text-dim); }
-/* Steps inside the workout sheet get a little more room to breathe. */
-.workout-sheet-steps { margin: 4px 0 8px; }
-
 .plan-empty { color: var(--text-dim); font-size: 13px; margin: 0; opacity: 0.65; }
 
 /* Empty state — shown where a section would otherwise render nothing at all. */
