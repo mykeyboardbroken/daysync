@@ -1162,12 +1162,20 @@
   justify-content: center;
   padding: max(24px, env(safe-area-inset-top)) 22px calc(24px + env(safe-area-inset-bottom));
   animation: survey-fade 0.35s ease;
+  /* A question with a lot of options (sports has 12) is taller than a phone screen.
+     Without this it was just clipped — the options below the fold, and the Next
+     button, were physically unreachable. */
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 .survey-inner {
   width: 100%;
   max-width: 440px;
   display: flex;
   flex-direction: column;
+  /* Fill the screen when the content is short (so it still centres), but grow past it
+     when the content is tall (so the parent can scroll). */
+  min-height: 100%;
 }
 .survey-top { padding-top: 8px; }
 .survey-bar {
@@ -1208,6 +1216,18 @@
 }
 .survey-input:focus { outline: none; border-color: var(--accent); }
 .survey-options { display: flex; flex-direction: column; gap: 9px; margin-top: 20px; }
+/* Long option lists sit two-across, halving the height. */
+.survey-options.two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.survey-options.two-col .survey-option {
+  padding: 13px 12px;
+  font-size: 14px;
+  min-width: 0;
+  overflow-wrap: break-word;
+}
 .survey-option {
   text-align: left;
   background: var(--surface-2);

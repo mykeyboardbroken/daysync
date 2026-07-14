@@ -169,7 +169,9 @@ export default function SurveyModal({ questions, onComplete }) {
           )}
 
           {q.type === 'multi' && (
-            <div className="survey-options">
+            /* A long list (sports has 12) goes two-across so it isn't an endless
+               vertical wall on a phone. */
+            <div className={`survey-options ${q.options.length > 6 ? 'two-col' : ''}`}>
               {q.options.map((o, i) => (
                 <button
                   key={o}
