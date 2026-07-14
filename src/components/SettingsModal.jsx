@@ -72,7 +72,6 @@ const SPORT_OPTIONS = [
   'Hockey',
   'Dance',
 ]
-const EQUIP_OPTIONS = ['Dumbbells', 'Resistance bands', 'Pull-up bar', 'Kettlebell', 'Skipping rope', 'Just bodyweight']
 const TIME_OPTIONS = ['Morning', 'Afternoon', 'Night', 'Anytime', "I don't"]
 
 export default function SettingsModal({
@@ -426,8 +425,8 @@ export default function SettingsModal({
 
                 <p className="settings-section-head">Workout</p>
                 <p className="settings-field-label">
-                  Strength that rotates push → pull → legs → cardio, using only the kit
-                  you have.
+                  Bodyweight only — no gym, no gear, nothing to buy. Rotates push → pull →
+                  legs → rest → cardio → core → rest, so recovery is built in.
                 </p>
 
                 <p className="settings-field-label">When</p>
@@ -443,41 +442,6 @@ export default function SettingsModal({
                     </button>
                   ))}
                 </div>
-
-                <p className="settings-field-label">Where</p>
-                <div className="type-select repeat-select habit-days">
-                  {[
-                    { label: 'Gym', gym: 'Yes' },
-                    { label: 'Home', gym: 'No' },
-                  ].map((o) => (
-                    <button
-                      type="button"
-                      key={o.label}
-                      className={`type-option ${(profile.gym === 'Yes' ? 'Gym' : 'Home') === o.label ? 'selected' : ''}`}
-                      onClick={() => onSetProfile('gym', o.gym)}
-                    >
-                      {o.label}
-                    </button>
-                  ))}
-                </div>
-
-                {profile.gym !== 'Yes' && (
-                  <>
-                    <p className="settings-field-label">What you've got at home</p>
-                    <div className="type-select repeat-select habit-days">
-                      {EQUIP_OPTIONS.map((o) => (
-                        <button
-                          type="button"
-                          key={o}
-                          className={`type-option ${(profile.equipment || []).includes(o) ? 'selected' : ''}`}
-                          onClick={() => toggleProfileArr('equipment', o)}
-                        >
-                          {o}
-                        </button>
-                      ))}
-                    </div>
-                  </>
-                )}
 
                 <p className="settings-section-head">Sport training</p>
                 <p className="settings-field-label">

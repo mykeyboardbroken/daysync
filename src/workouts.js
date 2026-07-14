@@ -94,98 +94,84 @@ export function sportAspectDesc(sport, aspect) {
 // day's rotation picks one part; only exercises whose gear you have are used.
 const GENERAL = {
   push: [
-    { name: 'Push-ups — 4 × 12', eq: 'bodyweight' },
-    { name: 'Pike push-ups — 3 × 10', eq: 'bodyweight' },
-    { name: 'Diamond push-ups — 3 × 10', eq: 'bodyweight' },
-    { name: 'Dumbbell shoulder press — 3 × 10', eq: 'dumbbells' },
-    { name: 'Dumbbell floor press — 3 × 12', eq: 'dumbbells' },
-    { name: 'Band shoulder press — 3 × 12', eq: 'bands' },
-    { name: 'Bench press — 4 × 8', eq: 'gym' },
-    { name: 'Overhead press — 3 × 8', eq: 'gym' },
+    'Push-ups — 4 × 12',
+    'Incline push-ups (hands on a chair) — 3 × 15',
+    'Pike push-ups — 3 × 10',
+    'Diamond push-ups — 3 × 10',
+    'Wide push-ups — 3 × 12',
+    'Tricep dips off a chair — 3 × 12',
+    'Wall handstand hold — 3 × 20 s',
   ],
   pull: [
-    { name: 'Superman holds — 3 × 20 s', eq: 'bodyweight' },
-    { name: 'Reverse snow angels — 3 × 15', eq: 'bodyweight' },
-    { name: 'Towel rows under a table — 3 × 12', eq: 'bodyweight' },
-    { name: 'Pull-ups — 4 × max', eq: 'pullupBar' },
-    { name: 'Chin-ups — 3 × 8', eq: 'pullupBar' },
-    { name: 'Dumbbell rows — 3 × 10 each side', eq: 'dumbbells' },
-    { name: 'Dumbbell curls — 3 × 12', eq: 'dumbbells' },
-    { name: 'Band rows — 3 × 15', eq: 'bands' },
-    { name: 'Band pull-aparts — 3 × 20', eq: 'bands' },
-    { name: 'Lat pulldown — 3 × 10', eq: 'gym' },
-    { name: 'Cable rows — 3 × 12', eq: 'gym' },
+    'Towel rows under a table — 3 × 12',
+    'Superman holds — 3 × 20 s',
+    'Reverse snow angels — 3 × 15',
+    'Doorway rows (grip the frame, lean back) — 3 × 12',
+    'Towel curls (pull against your own arm) — 3 × 15',
+    'Backpack rows (load it with books) — 3 × 12 each side',
+    'Prone Y-T-W raises — 3 × 10',
   ],
   legs: [
-    { name: 'Bodyweight squats — 4 × 15', eq: 'bodyweight' },
-    { name: 'Walking lunges — 3 × 12 each leg', eq: 'bodyweight' },
-    { name: 'Glute bridges — 3 × 15', eq: 'bodyweight' },
-    { name: 'Bulgarian split squats — 3 × 10 each leg', eq: 'bodyweight' },
-    { name: 'Dumbbell goblet squats — 4 × 12', eq: 'dumbbells' },
-    { name: 'Dumbbell lunges — 3 × 10 each leg', eq: 'dumbbells' },
-    { name: 'Kettlebell swings — 4 × 15', eq: 'kettlebell' },
-    { name: 'Kettlebell deadlift — 3 × 10', eq: 'kettlebell' },
-    { name: 'Band squats — 3 × 15', eq: 'bands' },
-    { name: 'Barbell squats — 4 × 8', eq: 'gym' },
-    { name: 'Leg press — 4 × 12', eq: 'gym' },
-    { name: 'Romanian deadlifts — 3 × 8', eq: 'gym' },
+    'Bodyweight squats — 4 × 15',
+    'Walking lunges — 3 × 12 each leg',
+    'Glute bridges — 3 × 15',
+    'Bulgarian split squats (back foot on a chair) — 3 × 10 each leg',
+    'Wall sit — 3 × 45 s',
+    'Calf raises on a step — 3 × 20',
+    'Step-ups on a chair — 3 × 12 each leg',
+    'Single-leg glute bridge — 3 × 12 each side',
   ],
   core: [
-    { name: 'Plank — 3 × 45 s', eq: 'bodyweight' },
-    { name: 'Bicycle crunches — 3 × 20', eq: 'bodyweight' },
-    { name: 'Russian twists — 3 × 20', eq: 'bodyweight' },
-    { name: 'Leg raises — 3 × 15', eq: 'bodyweight' },
-    { name: 'Hanging leg raises — 3 × 12', eq: 'pullupBar' },
+    'Plank — 3 × 45 s',
+    'Bicycle crunches — 3 × 20',
+    'Russian twists — 3 × 20',
+    'Leg raises — 3 × 15',
+    'Dead bugs — 3 × 12 each side',
+    'Side plank — 3 × 30 s each side',
   ],
-  // Cardio needs almost no kit — you can always run. The rope and gym machines are
-  // bonuses if you have them.
   cardio: [
-    { name: 'Easy run — 25 min', eq: 'bodyweight' },
-    { name: 'Interval run — 8 × 1 min hard / 1 min easy', eq: 'bodyweight' },
-    { name: 'Hill sprints — 6 × 30 s', eq: 'bodyweight' },
-    { name: 'Shuttle runs — 8 × 40 m', eq: 'bodyweight' },
-    { name: 'Stair sprints — 8 rounds', eq: 'bodyweight' },
-    { name: 'Tempo run — 3 × 5 min', eq: 'bodyweight' },
-    { name: 'Skipping — 10 × 1 min', eq: 'skippingRope' },
-    { name: 'Skipping intervals — 5 × 2 min', eq: 'skippingRope' },
-    { name: 'Rowing machine — 15 min', eq: 'gym' },
-    { name: 'Treadmill intervals — 8 × 400 m', eq: 'gym' },
-    { name: 'Stationary bike — 20 min', eq: 'gym' },
+    'Easy run — 25 min',
+    'Interval run — 8 × 1 min hard / 1 min easy',
+    'Hill sprints — 6 × 30 s',
+    'Shuttle runs — 8 × 40 m',
+    'Stair sprints — 8 rounds',
+    'Tempo run — 3 × 5 min',
+    'Skipping — 10 × 1 min',
+    'Brisk walk — 35 min',
   ],
   // Short, sharp finishers to close a cardio day out.
   burner: [
-    { name: 'Burpees — 5 × 10', eq: 'bodyweight' },
-    { name: 'Mountain climbers — 4 × 30 s', eq: 'bodyweight' },
-    { name: 'Jump squats — 3 × 15', eq: 'bodyweight' },
-    { name: 'High knees — 4 × 30 s', eq: 'bodyweight' },
+    'Burpees — 5 × 10',
+    'Mountain climbers — 4 × 30 s',
+    'Jump squats — 3 × 15',
+    'High knees — 4 × 30 s',
   ],
 }
 
-const EQUIPMENT_KEY = {
-  Dumbbells: 'dumbbells',
-  'Resistance bands': 'bands',
-  'Pull-up bar': 'pullupBar',
-  Kettlebell: 'kettlebell',
-  'Skipping rope': 'skippingRope',
-}
-
-// The rotation the workout cycles through, one day at a time. Cardio is a day of
-// its own rather than a finisher bolted onto every session — that way it gets a
-// full effort instead of being the tired thing you skip at the end.
+// The rotation, one day at a time. Cardio is a day of its own rather than a finisher
+// bolted onto every session, and REST is a real day — training every single day with
+// no recovery isn't a programme, it's a treadmill.
 const ROTATION = [
   { key: 'push', label: 'Push day' },
   { key: 'pull', label: 'Pull day' },
   { key: 'legs', label: 'Legs day' },
+  { key: 'rest', label: 'Rest day' },
   { key: 'cardio', label: 'Cardio day' },
+  { key: 'core', label: 'Core day' },
+  { key: 'rest', label: 'Rest day' },
 ]
 
-// Warm-ups are equipment-tagged too — the skipping one used to be offered to people
-// who don't own a rope.
+const RESTS = [
+  'Rest today — that\'s when you actually get stronger.',
+  'Nothing scheduled. Go for a walk if you feel like moving.',
+  'Recovery day. Stretch if you want, or do nothing at all.',
+]
+
 const WARMUPS = [
-  { name: 'Warm-up: 5 min light jog + dynamic stretches', eq: 'bodyweight' },
-  { name: 'Warm-up: 5 min brisk walk + mobility drills', eq: 'bodyweight' },
-  { name: 'Warm-up: arm & leg swings + 20 jumping jacks', eq: 'bodyweight' },
-  { name: 'Warm-up: 3 min skipping + arm & leg swings', eq: 'skippingRope' },
+  'Warm-up: 5 min light jog + dynamic stretches',
+  'Warm-up: 5 min brisk walk + mobility drills',
+  'Warm-up: arm & leg swings + 20 jumping jacks',
+  'Warm-up: 2 min marching on the spot + shoulder circles',
 ]
 const COOLDOWNS = [
   'Cool-down: 5 min easy walk + stretching',
@@ -221,21 +207,8 @@ function dayNumber(date) {
   return Math.floor((date - new Date(date.getFullYear(), 0, 0)) / 86400000)
 }
 
-// A warm-up you can actually do with the kit you have.
-function pickWarmup(avail, rand) {
-  const usable = WARMUPS.filter((w) => avail.has(w.eq)).map((w) => w.name)
-  return usable[Math.floor(rand() * usable.length)]
-}
-
-// Equipment the user can train with (bodyweight always available).
-function availableEquip(profile) {
-  const set = new Set(['bodyweight'])
-  if (profile.gym === 'Yes') set.add('gym')
-  else for (const label of profile.equipment || []) {
-    const key = EQUIPMENT_KEY[label]
-    if (key) set.add(key)
-  }
-  return set
+function pickWarmup(rand) {
+  return WARMUPS[Math.floor(rand() * WARMUPS.length)]
 }
 
 // Right-size the session by age. College age (the app's main audience) gets the
@@ -274,7 +247,7 @@ export function generateSport(profile = {}, date = new Date(), seed = 0) {
   const weakAspects = aspects.filter((a) => focus[a] === 'weak')
   const sequence = [...aspects, ...weakAspects]
 
-  const steps = [pickWarmup(availableEquip(profile), rand)]
+  const steps = [pickWarmup(rand)]
   let i = 0
   while (steps.length < count + 1 && i < sequence.length * 3) {
     const drill = pickSome(skills[sequence[i % sequence.length]].drills, 1, rand, seen)[0]
@@ -285,25 +258,31 @@ export function generateSport(profile = {}, date = new Date(), seed = 0) {
   return { steps, label: today }
 }
 
-// General strength — rotates push/pull/legs by day, plus a core finisher.
-// Returns { steps, label } where label is e.g. "Push day".
+// The workout: a 7-day rotation of push / pull / legs / rest / cardio / core / rest.
+// Everything is BODYWEIGHT — no gym, no gear, no "do you own dumbbells?" question.
+// That means it works for everyone, anywhere, and it can't hand a 13-year-old a
+// barbell it never taught them to use.
+// Returns { steps, label }.
 export function generateGeneral(profile = {}, date = new Date(), seed = 0) {
   const rand = mulberry32(dayNumber(date) + seed * 197 + 13)
   const seen = new Set()
-  const avail = availableEquip(profile)
   const rot = ROTATION[(dayNumber(date) + seed) % ROTATION.length]
-  const pool = (part) => GENERAL[part].filter((e) => avail.has(e.eq)).map((e) => e.name)
 
-  const steps = [pickWarmup(avail, rand)]
+  if (rot.key === 'rest') {
+    return { steps: [RESTS[Math.floor(rand() * RESTS.length)]], label: rot.label, rest: true }
+  }
+
+  const steps = [pickWarmup(rand)]
   if (rot.key === 'cardio') {
     // A cardio session is ONE main effort — nobody does three separate runs — so it's
     // a single piece of work plus a short burner, rather than a list of them.
-    steps.push(...pickSome(pool('cardio'), 1, rand, seen))
-    steps.push(...pickSome(pool('burner'), 1, rand, seen))
+    steps.push(...pickSome(GENERAL.cardio, 1, rand, seen))
+    steps.push(...pickSome(GENERAL.burner, 1, rand, seen))
   } else {
-    steps.push(...pickSome(pool(rot.key), intensityForAge(profile.age).main, rand, seen))
+    steps.push(...pickSome(GENERAL[rot.key], intensityForAge(profile.age).main, rand, seen))
   }
-  steps.push(...pickSome(pool('core'), 1, rand, seen))
+  // Core day already IS core — don't tack another one on the end of it.
+  if (rot.key !== 'core') steps.push(...pickSome(GENERAL.core, 1, rand, seen))
   steps.push(COOLDOWNS[Math.floor(rand() * COOLDOWNS.length)])
   return { steps, label: rot.label }
 }

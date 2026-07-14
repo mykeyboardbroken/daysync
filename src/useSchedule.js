@@ -550,6 +550,12 @@ export function normalize(parsed) {
   // Title-based rewrites are done for good — from here on, a task's title is just a
   // title and the app will never reinterpret it.
   data.seededLegacyTitleFix = true
+  // Workouts are bodyweight-only now — there's no gym or equipment question anymore,
+  // so drop the answers from older profiles rather than leave dead data lying around.
+  if (data.profile && ('gym' in data.profile || 'equipment' in data.profile)) {
+    const { gym, equipment, ...rest } = data.profile
+    data.profile = rest
+  }
   // Journaling is the first thing in the morning. Ensure it exists and sits first.
   if (!data.seededJournalingFirst) {
     if (data.tasks.some((t) => t.title === 'Journaling')) {
