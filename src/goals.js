@@ -9,6 +9,15 @@
 // Challenges are ordered EASY → HARD. You get the next one up each time you finish
 // one, so the thing that felt big in week one is the warm-up by week four.
 
+// The user's OWN goals, in their own words, over three horizons. A goal with no
+// timeframe is a wish. Shared by the survey, the Today card and Settings so the three
+// can't drift apart.
+export const HORIZONS = [
+  { key: 'short', label: 'This week', placeholder: 'e.g. finish the history essay' },
+  { key: 'medium', label: 'This term', placeholder: 'e.g. get my maths up to an A' },
+  { key: 'long', label: 'This year', placeholder: 'e.g. make the first XI' },
+]
+
 export const GOALS = [
   {
     id: 'confidence',

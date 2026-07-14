@@ -902,6 +902,79 @@
 .custom-repeat-n { width: 84px; flex-shrink: 0; }
 .custom-repeat-warn { color: var(--warn); font-size: 12px; margin: 8px 0 0; line-height: 1.45; }
 
+/* ---------- Your goals (survey step, Today card, Settings editor) ---------- */
+.goalset { margin-top: 18px; }
+.goalset-block + .goalset-block { margin-top: 16px; }
+.goalset-label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--accent);
+  margin: 0 0 8px;
+}
+.goalset-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  margin-bottom: 6px;
+  border-radius: 10px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+}
+.goalset-text { flex: 1; font-size: 14px; min-width: 0; overflow-wrap: break-word; }
+.goalset-del {
+  background: none;
+  border: none;
+  color: var(--text-dim);
+  font-size: 14px;
+  cursor: pointer;
+  padding: 2px 4px;
+  flex-shrink: 0;
+}
+.goalset-del:hover { color: var(--danger); }
+.goalset-input {
+  width: 100%;
+  padding: 11px 12px;
+  border: 1px dashed var(--border);
+  border-radius: 10px;
+  background: none;
+  color: var(--text);
+  font-family: inherit;
+  font-size: 14px;
+}
+.goalset-input:focus { outline: none; border-style: solid; border-color: var(--accent); }
+
+/* The Today card listing them. */
+.mygoals-block + .mygoals-block { margin-top: 12px; }
+.mygoals-label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-dim);
+  margin: 0 0 6px;
+}
+.mygoals-list { margin: 0; padding: 0; list-style: none; }
+.mygoals-list li {
+  font-size: 14px;
+  line-height: 1.5;
+  padding: 3px 0 3px 16px;
+  position: relative;
+  overflow-wrap: break-word;
+}
+.mygoals-list li::before {
+  content: '';
+  position: absolute;
+  left: 2px;
+  top: 11px;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+
 /* ---------- Daily challenge (Goals) ---------- */
 .challenge-card { border-color: color-mix(in srgb, var(--accent) 34%, var(--border)); }
 .challenge-card.done { border-color: var(--border); opacity: 0.72; }

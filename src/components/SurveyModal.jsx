@@ -71,7 +71,11 @@ export default function SurveyModal({ questions, onComplete }) {
     function onKeyDown(e) {
       if (e.key !== 'Enter') return
       if (finishing) return // the outro is playing; don't queue up another finish
-      if (document.activeElement?.classList?.contains('survey-option')) return
+      const el = document.activeElement
+      if (el?.classList?.contains('survey-option')) return
+      // In the goals step, Enter ADDS the goal you just typed — it must not also skip
+      // the question out from under you.
+      if (el?.classList?.contains('goalset-input')) return
       e.preventDefault() // stops the focused button firing its own click too
       next()
     }
@@ -165,6 +169,56 @@ export default function SurveyModal({ questions, onComplete }) {
                   {o}
                 </button>
               ))}
+            </div>
+          )}
+
+          {q.type === 'goals' && (
+            <div className="goalset">
+              {q.horizons.map((h) => {
+                const list = (value || {})[h.key] || []
+                const addGoal = (text) => {
+                  const t = text.trim()
+                  if (!t) return
+                  setAnswer({ ...(value || {}), [h.key]: [...list, t] })
+                }
+                const removeGoal = (idx) =>
+                  setAnswer({ ...(value || {}), [h.key]: list.filter((_, n) => n !== idx) })
+                return (
+                  <div className="goalset-block" key={h.key}>
+                    <p className="goalset-label">{h.label}</p>
+                    {list.map((g, idx) => (
+                      <div className="goalset-row" key={idx}>
+                        <span className="goalset-text">{g}</span>
+                        <button
+                          type="button"
+                          className="goalset-del"
+                          onClick={() => removeGoal(idx)}
+                          aria-label={`Remove ${g}`}
+                        >
+                          ✕
+                        </button>
+                      </div>
+                    ))}
+                    <input
+                      type="text"
+                      className="goalset-input"
+                      placeholder={h.placeholder}
+                      // Enter adds the goal rather than advancing the survey.
+                      onKeyDown={(e) => {
+                        if (e.key !== 'Enter') return
+                        e.preventDefault()
+                        e.stopPropagation()
+                        addGoal(e.currentTarget.value)
+                        e.currentTarget.value = ''
+                      }}
+                      onBlur={(e) => {
+                        addGoal(e.currentTarget.value)
+                        e.currentTarget.value = ''
+                      }}
+                    />
+                  </div>
+                )
+              })}
             </div>
           )}
 

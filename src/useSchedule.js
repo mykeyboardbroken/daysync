@@ -74,6 +74,7 @@ function emptyData() {
       showWeather: true, // the weather line on Today
       showLevel: true, // the level / XP chip on Today
       showGreeting: true, // the "Morning, Brian" line
+      showGoals: true, // the "what you're working on" card
     },
   }
 }

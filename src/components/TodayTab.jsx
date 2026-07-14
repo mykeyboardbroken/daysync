@@ -5,7 +5,7 @@ import { bannerLine } from '../greeting'
 import { dueAlerts, repeatLabel } from '../alerts'
 import { useWeather } from '../useWeather'
 import { trainingWarnings } from '../trainingAlert'
-import { todaysChallenge } from '../goals'
+import { todaysChallenge, HORIZONS } from '../goals'
 import Icon from './Icon'
 import DayPlan from './DayPlan'
 import WeatherStrip from './WeatherStrip'
@@ -21,6 +21,9 @@ export default function TodayTab({ schedule }) {
   const banner = bannerLine(date, schedule.profile?.name)
   // What the user has chosen to see on Today (default: everything).
   const prefs = schedule.settings || {}
+
+  const myGoals = schedule.profile?.myGoals || {}
+  const hasMyGoals = HORIZONS.some((h) => (myGoals[h.key] || []).length > 0)
 
   const todayKey = toKey(date)
   const challenge = todaysChallenge(
@@ -124,6 +127,30 @@ export default function TodayTab({ schedule }) {
               </li>
             ))}
           </ul>
+        </section>
+      )}
+
+      {/* What they're aiming at, in their own words. A goal you write once and never
+          see again is just a wish, so it lives on the screen they open every day. */}
+      {hasMyGoals && prefs.showGoals !== false && (
+        <section className="card mygoals-card">
+          <div className="card-header">
+            <div><h2>What you're working on</h2></div>
+          </div>
+          {HORIZONS.map(({ key, label }) => {
+            const list = myGoals[key] || []
+            if (!list.length) return null
+            return (
+              <div className="mygoals-block" key={key}>
+                <p className="mygoals-label">{label}</p>
+                <ul className="mygoals-list">
+                  {list.map((g, i) => (
+                    <li key={i}>{g}</li>
+                  ))}
+                </ul>
+              </div>
+            )
+          })}
         </section>
       )}
 

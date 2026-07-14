@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import Icon from './Icon'
-import { GOALS } from '../goals'
+import { GOALS, HORIZONS } from '../goals'
 
 // Slide the hue, keep saturation/lightness fixed → always a pleasant accent.
 function hslToHex(h, s, l) {
@@ -297,6 +297,12 @@ export default function SettingsModal({
                   "Today's forecast under the date",
                   true,
                 )}
+                {toggleRow(
+                  'showGoals',
+                  'Your goals',
+                  "The \"what you're working on\" card",
+                  true,
+                )}
               </div>
             )}
 
@@ -419,8 +425,57 @@ export default function SettingsModal({
 
             {section === 'goals' && (
               <div className="color-pickers">
+                <p className="settings-section-head">Your goals</p>
                 <p className="settings-field-label">
-                  Pick what you're working on and you'll get one small challenge a day —
+                  What you're actually aiming at. These show on your Today screen.
+                </p>
+
+                {HORIZONS.map((h) => {
+                  const list = (profile.myGoals || {})[h.key] || []
+                  const setList = (next) =>
+                    onSetProfile('myGoals', { ...(profile.myGoals || {}), [h.key]: next })
+                  return (
+                    <div className="goalset-block" key={h.key}>
+                      <p className="goalset-label">{h.label}</p>
+                      {list.map((g, i) => (
+                        <div className="goalset-row" key={i}>
+                          <span className="goalset-text">{g}</span>
+                          <button
+                            type="button"
+                            className="goalset-del"
+                            onClick={() => setList(list.filter((_, n) => n !== i))}
+                            aria-label={`Remove ${g}`}
+                          >
+                            ✕
+                          </button>
+                        </div>
+                      ))}
+                      <input
+                        type="text"
+                        className="goalset-input"
+                        placeholder={h.placeholder}
+                        onKeyDown={(e) => {
+                          if (e.key !== 'Enter') return
+                          e.preventDefault()
+                          const t = e.currentTarget.value.trim()
+                          if (!t) return
+                          setList([...list, t])
+                          e.currentTarget.value = ''
+                        }}
+                        onBlur={(e) => {
+                          const t = e.currentTarget.value.trim()
+                          if (!t) return
+                          setList([...list, t])
+                          e.currentTarget.value = ''
+                        }}
+                      />
+                    </div>
+                  )
+                })}
+
+                <p className="settings-section-head">Daily challenge</p>
+                <p className="settings-field-label">
+                  Pick what you're building and you'll get one small challenge a day —
                   never more than one. Finish it and the next one is a bit harder.
                   Off by default.
                 </p>
