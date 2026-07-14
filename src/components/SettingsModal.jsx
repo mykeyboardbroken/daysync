@@ -43,14 +43,14 @@ const PALETTE = [
 ]
 
 // Top-level settings categories. Add more here; each opens its own panel.
+// Six sections, not nine. "Today screen" and "Tasks" were a handful of switches each
+// — they belong under Appearance with everything else that changes how the app looks,
+// not behind their own row. Feedback was one textarea; it lives in About.
 const SECTIONS = [
   { key: 'appearance', label: 'Appearance', icon: 'palette' },
-  { key: 'today', label: 'Today screen', icon: 'sun' },
-  { key: 'tasks', label: 'Tasks', icon: 'check' },
   { key: 'profile', label: 'Profile', icon: 'user' },
   { key: 'goals', label: 'Goals', icon: 'trendingUp' },
   { key: 'exercise', label: 'Exercise', icon: 'activity' },
-  { key: 'feedback', label: 'Feedback', icon: 'mail' },
   { key: 'backup', label: 'Backup', icon: 'file' },
   { key: 'about', label: 'About', icon: 'star' },
 ]
@@ -257,52 +257,16 @@ export default function SettingsModal({
                     'Reduce motion',
                     'Turn off the sliding and fading animations',
                   )}
+                  {toggleRow('showStreaks', 'Show streaks', 'Count days in a row on repeating tasks')}
                 </div>
-              </div>
-            )}
 
-            {section === 'tasks' && (
-              <button
-                type="button"
-                className="toggle-row"
-                onClick={() => onSetSetting('showStreaks', !settings?.showStreaks)}
-              >
-                <span className="toggle-text">
-                  <span className="toggle-label">Show streaks</span>
-                  <span className="toggle-hint">Count days in a row on repeating tasks</span>
-                </span>
-                <span className={`toggle ${settings?.showStreaks ? 'on' : ''}`}>
-                  <span className="toggle-knob" />
-                </span>
-              </button>
-            )}
-
-            {section === 'today' && (
-              <div className="settings-menu">
-                {toggleRow(
-                  'showGreeting',
-                  'Greeting',
-                  'The "Morning, Brian" line at the top',
-                  true,
-                )}
-                {toggleRow(
-                  'showLevel',
-                  'Level & XP',
-                  'The level chip and your day streak',
-                  true,
-                )}
-                {toggleRow(
-                  'showWeather',
-                  'Weather',
-                  "Today's forecast under the date",
-                  true,
-                )}
-                {toggleRow(
-                  'showGoals',
-                  'Your goals',
-                  "The \"what you're working on\" card",
-                  true,
-                )}
+                <p className="settings-section-head">On your Today screen</p>
+                <div className="settings-menu">
+                  {toggleRow('showGreeting', 'Greeting', 'The "Morning, Brian" line at the top', true)}
+                  {toggleRow('showLevel', 'Level & XP', 'The level chip and your day streak', true)}
+                  {toggleRow('showWeather', 'Weather', "Today's forecast under the date", true)}
+                  {toggleRow('showGoals', 'Your goals', 'The "what you\'re working on" card', true)}
+                </div>
               </div>
             )}
 
@@ -321,14 +285,24 @@ export default function SettingsModal({
                   Everything lives on your own device. No tracking, no ads, and nothing is
                   sent anywhere unless you export it yourself.
                 </p>
+                <p className="settings-section-head">Send feedback</p>
+                <p className="settings-field-label">
+                  What do you like, what's missing, any bugs? This opens your email app.
+                </p>
+                <textarea
+                  className="feedback-input"
+                  rows={4}
+                  value={feedback}
+                  onChange={(e) => setFeedback(e.target.value)}
+                  placeholder="Your feedback…"
+                />
                 <button
                   type="button"
-                  className="settings-row"
-                  onClick={() => setSection('feedback')}
+                  className="primary-btn"
+                  onClick={sendFeedback}
+                  disabled={!feedback.trim()}
                 >
-                  <span className="settings-row-icon"><Icon name="mail" size={17} /></span>
-                  <span className="settings-row-label">Send feedback</span>
-                  <Icon name="chevronRight" size={18} className="settings-chevron" />
+                  Send feedback
                 </button>
               </div>
             )}
@@ -604,29 +578,6 @@ export default function SettingsModal({
                     </button>
                   ))}
                 </div>
-              </div>
-            )}
-
-            {section === 'feedback' && (
-              <div className="color-pickers">
-                <p className="settings-field-label">
-                  What do you like, what's missing, any bugs? This opens your email app to send it.
-                </p>
-                <textarea
-                  className="feedback-input"
-                  rows={5}
-                  value={feedback}
-                  onChange={(e) => setFeedback(e.target.value)}
-                  placeholder="Your feedback…"
-                />
-                <button
-                  type="button"
-                  className="primary-btn"
-                  onClick={sendFeedback}
-                  disabled={!feedback.trim()}
-                >
-                  Send feedback
-                </button>
               </div>
             )}
 
