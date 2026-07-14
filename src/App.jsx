@@ -42,6 +42,8 @@ export default function App() {
   const [tab, setTab] = useState('today')
   // null = closed; otherwise the add flow: 'menu' | 'assignment' | 'date' | …
   const [adding, setAdding] = useState(null)
+  // The sign-in sheet, opened deliberately from Settings — never forced on anyone.
+  const [showAuth, setShowAuth] = useState(false)
 
   // Ease the app in the moment the INTRO finishes — that's the last thing covering it.
   // (This used to key off the survey, but the intro then sat on top of the app while
@@ -95,11 +97,10 @@ export default function App() {
     setAdding(null)
   }
 
-  // With accounts enabled, nothing loads until we know who you are.
-  if (auth.enabled && auth.loading) return <div className="auth-screen" />
-  if (auth.enabled && !auth.session) {
-    return <AuthScreen onSignIn={auth.signIn} onSignUp={auth.signUp} />
-  }
+  // NO SIGN-IN WALL. The app opens straight into your day, local-only, forever if you
+  // like. Signing in is an opt-in from Settings → Backup, purely to sync your data to
+  // another device. Making it a gate would cost more users than the sync is worth —
+  // half the people you send the link to would bounce at a signup form.
 
   return (
     <div className="app">
@@ -128,7 +129,10 @@ export default function App() {
             onExport={schedule.exportData}
             onImport={schedule.importData}
             onReset={schedule.resetAll}
-            account={auth.enabled ? { email: auth.session?.user?.email, username: auth.username } : null}
+            cloudEnabled={auth.enabled}
+            account={auth.session ? { email: auth.session.user?.email, username: auth.username } : null}
+            syncState={schedule.syncState}
+            onOpenAuth={() => setShowAuth(true)}
             onSignOut={auth.signOut}
           />
         )}
@@ -153,6 +157,14 @@ export default function App() {
           app, which is how iOS quietly eats their data. */}
       {schedule.onboarded && !schedule.introDone && (
         <IntroTour onDone={schedule.finishIntro} schedule={schedule} />
+      )}
+
+      {showAuth && !auth.session && (
+        <AuthScreen
+          onSignIn={auth.signIn}
+          onSignUp={auth.signUp}
+          onClose={() => setShowAuth(false)}
+        />
       )}
 
 

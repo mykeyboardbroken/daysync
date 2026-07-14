@@ -85,7 +85,10 @@ export default function SettingsModal({
   onExport,
   onImport,
   onReset,
+  cloudEnabled = false,
   account = null,
+  syncState = 'off',
+  onOpenAuth,
   onSignOut,
 }) {
   const toggleProfileArr = (key, opt) => {
@@ -312,27 +315,6 @@ export default function SettingsModal({
 
             {section === 'profile' && (
               <div className="color-pickers">
-                {account && (
-                  <>
-                    <p className="settings-field-label">Account</p>
-                    <div className="account-card">
-                      <span className="account-avatar" aria-hidden="true">
-                        <Icon name="user" size={18} />
-                      </span>
-                      <span className="account-meta">
-                        <span className="account-name">{account.username || 'Signed in'}</span>
-                        <span className="account-email">{account.email}</span>
-                      </span>
-                    </div>
-                    <p className="settings-field-label">
-                      Your data syncs to this account, so it follows you to any device you sign in on.
-                    </p>
-                    <button type="button" className="ghost-btn auth-signout" onClick={onSignOut}>
-                      Sign out
-                    </button>
-                  </>
-                )}
-
                 <p className="settings-field-label">Personal information</p>
                 <label className="study-field">
                   Name
@@ -499,6 +481,53 @@ export default function SettingsModal({
 
             {section === 'backup' && (
               <div className="settings-menu">
+                {/* Sync is OPT-IN and it only exists when the cloud is actually
+                    configured — no dead row promising something that can't happen. */}
+                {cloudEnabled && !account && (
+                  <>
+                    <button type="button" className="settings-row" onClick={onOpenAuth}>
+                      <span className="settings-row-icon"><Icon name="cloud" size={17} /></span>
+                      <span className="settings-row-label">Sync &amp; backup</span>
+                      <Icon name="chevronRight" size={18} className="settings-chevron" />
+                    </button>
+                    <p className="settings-field-label">
+                      Sign in to keep your data if you change phones or lose this one — and to
+                      pick up where you left off on another device. Optional; the app works
+                      fine without it.
+                    </p>
+                  </>
+                )}
+
+                {account && (
+                  <>
+                    <div className="account-card">
+                      <span className="account-avatar" aria-hidden="true">
+                        <Icon name="user" size={18} />
+                      </span>
+                      <span className="account-meta">
+                        <span className="account-name">{account.username || 'Signed in'}</span>
+                        <span className="account-email">{account.email}</span>
+                      </span>
+                      <span className={`sync-pill sync-${syncState}`}>
+                        {{
+                          syncing: 'Syncing…',
+                          synced: 'Synced',
+                          offline: 'Offline',
+                          off: '',
+                        }[syncState] || ''}
+                      </span>
+                    </div>
+                    <p className="settings-field-label">
+                      {syncState === 'offline'
+                        ? "Can't reach the server. Your data is safe on this device and will sync when you're back online."
+                        : 'Your data syncs to this account, so it follows you to any device you sign in on.'}
+                    </p>
+                    <button type="button" className="ghost-btn auth-signout" onClick={onSignOut}>
+                      Sign out
+                    </button>
+                  </>
+                )}
+
                 <button type="button" className="settings-row" onClick={handleExport}>
                   <span className="settings-row-icon"><Icon name="file" size={17} /></span>
                   <span className="settings-row-label">Export backup</span>

@@ -3,7 +3,7 @@ import Icon from './Icon'
 
 // Full-screen sign in / sign up. Shown before anything else when cloud accounts
 // are enabled and nobody is signed in.
-export default function AuthScreen({ onSignIn, onSignUp }) {
+export default function AuthScreen({ onSignIn, onSignUp, onClose }) {
   const [mode, setMode] = useState('signin') // 'signin' | 'signup'
   const [username, setUsername] = useState('')
   const [email, setEmail] = useState('')
@@ -56,13 +56,19 @@ export default function AuthScreen({ onSignIn, onSignUp }) {
   return (
     <div className="auth-screen">
       <form className="auth-card" onSubmit={submit}>
+        {/* This is a sheet you opened on purpose, not a wall — so it must be closeable. */}
+        {onClose && (
+          <button type="button" className="auth-close" onClick={onClose} aria-label="Close">
+            ✕
+          </button>
+        )}
         <div className="auth-mark" aria-hidden="true">
           <Icon name="checkmark" size={26} />
         </div>
         <h1 className="auth-title">{isSignUp ? 'Create your account' : 'Welcome back'}</h1>
         <p className="auth-sub">
           {isSignUp
-            ? 'Your day, synced across every device you sign in on.'
+            ? 'Optional — it keeps your data safe and syncs it to your other devices. The app works fine without it.'
             : 'Sign in to pick up where you left off.'}
         </p>
 

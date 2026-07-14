@@ -9,6 +9,9 @@ const XP = { task: 10, assignment: 15, event: 20, workout: 25 }
 const STORAGE_KEY = 'schedule-app.data'
 // Where an unreadable save gets parked so it isn't overwritten and lost forever.
 const BACKUP_KEY = 'schedule-app.data.corrupt'
+// When this device last changed its data — used to decide whether the cloud copy or
+// the local copy is the newer one.
+const STAMP_KEY = 'schedule-app.updatedAt'
 
 // Everything the app stores lives under one key so a single save keeps them
 // in sync:
@@ -683,6 +686,7 @@ export function useSchedule(userId = null) {
   useEffect(() => {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(data))
+      localStorage.setItem(STAMP_KEY, String(Date.now()))
     } catch {
       // Storage full, or Safari private mode. Losing a save is bad; taking the whole
       // app down to the error screen mid-edit is worse. Keep running in memory.
@@ -694,30 +698,81 @@ export function useSchedule(userId = null) {
   // on every keystroke).
   const dataRef = useRef(data)
   dataRef.current = data
-  // Only start pushing once we've pulled, or the first save would overwrite the
-  // account's real data with whatever was cached on this device.
+  // Nothing is pushed until a pull has settled — otherwise the first save would
+  // overwrite the account's real data with whatever was cached on this device.
   const [synced, setSynced] = useState(false)
+  // 'off' | 'syncing' | 'synced' | 'offline'  — surfaced in Settings so the user can
+  // see whether their data actually made it anywhere.
+  const [syncState, setSyncState] = useState('off')
 
-  // Pull on sign-in: adopt the account's data, or seed the account from what's
-  // already on this device (so signing up doesn't throw away an existing setup).
+  // Stamp every local save so we can tell WHICH side is newer. Without this, the pull
+  // blindly adopted the cloud copy — so a session spent editing on a bus with no signal
+  // was silently wiped by yesterday's cloud blob the next time the app opened.
+  const stampLocal = () => {
+    try {
+      localStorage.setItem(STAMP_KEY, String(Date.now()))
+    } catch {
+      /* ignore */
+    }
+  }
+  const localStamp = () => {
+    try {
+      return Number(localStorage.getItem(STAMP_KEY)) || 0
+    } catch {
+      return 0
+    }
+  }
+
+  // Pull on sign-in. The NEWER side wins:
+  //   • cloud newer  → adopt the cloud copy
+  //   • local newer  → keep local, and push it up so the cloud catches up
+  //   • no cloud row → seed the account from this device (signing up keeps your setup)
+  // If the pull fails (offline), we do NOT push: pushing over a cloud copy we've never
+  // seen is exactly how you lose data. We retry when the network comes back.
   useEffect(() => {
-    if (!isCloudEnabled || !userId) return
+    if (!isCloudEnabled || !userId) {
+      setSyncState('off')
+      return
+    }
     let alive = true
-    setSynced(false)
-    ;(async () => {
+
+    const pull = async () => {
+      setSynced(false)
+      setSyncState('syncing')
       const { data: row, error } = await supabase
         .from(DATA_TABLE)
-        .select('data')
+        .select('data, updated_at')
         .eq('user_id', userId)
         .maybeSingle()
       if (!alive) return
-      if (error) return // offline or blocked — keep working from the local cache
-      if (row?.data) setData(normalize(row.data))
-      else await supabase.from(DATA_TABLE).upsert({ user_id: userId, data: dataRef.current })
-      if (alive) setSynced(true)
-    })()
+
+      if (error) {
+        setSyncState('offline') // keep working from the local cache; retry on reconnect
+        return
+      }
+
+      if (!row) {
+        await supabase
+          .from(DATA_TABLE)
+          .upsert({ user_id: userId, data: dataRef.current, updated_at: new Date().toISOString() })
+      } else {
+        const cloudAt = new Date(row.updated_at || 0).getTime()
+        if (cloudAt > localStamp()) {
+          setData(normalize(row.data))
+          stampLocal()
+        }
+        // else: local is newer — the push effect below sends it up.
+      }
+      if (!alive) return
+      setSynced(true)
+      setSyncState('synced')
+    }
+
+    pull()
+    window.addEventListener('online', pull)
     return () => {
       alive = false
+      window.removeEventListener('online', pull)
     }
   }, [userId])
 
@@ -725,16 +780,31 @@ export function useSchedule(userId = null) {
   useEffect(() => {
     if (!isCloudEnabled || !userId || !synced) return
     const t = setTimeout(() => {
+      setSyncState('syncing')
       supabase
         .from(DATA_TABLE)
         .upsert({ user_id: userId, data, updated_at: new Date().toISOString() })
-        .then(() => {}, () => {}) // offline writes fail silently; local cache still has it
+        .then(
+          ({ error }) => {
+            if (error) return setSyncState('offline')
+            stampLocal()
+            setSyncState('synced')
+          },
+          () => setSyncState('offline'), // offline — the local cache still has everything
+        )
     }, 800)
     return () => clearTimeout(t)
   }, [data, userId, synced])
 
-  // Login streak: bump once per day. Same day = no change; yesterday = +1;
-  // a gap resets to 1. Runs once on mount.
+  // Login streak: bump once per day. Same day = no change; yesterday = +1; a gap
+  // resets to 1.
+  //
+  // Depends on `synced`, NOT [] — and that's the whole fix. It used to run once on
+  // mount, bump the streak, and then the cloud pull would land and replace the entire
+  // data object (streak included) with the cloud's copy. The bump was discarded on
+  // every launch, so for anyone signed in the streak was frozen forever. Re-running it
+  // after the pull settles fixes that, and it's idempotent — if lastActive is already
+  // today it does nothing.
   useEffect(() => {
     setData((prev) => {
       const today = toKey(new Date())
@@ -743,7 +813,7 @@ export function useSchedule(userId = null) {
       const streak = prev.lastActive === yesterday ? (prev.loginStreak || 0) + 1 : 1
       return { ...prev, lastActive: today, loginStreak: streak }
     })
-  }, [])
+  }, [synced])
 
   // ---- Assignments (schoolwork with a due date) ----
   const addAssignment = useCallback(({ title, subject, due, kind = 'assignment' }) => {
@@ -1237,6 +1307,7 @@ export function useSchedule(userId = null) {
     }
     try {
       localStorage.removeItem(STORAGE_KEY)
+      localStorage.removeItem(STAMP_KEY) // or the next pull would think local is newer
     } catch {
       /* ignore — reload still gives a clean slate */
     }
@@ -1298,6 +1369,7 @@ export function useSchedule(userId = null) {
     profile: data.profile,
     finishSurvey,
     finishIntro,
+    syncState,
     introDone: data.introDone,
     restartSurvey,
     setProfile,
