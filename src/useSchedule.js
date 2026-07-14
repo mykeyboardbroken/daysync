@@ -4,7 +4,7 @@ import { toKey, keyToDate, addDays } from './dateUtils'
 import { supabase, isCloudEnabled, DATA_TABLE } from './supabase'
 
 // XP awarded for completing each kind of thing.
-const XP = { task: 10, assignment: 15, event: 20, workout: 25, challenge: 20 }
+const XP = { task: 10, assignment: 15, event: 20, workout: 25 }
 
 const STORAGE_KEY = 'schedule-app.data'
 // Where an unreadable save gets parked so it isn't overwritten and lost forever.
@@ -47,11 +47,7 @@ function emptyData() {
     onboarded: false, // whether the first-open survey has been completed
     introDone: false, // whether the post-survey feature intro has been seen
     profile: {}, // answers from the onboarding survey, keyed by question id
-    // Goals: profile.goals holds the chosen goal ids. `goalProgress` counts how many
-    // challenges you've finished per goal (which is what escalates the difficulty),
-    // and `goalLog` is the per-day done state.
-    goalProgress: {},
-    goalLog: {},
+    // The user's own goals live on `profile.myGoals` ({ short, medium, long }).
     workoutLog: {}, // per-day done state for the generated workout ({ dateKey: true })
     workoutSeed: 0, // bumped to reshuffle today's generated workout
     xp: 0, // total XP earned by completing things
@@ -1136,31 +1132,6 @@ export function useSchedule(userId = null) {
     setData((prev) => ({ ...prev, introDone: true }))
   }, [])
 
-  // ---- Goals: today's challenge ----
-  // Completing one bumps that goal's progress, which is what promotes you to the next
-  // (harder) challenge in its ladder. Un-ticking rolls it back, so a mis-tap can't
-  // silently skip you up a level.
-  const toggleChallenge = useCallback((goalId, dateKey) => {
-    setData((prev) => {
-      const done = !!prev.goalLog?.[dateKey]
-      const goalLog = { ...prev.goalLog }
-      const goalProgress = { ...prev.goalProgress }
-      if (done) {
-        delete goalLog[dateKey]
-        goalProgress[goalId] = Math.max(0, (goalProgress[goalId] || 1) - 1)
-      } else {
-        goalLog[dateKey] = goalId
-        goalProgress[goalId] = (goalProgress[goalId] || 0) + 1
-      }
-      return {
-        ...prev,
-        goalLog,
-        goalProgress,
-        xp: Math.max(0, (prev.xp || 0) + (done ? -XP.challenge : XP.challenge)),
-      }
-    })
-  }, [])
-
   // Update a single profile field (edited from Settings → Profile).
   const setProfile = useCallback((key, value) => {
     setData((prev) => ({ ...prev, profile: { ...prev.profile, [key]: value } }))
@@ -1329,9 +1300,6 @@ export function useSchedule(userId = null) {
     profile: data.profile,
     finishSurvey,
     finishIntro,
-    toggleChallenge,
-    goalProgress: data.goalProgress,
-    goalLog: data.goalLog,
     introDone: data.introDone,
     restartSurvey,
     setProfile,

@@ -127,7 +127,6 @@ export default function App() {
             onExport={schedule.exportData}
             onImport={schedule.importData}
             onReset={schedule.resetAll}
-            goalProgress={schedule.goalProgress}
             account={auth.enabled ? { email: auth.session?.user?.email, username: auth.username } : null}
             onSignOut={auth.signOut}
           />

@@ -5,7 +5,7 @@ import { bannerLine } from '../greeting'
 import { dueAlerts, repeatLabel } from '../alerts'
 import { useWeather } from '../useWeather'
 import { trainingWarnings } from '../trainingAlert'
-import { todaysChallenge, HORIZONS } from '../goals'
+import { HORIZONS } from '../goals'
 import Icon from './Icon'
 import DayPlan from './DayPlan'
 import WeatherStrip from './WeatherStrip'
@@ -24,14 +24,6 @@ export default function TodayTab({ schedule }) {
 
   const myGoals = schedule.profile?.myGoals || {}
   const hasMyGoals = HORIZONS.some((h) => (myGoals[h.key] || []).length > 0)
-
-  const todayKey = toKey(date)
-  const challenge = todaysChallenge(
-    schedule.profile?.goals || [],
-    schedule.goalProgress || {},
-    date,
-  )
-  const challengeDone = !!schedule.goalLog?.[todayKey]
 
   // Re-check due reminders every 20s while the tab is open.
   const [, setTick] = useState(0)
@@ -151,30 +143,6 @@ export default function TodayTab({ schedule }) {
               </div>
             )
           })}
-        </section>
-      )}
-
-      {/* One challenge a day, from the goals you picked. Never more than one — ten
-          challenges a day is just another chore list. */}
-      {challenge && (
-        <section className={`card challenge-card ${challengeDone ? 'done' : ''}`}>
-          <div className="challenge-head">
-            <span className="challenge-icon" aria-hidden="true">
-              <Icon name={challenge.icon} size={16} />
-            </span>
-            <span className="challenge-goal">{challenge.label}</span>
-            <span className="challenge-step">
-              {challenge.step} of {challenge.total}
-            </span>
-          </div>
-          <p className="challenge-text">{challenge.text}</p>
-          <button
-            type="button"
-            className={challengeDone ? 'ghost-btn challenge-btn' : 'primary-btn challenge-btn'}
-            onClick={() => schedule.toggleChallenge(challenge.goalId, todayKey)}
-          >
-            {challengeDone ? 'Done — undo?' : 'I did it'}
-          </button>
         </section>
       )}
 
