@@ -21,6 +21,7 @@ export default function DayPlan({ schedule }) {
   const [expandedId, setExpandedId] = useState(null)
   const [editing, setEditing] = useState(false)
   const [showTemplates, setShowTemplates] = useState(false)
+  const [showWorkout, setShowWorkout] = useState(false)
   const [dragId, setDragId] = useState(null)
   const { tasks } = schedule
   const todayKey = toKey(new Date())
@@ -56,6 +57,8 @@ export default function DayPlan({ schedule }) {
   // A morning workout already starts with a warm-up/stretch, so fold the standalone
   // "Stretch / Move" into it — clearer than showing both.
   const morningWorkout = sportBucket === 'morning' || generalBucket === 'morning'
+  const workoutKey = `${todayKey}|general`
+  const workoutDone = !!schedule.workoutLog?.[workoutKey]
 
   const SKILL_LEVELS = [
     { key: 'weak', label: 'Weak' },
@@ -382,23 +385,23 @@ export default function DayPlan({ schedule }) {
 
   // How much is still undone in a bucket — shown on its tab so nothing gets
   // forgotten just because it's on another tab.
+  // The workout no longer counts toward "what's left" — it isn't a task you owe
+  // anyone. Sport training still does: you chose a sport, that's a commitment.
   const leftIn = (key) =>
     tasksIn(key).filter((t) => (t.repeat ? !habitDoneOn(t, todayKey) : !t.done)).length +
-    (sport && sportBucket === key && !schedule.workoutLog?.[`${todayKey}|sport`] ? 1 : 0) +
-    (general && generalBucket === key && !schedule.workoutLog?.[`${todayKey}|general`] ? 1 : 0)
+    (sport && sportBucket === key && !schedule.workoutLog?.[`${todayKey}|sport`] ? 1 : 0)
 
   const bucketSection = (key, icon, label, alwaysShow) => {
     const items = tasksIn(key)
     const showSport = sport && sportBucket === key
-    const showGeneral = general && generalBucket === key
-    if (!alwaysShow && items.length === 0 && !showSport && !showGeneral) return null
+    if (!alwaysShow && items.length === 0 && !showSport) return null
     return (
       <div className="plan-section" key={key || 'anytime'}>
         {/* The active tab already names the time bucket, so it passes no label. */}
         {label && (
           <div className="plan-section-head"><Icon name={icon} size={15} /> {label}</div>
         )}
-        {items.length === 0 && !showSport && !showGeneral ? (
+        {items.length === 0 && !showSport ? (
           <p className="plan-empty">Nothing planned</p>
         ) : (
           <ul className="assignment-list">
@@ -410,13 +413,6 @@ export default function DayPlan({ schedule }) {
                 subtitle: `${sport.label} drills`,
                 steps: sport.steps,
                 skillSport: sport.label,
-              })}
-            {showGeneral &&
-              renderWorkoutRow({
-                id: 'general',
-                title: 'Workout',
-                subtitle: general.label,
-                steps: general.steps,
               })}
           </ul>
         )}
@@ -458,12 +454,86 @@ export default function DayPlan({ schedule }) {
             rather than hiding behind one. Only rendered when it has something. */}
         {bucketSection('', 'clock', 'Anytime', false)}
 
+        {/* The workout is a BUTTON, not a task. It has no checkbox in your list and it
+            never counts as something you owe — open it if you want it, ignore it and
+            nothing nags you. Sport training stays a real task: you chose a sport. */}
+        {general && (
+          <button
+            type="button"
+            className={`workout-btn ${workoutDone ? 'done' : ''}`}
+            onClick={() => setShowWorkout(true)}
+          >
+            <span className="workout-btn-icon" aria-hidden="true">
+              <Icon name={general.rest ? 'moon' : 'activity'} size={18} />
+            </span>
+            <span className="workout-btn-text">
+              <span className="workout-btn-title">
+                {general.rest ? 'Rest day' : 'Workout'}
+              </span>
+              <span className="workout-btn-sub">
+                {workoutDone ? 'Done' : general.rest ? 'Nothing to do today' : general.label}
+              </span>
+            </span>
+            {workoutDone && <Icon name="checkmark" size={17} className="workout-btn-check" />}
+            <Icon name="chevronRight" size={16} className="workout-btn-chevron" />
+          </button>
+        )}
+
         {editing && (
           <button type="button" className="add-step-btn plan-add-templates" onClick={() => setShowTemplates(true)}>
             + Add a default task
           </button>
         )}
       </section>
+
+      {showWorkout && general && (
+        <div className="modal-overlay" onClick={() => setShowWorkout(false)}>
+          <div className="modal" onClick={(e) => e.stopPropagation()}>
+            <h3>{general.rest ? 'Rest day' : general.label}</h3>
+            <p className="modal-sub">
+              {general.rest
+                ? 'No session today.'
+                : 'Bodyweight only — no gear needed. Do it if you feel like it.'}
+            </p>
+
+            <ol className="task-steps workout-sheet-steps">
+              {general.steps.map((s, i) => (
+                <li key={i}>{s}</li>
+              ))}
+            </ol>
+
+            <div className="modal-actions">
+              {!general.rest && (
+                <button
+                  type="button"
+                  className="ghost-btn"
+                  onClick={() => schedule.reshuffleWorkout()}
+                >
+                  New workout
+                </button>
+              )}
+              <span className="spacer" />
+              {!general.rest && (
+                <button
+                  type="button"
+                  className={workoutDone ? 'ghost-btn' : 'primary-btn'}
+                  onClick={() => {
+                    schedule.toggleWorkout(workoutKey)
+                    if (!workoutDone) setShowWorkout(false)
+                  }}
+                >
+                  {workoutDone ? 'Undo' : 'Mark done'}
+                </button>
+              )}
+              {general.rest && (
+                <button type="button" className="primary-btn" onClick={() => setShowWorkout(false)}>
+                  Nice
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
       {showTemplates && (
         <div className="modal-overlay" onClick={() => setShowTemplates(false)}>
