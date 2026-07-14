@@ -499,23 +499,27 @@ export default function SettingsModal({
                   ))}
                 </div>
 
-                {(profile.sports || []).length > 0 && (
-                  <>
-                    <p className="settings-field-label">When</p>
-                    <div className="type-select repeat-select habit-days">
-                      {TIME_OPTIONS.map((o) => (
-                        <button
-                          type="button"
-                          key={o}
-                          className={`type-option ${profile.sportTime === o ? 'selected' : ''}`}
-                          onClick={() => onSetProfile('sportTime', o)}
-                        >
-                          {o}
-                        </button>
-                      ))}
-                    </div>
-                  </>
-                )}
+                {/* Always shown. Hiding this until a sport was picked made the option
+                    look like it didn't exist — you'd open Exercise, see a "When" for the
+                    workout and none for sport, and assume it was missing. */}
+                <p className="settings-field-label">
+                  When{' '}
+                  {(profile.sports || []).length === 0 && (
+                    <span className="label-optional">— pick a sport above to use this</span>
+                  )}
+                </p>
+                <div className="type-select repeat-select habit-days">
+                  {TIME_OPTIONS.map((o) => (
+                    <button
+                      type="button"
+                      key={o}
+                      className={`type-option ${profile.sportTime === o ? 'selected' : ''}`}
+                      onClick={() => onSetProfile('sportTime', o)}
+                    >
+                      {o}
+                    </button>
+                  ))}
+                </div>
               </div>
             )}
 
