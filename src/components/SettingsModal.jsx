@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import Icon from './Icon'
+import { GOALS } from '../goals'
 
 // Slide the hue, keep saturation/lightness fixed → always a pleasant accent.
 function hslToHex(h, s, l) {
@@ -47,6 +48,7 @@ const SECTIONS = [
   { key: 'today', label: 'Today screen', icon: 'sun' },
   { key: 'tasks', label: 'Tasks', icon: 'check' },
   { key: 'profile', label: 'Profile', icon: 'user' },
+  { key: 'goals', label: 'Goals', icon: 'trendingUp' },
   { key: 'exercise', label: 'Exercise', icon: 'activity' },
   { key: 'feedback', label: 'Feedback', icon: 'mail' },
   { key: 'backup', label: 'Backup', icon: 'file' },
@@ -84,6 +86,7 @@ export default function SettingsModal({
   onExport,
   onImport,
   onReset,
+  goalProgress = {},
   account = null,
   onSignOut,
 }) {
@@ -411,6 +414,47 @@ export default function SettingsModal({
                   </label>
                 ))}
 
+              </div>
+            )}
+
+            {section === 'goals' && (
+              <div className="color-pickers">
+                <p className="settings-field-label">
+                  Pick what you're working on and you'll get one small challenge a day —
+                  never more than one. Finish it and the next one is a bit harder.
+                  Off by default.
+                </p>
+
+                <div className="goal-list">
+                  {GOALS.map((g) => {
+                    const on = (profile.goals || []).includes(g.id)
+                    const done = goalProgress?.[g.id] || 0
+                    return (
+                      <button
+                        key={g.id}
+                        type="button"
+                        className={`goal-item ${on ? 'selected' : ''}`}
+                        onClick={() => toggleProfileArr('goals', g.id)}
+                      >
+                        <span className="goal-item-icon" aria-hidden="true">
+                          <Icon name={g.icon} size={18} />
+                        </span>
+                        <span className="goal-item-text">
+                          <span className="goal-item-label">{g.label}</span>
+                          <span className="goal-item-blurb">{g.blurb}</span>
+                        </span>
+                        {done > 0 && <span className="goal-item-count">{done} done</span>}
+                        {on && <Icon name="checkmark" size={17} className="goal-item-check" />}
+                      </button>
+                    )
+                  })}
+                </div>
+
+                {(profile.goals || []).length > 1 && (
+                  <p className="settings-field-label">
+                    With more than one goal, the challenge rotates between them day by day.
+                  </p>
+                )}
               </div>
             )}
 

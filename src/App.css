@@ -902,6 +902,68 @@
 .custom-repeat-n { width: 84px; flex-shrink: 0; }
 .custom-repeat-warn { color: var(--warn); font-size: 12px; margin: 8px 0 0; line-height: 1.45; }
 
+/* ---------- Daily challenge (Goals) ---------- */
+.challenge-card { border-color: color-mix(in srgb, var(--accent) 34%, var(--border)); }
+.challenge-card.done { border-color: var(--border); opacity: 0.72; }
+.challenge-head { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+.challenge-icon {
+  width: 26px;
+  height: 26px;
+  border-radius: 8px;
+  display: grid;
+  place-items: center;
+  color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 15%, transparent);
+}
+.challenge-goal {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--accent);
+}
+.challenge-step { margin-left: auto; font-size: 11px; color: var(--text-dim); }
+.challenge-text { font-size: 16px; line-height: 1.45; margin: 0 0 14px; }
+.challenge-card.done .challenge-text { text-decoration: line-through; color: var(--text-dim); }
+.challenge-btn { width: 100%; }
+
+/* Goal picker in Settings */
+.goal-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 4px; }
+.goal-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 13px 14px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface-2);
+  color: var(--text);
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.16s, background 0.16s;
+}
+.goal-item:hover { border-color: var(--accent); }
+.goal-item.selected {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 12%, var(--surface-2));
+}
+.goal-item-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 14%, transparent);
+}
+.goal-item-text { display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 0; }
+.goal-item-label { font-size: 15px; font-weight: 600; }
+.goal-item-blurb { font-size: 12px; color: var(--text-dim); line-height: 1.4; }
+.goal-item-count { font-size: 11px; color: var(--text-dim); flex-shrink: 0; }
+.goal-item-check { color: var(--accent); flex-shrink: 0; }
+
 /* ---------- Reminders (top-of-Today banners) ---------- */
 .reminders { display: flex; flex-direction: column; gap: 8px; }
 .reminder-check { margin-right: 2px; }
