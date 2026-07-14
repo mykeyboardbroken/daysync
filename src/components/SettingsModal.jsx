@@ -424,10 +424,7 @@ export default function SettingsModal({
                 </p>
 
                 <p className="settings-section-head">Workout</p>
-                <p className="settings-field-label">
-                  Off by default. Bodyweight only — no gym, no gear. Rotates push → pull →
-                  legs → rest → cardio → core → rest, so recovery is built in.
-                </p>
+                <p className="settings-field-label">Off by default.</p>
 
                 {/* The whole workout lives behind this one switch. Off, and it does not
                     exist anywhere in the app — no task, no time picker, nothing. */}
