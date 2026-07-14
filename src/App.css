@@ -1160,11 +1160,13 @@
   color: var(--text);
   display: flex;
   justify-content: center;
+  /* align-items MUST be flex-start. The default (stretch) locks .survey-inner to the
+     container's exact height, so tall content spills OUT of it rather than growing it
+     — scrollHeight never increases and overflow-y has nothing to scroll. This is why
+     the sports question (12 options) was unreachable even with overflow-y set. */
+  align-items: flex-start;
   padding: max(24px, env(safe-area-inset-top)) 22px calc(24px + env(safe-area-inset-bottom));
   animation: survey-fade 0.35s ease;
-  /* A question with a lot of options (sports has 12) is taller than a phone screen.
-     Without this it was just clipped — the options below the fold, and the Next
-     button, were physically unreachable. */
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
 }
@@ -1327,7 +1329,9 @@
   color: var(--text);
   display: flex;
   justify-content: center;
+  align-items: flex-start; /* see .survey-screen — stretch would break scrolling */
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
   padding: max(24px, env(safe-area-inset-top)) 22px calc(24px + env(safe-area-inset-bottom));
   animation: survey-fade 0.35s ease;
 }
