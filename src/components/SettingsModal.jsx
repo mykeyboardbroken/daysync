@@ -117,15 +117,34 @@ export default function SettingsModal({
 
   function handleExport() {
     const blob = new Blob([onExport()], { type: 'application/json' })
-    const url = URL.createObjectURL(blob)
     const d = new Date()
     const stamp = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+    const filename = `daysync-backup-${stamp}.json`
+
+    // On iOS, a share sheet is the only thing that reliably gets a file OUT of an
+    // installed PWA — a plain <a download> often does nothing there. Use it when the
+    // browser says it can share files, and fall back to a normal download elsewhere.
+    const file = new File([blob], filename, { type: 'application/json' })
+    if (navigator.canShare?.({ files: [file] })) {
+      navigator
+        .share({ files: [file], title: 'DaySync backup' })
+        .then(() => setBackupMsg('Backup shared. Keep it somewhere safe.'))
+        .catch(() => setBackupMsg('')) // user cancelled the sheet — say nothing
+      return
+    }
+
+    const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = `schedule-backup-${stamp}.json`
+    a.download = filename
+    // The anchor must be IN the document for the click to count in some browsers, and
+    // the object URL must outlive the click — revoking it on the next line (as this
+    // used to) cancels the download in Safari.
+    document.body.appendChild(a)
     a.click()
-    URL.revokeObjectURL(url)
-    setBackupMsg('Backup downloaded.')
+    a.remove()
+    setTimeout(() => URL.revokeObjectURL(url), 10000)
+    setBackupMsg('Backup saved to your downloads.')
   }
 
   function handleImportFile(e) {

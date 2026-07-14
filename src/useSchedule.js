@@ -7,6 +7,8 @@ import { supabase, isCloudEnabled, DATA_TABLE } from './supabase'
 const XP = { task: 10, assignment: 15, event: 20, workout: 25 }
 
 const STORAGE_KEY = 'schedule-app.data'
+// Where an unreadable save gets parked so it isn't overwritten and lost forever.
+const BACKUP_KEY = 'schedule-app.data.corrupt'
 
 // Everything the app stores lives under one key so a single save keeps them
 // in sync:
@@ -41,6 +43,7 @@ function emptyData() {
     seededCheckPlans: false, // "check tomorrow's plans" default seeded once (legacy)
     seededNightMerge: false, // folded check-plans + charge-devices into Get-ready once
     seededHydrationTrim: false, // removed the stray nightly "Hydration" duplicate once
+    seededLegacyTitleFix: false, // one-time rename/reword of old seeded tasks, by title
     onboarded: false, // whether the first-open survey has been completed
     profile: {}, // answers from the onboarding survey, keyed by question id
     workoutLog: {}, // per-day done state for the generated workout ({ dateKey: true })
@@ -167,12 +170,29 @@ function freshData() {
 // Take a parsed (possibly older / partial) data object and bring it up to the
 // current shape — filling defaults and running every migration. Shared by
 // load() (from localStorage) and importData() (from a backup file).
-function normalize(parsed) {
+export function normalize(parsed) {
   const base = emptyData()
   const data = { ...base, ...parsed }
+  // Spreading `parsed` lets a bad value (null, a string, a number) override a default
+  // wholesale — and an imported backup is arbitrary JSON from a file. Force every
+  // collection back to the right SHAPE before a single migration touches it, or a
+  // hand-edited backup can hand the renderer a null it will crash on later.
+  for (const key of ['assignments', 'events', 'reminders', 'notes', 'bring', 'tasks', 'reports', 'alerts']) {
+    if (!Array.isArray(data[key])) data[key] = []
+  }
+  for (const key of ['timetable', 'workoutLog', 'profile']) {
+    if (!data[key] || typeof data[key] !== 'object' || Array.isArray(data[key])) data[key] = {}
+  }
+  data.extras = {
+    service: Array.isArray(data.extras?.service) ? data.extras.service : [],
+    activities: Array.isArray(data.extras?.activities) ? data.extras.activities : [],
+  }
+  data.reportSettings = { ...base.reportSettings, ...(data.reportSettings || {}) }
   data.settings = { ...base.settings, ...(data.settings || {}) }
   data.customColors = { ...base.customColors, ...(data.customColors || {}) }
   data.profile = { ...(data.profile || {}) }
+  data.xp = Number.isFinite(data.xp) ? Math.max(0, data.xp) : 0
+  data.loginStreak = Number.isFinite(data.loginStreak) ? data.loginStreak : 0
   // Assignments gained a `kind` ('assignment' | 'homework') — default older ones.
   data.assignments = (data.assignments || []).map((a) => ({ kind: 'assignment', ...a }))
   // The old preset themes were dropped — fold any legacy one into the custom
@@ -261,24 +281,34 @@ function normalize(parsed) {
     "Lay out tomorrow's clothes, pack your bag, charge your devices, set your alarm, and check what's on tomorrow.",
     "Clothes laid out, bag packed, devices charging, alarm set, and tomorrow's plans reviewed.",
   ])
+  // ---- One-time legacy title fix-ups ----
+  // Everything below rewrites tasks BY TITLE. That's fine as a one-off upgrade of old
+  // seeded defaults, but it must NEVER run again: these titles would otherwise be
+  // reserved words forever, and a task the user makes later that happens to share one
+  // ("Pack your bag") would get silently renamed, recategorised and have its weekdays
+  // wiped — on every single app load. Run once, then never look at titles again.
+  const fixLegacyTitles = !data.seededLegacyTitleFix
+
   // Adopt older seeded copies into the current form (rename, Lifestyle, daily,
   // general description + steps). Skips a description you've edited yourself.
-  data.tasks = data.tasks.map((t) => {
-    const isOld = OLD_READY_TITLES.includes(t.title)
-    if (!isOld && t.title !== READY_TITLE) return t
-    const next = { ...t, title: READY_TITLE }
-    delete next.schoolNight
-    delete next.schoolAware
-    if (OLD_READY_DESCS.has(t.description)) {
-      next.description = READY_DESC
-      if (!next.steps || next.steps.length === 0) next.steps = READY_STEPS
-    }
-    if (isOld) {
-      next.category = 'lifestyle'
-      next.days = []
-    }
-    return next
-  })
+  if (fixLegacyTitles) {
+    data.tasks = data.tasks.map((t) => {
+      const isOld = OLD_READY_TITLES.includes(t.title)
+      if (!isOld && t.title !== READY_TITLE) return t
+      const next = { ...t, title: READY_TITLE }
+      delete next.schoolNight
+      delete next.schoolAware
+      if (OLD_READY_DESCS.has(t.description)) {
+        next.description = READY_DESC
+        if (!next.steps || next.steps.length === 0) next.steps = READY_STEPS
+      }
+      if (isOld) {
+        next.category = 'lifestyle'
+        next.days = []
+      }
+      return next
+    })
+  }
   // Fold the standalone "Check tomorrow's plans" and "Charge all devices" defaults
   // back into Get-ready-for-tomorrow as steps, so the night is one routine instead
   // of three chores. Runs once (the flag), and only removes a copy that's still the
@@ -412,13 +442,15 @@ function normalize(parsed) {
       ]),
     },
   }
-  data.tasks = data.tasks.map((t) => {
-    const d = CHORE_DEFAULTS[t.title]
-    if (!d || !d.old.has(t.description)) return t
-    const next = { ...t, description: '' }
-    if (!next.steps || next.steps.length === 0) next.steps = d.steps
-    return next
-  })
+  if (fixLegacyTitles) {
+    data.tasks = data.tasks.map((t) => {
+      const d = CHORE_DEFAULTS[t.title]
+      if (!d || !d.old.has(t.description)) return t
+      const next = { ...t, description: '' }
+      if (!next.steps || next.steps.length === 0) next.steps = d.steps
+      return next
+    })
+  }
   // Reframe the old "grooming"/"skincare" defaults as plain hygiene routines, so the
   // wording reads the same to every student. Steps are only rewritten if they're
   // still the untouched defaults — anything you've edited yourself is left alone.
@@ -434,13 +466,15 @@ function normalize(parsed) {
       steps: ['Shower or wash your face', 'Brush your teeth', 'Moisturise'],
     },
   }
-  data.tasks = data.tasks.map((t) => {
-    const r = HYGIENE_RENAMES[t.title]
-    if (!r) return t
-    const next = { ...t, title: r.title }
-    if (JSON.stringify(t.steps) === JSON.stringify(r.oldSteps)) next.steps = r.steps
-    return next
-  })
+  if (fixLegacyTitles) {
+    data.tasks = data.tasks.map((t) => {
+      const r = HYGIENE_RENAMES[t.title]
+      if (!r) return t
+      const next = { ...t, title: r.title }
+      if (JSON.stringify(t.steps) === JSON.stringify(r.oldSteps)) next.steps = r.steps
+      return next
+    })
+  }
   // A morning stretch + an afternoon hydration nudge (deletable, seeded once).
   if (!data.seededRoutinePlus) {
     data.tasks = [
@@ -498,12 +532,17 @@ function normalize(parsed) {
     data.seededReading = true
   }
   // Refresh the reading default's wording (drop the fixed "twenty minutes").
-  data.tasks = data.tasks.map((t) =>
-    t.title === 'Reading' &&
-    t.description === 'Twenty minutes with a book to unwind and pick up something new.'
-      ? { ...t, description: READING_DESC }
-      : t,
-  )
+  if (fixLegacyTitles) {
+    data.tasks = data.tasks.map((t) =>
+      t.title === 'Reading' &&
+      t.description === 'Twenty minutes with a book to unwind and pick up something new.'
+        ? { ...t, description: READING_DESC }
+        : t,
+    )
+  }
+  // Title-based rewrites are done for good — from here on, a task's title is just a
+  // title and the app will never reinterpret it.
+  data.seededLegacyTitleFix = true
   // Journaling is the first thing in the morning. Ensure it exists and sits first.
   if (!data.seededJournalingFirst) {
     if (data.tasks.some((t) => t.title === 'Journaling')) {
@@ -580,12 +619,26 @@ function normalize(parsed) {
 // ships with NO default timetable, so a fresh device starts empty and you fill
 // it in via the "Class" add option.
 function load() {
+  let raw = null
   try {
-    const raw = localStorage.getItem(STORAGE_KEY)
-    if (!raw) return freshData() // brand-new install → curated starter routines
+    raw = localStorage.getItem(STORAGE_KEY)
+  } catch {
+    return freshData() // storage unavailable (private mode) — run in memory
+  }
+  if (!raw) return freshData() // brand-new install → curated starter routines
+  try {
     return normalize(JSON.parse(raw))
   } catch {
-    return emptyData()
+    // The saved data is unreadable (a truncated write, storage eviction). Do NOT
+    // just start empty: the very next save would overwrite the damaged-but-possibly-
+    // recoverable original. Park a copy under its own key first, so it can still be
+    // rescued by hand, then start fresh.
+    try {
+      localStorage.setItem(BACKUP_KEY, raw)
+    } catch {
+      /* nothing more we can do */
+    }
+    return freshData()
   }
 }
 
@@ -614,7 +667,12 @@ export function useSchedule(userId = null) {
   // localStorage stays the offline cache / source of truth on-device, so the app
   // still works with no signal. The cloud is a mirror on top of it.
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(data))
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(data))
+    } catch {
+      // Storage full, or Safari private mode. Losing a save is bad; taking the whole
+      // app down to the error screen mid-edit is worse. Keep running in memory.
+    }
   }, [data])
 
   // ---- Cloud sync ----
@@ -760,6 +818,9 @@ export function useSchedule(userId = null) {
           done: true,
         },
       ],
+      // It's created already done, so it has to earn its XP here. Without this,
+      // toggleEvent would later DEDUCT XP that was never awarded.
+      xp: (prev.xp || 0) + XP.event,
     }))
   }, [])
 

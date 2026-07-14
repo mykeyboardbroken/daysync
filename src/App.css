@@ -1485,9 +1485,23 @@
   font-weight: 600;
   cursor: pointer;
 }
-.skill-btn.weak { background: rgba(239, 68, 68, 0.18); border-color: #ef4444; color: #f87171; }
-.skill-btn.okay { background: rgba(245, 158, 11, 0.18); border-color: #f59e0b; color: #fbbf24; }
-.skill-btn.strong { background: rgba(16, 185, 129, 0.18); border-color: #10b981; color: #34d399; }
+/* Tones come from theme variables — the old hardcoded pastels were tuned for a dark
+   card and turned light-on-light (unreadable) on the bright base. */
+.skill-btn.weak {
+  background: color-mix(in srgb, var(--tone-weak) 16%, transparent);
+  border-color: var(--tone-weak);
+  color: var(--tone-weak);
+}
+.skill-btn.okay {
+  background: color-mix(in srgb, var(--tone-okay) 16%, transparent);
+  border-color: var(--tone-okay);
+  color: var(--tone-okay);
+}
+.skill-btn.strong {
+  background: color-mix(in srgb, var(--tone-strong) 16%, transparent);
+  border-color: var(--tone-strong);
+  color: var(--tone-strong);
+}
 
 /* Edit-mode reorder (drag) */
 .assignment.editing,
@@ -1895,8 +1909,8 @@ p.weather-strip { font-size: 13px; }
 /* Checked-off tasks go visibly darker (not just faded). */
 .assignment.done,
 .habit-row.done {
-  background: color-mix(in srgb, var(--surface-2) 72%, #000);
-  border-color: color-mix(in srgb, var(--border) 65%, #000);
+  background: var(--done-bg);
+  border-color: var(--done-border);
 }
 .habit-row.done .habit-title {
   text-decoration: line-through;
@@ -2088,7 +2102,10 @@ p.weather-strip { font-size: 13px; }
   background: rgba(0, 0, 0, 0.6);
   display: grid;
   place-items: center;
-  padding: 20px;
+  /* Keep tall modals clear of the notch and the home-indicator strip. Without the
+     bottom inset, a long modal's Cancel/Add row lands inside the swipe-up gesture
+     zone and becomes very hard to tap. */
+  padding: calc(20px + env(safe-area-inset-top)) 20px calc(20px + env(safe-area-inset-bottom));
   z-index: 50;
 }
 .modal {
@@ -2098,7 +2115,10 @@ p.weather-strip { font-size: 13px; }
   padding: 24px;
   width: 100%;
   max-width: 460px;
-  max-height: calc(100vh - 40px);
+  /* dvh, not vh: on iOS Safari 100vh is the LARGE viewport (as if the browser bars
+     were hidden), so a 100vh-tall modal runs under the bottom toolbar. The overlay's
+     padding already reserves the safe areas, so 100% of it is the right cap. */
+  max-height: 100%;
   overflow-y: auto;
 }
 .modal h3 { margin: 0 0 4px; font-size: 20px; }

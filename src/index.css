@@ -9,6 +9,16 @@
   --accent-hover: #4f46e5;
   --danger: #ef4444;
   --warn: #f59e0b;
+  --ok: #34d399;
+  /* A completed row goes DARKER on the dark base. These are variables because the
+     bright base has to go the other way — mixing toward black there turned every
+     finished task into a muddy grey block. */
+  --done-bg: color-mix(in srgb, var(--surface-2) 72%, #000);
+  --done-border: color-mix(in srgb, var(--border) 65%, #000);
+  /* Tone colours for the Weak/Okay/Strong picker, tuned for a dark card. */
+  --tone-weak: #f87171;
+  --tone-okay: #fbbf24;
+  --tone-strong: #34d399;
   /* Calendar holiday markers (dark base) */
   --cal-break: rgba(52, 211, 153, 0.15);
   --cal-break-legend: rgba(52, 211, 153, 0.55);
@@ -53,6 +63,17 @@ h1, h2, h3, h4 {
   --text-dim: #64748b;
   --accent: #6366f1;
   --accent-hover: #4f46e5;
+  --danger: #dc2626;
+  --warn: #b45309;
+  --ok: #047857;
+  /* On a light base a finished row settles a little GREYER, not darker — the dark
+     base's mix-toward-black made it a muddy slab here. */
+  --done-bg: color-mix(in srgb, var(--surface-2) 82%, #94a3b8);
+  --done-border: color-mix(in srgb, var(--border) 60%, #94a3b8);
+  /* Deeper tones so Weak/Okay/Strong stay legible on white. */
+  --tone-weak: #dc2626;
+  --tone-okay: #b45309;
+  --tone-strong: #047857;
   /* Calendar holiday markers (bright base) — deeper so they read on white */
   --cal-break: rgba(5, 150, 105, 0.15);
   --cal-break-legend: rgba(5, 150, 105, 0.6);
@@ -80,6 +101,23 @@ body {
   /* The page must never scroll sideways. Anything too wide (a day strip, a table)
      scrolls inside its own container instead of shoving the whole layout across. */
   overflow-x: hidden;
+}
+
+/* The installed iOS app draws under the status bar, and its clock/battery glyphs are
+   WHITE (apple-mobile-web-app-status-bar-style: black-translucent). That's right for
+   the dark base, but on the bright base it's white-on-near-white — you can't see the
+   time. Lay a dark strip behind the status bar in bright mode so the glyphs still read.
+   Zero height when the device reports no top inset, so it costs nothing elsewhere. */
+[data-theme='light'] body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: env(safe-area-inset-top);
+  background: #0f172a;
+  z-index: 100;
+  pointer-events: none;
 }
 
 button {

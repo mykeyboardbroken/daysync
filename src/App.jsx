@@ -70,6 +70,12 @@ export default function App() {
       root.style.removeProperty('--accent')
       root.style.removeProperty('--accent-hover')
     }
+    // Keep the browser/OS chrome colour in step with the theme. It's hardcoded dark in
+    // index.html, which is wrong the moment someone picks the bright base.
+    const bright = schedule.theme === 'custom' && schedule.customColors?.base === 'bright'
+    document
+      .querySelector('meta[name="theme-color"]')
+      ?.setAttribute('content', bright ? '#f6f8fb' : '#0f172a')
   }, [schedule.theme, schedule.customColors])
 
   function closeAdd() {
