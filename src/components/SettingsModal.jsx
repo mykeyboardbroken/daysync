@@ -403,47 +403,9 @@ export default function SettingsModal({
                   this alone and DaySync stays a plain planner.
                 </p>
 
-                <p className="settings-section-head">Workout</p>
-                <p className="settings-field-label">Off by default.</p>
-
-                {/* The whole workout lives behind this one switch. Off, and it does not
-                    exist anywhere in the app — no task, no time picker, nothing. */}
-                <div className="settings-menu">
-                  <button
-                    type="button"
-                    className="toggle-row"
-                    onClick={() =>
-                      onSetProfile('workoutTime', profile.workoutTime ? '' : 'Night')
-                    }
-                  >
-                    <span className="toggle-text">
-                      <span className="toggle-label">Show a workout on my day</span>
-                      <span className="toggle-hint">Adds a daily bodyweight session</span>
-                    </span>
-                    <span className={`toggle ${profile.workoutTime ? 'on' : ''}`}>
-                      <span className="toggle-knob" />
-                    </span>
-                  </button>
-                </div>
-
-                {profile.workoutTime && (
-                  <>
-                    <p className="settings-field-label">When</p>
-                    <div className="type-select repeat-select habit-days">
-                      {['Morning', 'Afternoon', 'Night', 'Anytime'].map((o) => (
-                        <button
-                          type="button"
-                          key={o}
-                          className={`type-option ${profile.workoutTime === o ? 'selected' : ''}`}
-                          onClick={() => onSetProfile('workoutTime', o)}
-                        >
-                          {o}
-                        </button>
-                      ))}
-                    </div>
-                  </>
-                )}
-
+                {/* Sport comes FIRST. It's the half people actually use — you picked your
+                    sports in the survey — whereas the workout is a hidden opt-in. Putting
+                    the buried thing at the top made the used thing hard to find. */}
                 <p className="settings-section-head">Sport training</p>
                 <p className="settings-field-label">
                   Drills for the sports you play, one sport a day. Rate your skills on the
@@ -485,6 +447,47 @@ export default function SettingsModal({
                     </button>
                   ))}
                 </div>
+
+                <p className="settings-section-head">Workout</p>
+                <p className="settings-field-label">Off by default.</p>
+
+                {/* The whole workout lives behind this one switch. Off, and it does not
+                    exist anywhere in the app — no task, no time picker, nothing. */}
+                <div className="settings-menu">
+                  <button
+                    type="button"
+                    className="toggle-row"
+                    onClick={() =>
+                      onSetProfile('workoutTime', profile.workoutTime ? '' : 'Night')
+                    }
+                  >
+                    <span className="toggle-text">
+                      <span className="toggle-label">Show a workout on my day</span>
+                      <span className="toggle-hint">Adds a daily bodyweight session</span>
+                    </span>
+                    <span className={`toggle ${profile.workoutTime ? 'on' : ''}`}>
+                      <span className="toggle-knob" />
+                    </span>
+                  </button>
+                </div>
+
+                {profile.workoutTime && (
+                  <>
+                    <p className="settings-field-label">When</p>
+                    <div className="type-select repeat-select habit-days">
+                      {['Morning', 'Afternoon', 'Night', 'Anytime'].map((o) => (
+                        <button
+                          type="button"
+                          key={o}
+                          className={`type-option ${profile.workoutTime === o ? 'selected' : ''}`}
+                          onClick={() => onSetProfile('workoutTime', o)}
+                        >
+                          {o}
+                        </button>
+                      ))}
+                    </div>
+                  </>
+                )}
               </div>
             )}
 
