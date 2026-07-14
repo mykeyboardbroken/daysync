@@ -68,7 +68,7 @@ function emptyData() {
       reduceMotion: false, // kill the animations
       showWeather: true, // the weather line on Today
       showLevel: true, // the level / XP chip on Today
-      showGreeting: true, // the "Morning, Brian" line
+      showGreeting: true, // the "Morning, <name>" line
     },
   }
 }

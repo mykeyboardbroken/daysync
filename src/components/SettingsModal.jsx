@@ -260,7 +260,13 @@ export default function SettingsModal({
 
                 <p className="settings-section-head">On your Today screen</p>
                 <div className="settings-menu">
-                  {toggleRow('showGreeting', 'Greeting', 'The "Morning, Brian" line at the top', true)}
+                  {/* Use the user's OWN name, not the developer's. */}
+                  {toggleRow(
+                    'showGreeting',
+                    'Greeting',
+                    `The "Morning${profile.name ? `, ${profile.name}` : ''}" line at the top`,
+                    true,
+                  )}
                   {toggleRow('showLevel', 'Level & XP', 'The level chip and your day streak', true)}
                   {toggleRow('showWeather', 'Weather', "Today's forecast under the date", true)}
                                   </div>

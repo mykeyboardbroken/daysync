@@ -29,15 +29,28 @@ export default function CalendarTab({ schedule }) {
     return Array.from({ length: 42 }, (_, i) => addDays(start, i))
   }, [anchor])
 
-  // dateKey -> count of dated items, for the little dots.
-  const countByDay = useMemo(() => {
+  // dateKey -> which KINDS of thing land on that day. Every item used to be an
+  // identical accent dot, so a test looked exactly like a piece of homework — which
+  // makes the dots almost useless for the one thing you scan a calendar for: "when's
+  // my next test?". They're now coloured and ordered by how much they should worry you.
+  const marksByDay = useMemo(() => {
     const m = {}
-    const bump = (k) => { if (k) m[k] = (m[k] || 0) + 1 }
-    for (const a of schedule.assignments) if (!a.done) bump(dueKey(a.due))
-    for (const e of schedule.events) if (!e.done) bump(e.date)
-    for (const t of schedule.tasks) if (!t.done) bump(dueKey(t.due))
+    const add = (k, kind) => {
+      if (!k) return
+      if (!m[k]) m[k] = new Set()
+      m[k].add(kind)
+    }
+    for (const e of schedule.events) if (!e.done) add(e.date, 'test')
+    for (const a of schedule.assignments) {
+      if (a.done) continue
+      add(dueKey(a.due), a.kind === 'homework' ? 'homework' : 'assignment')
+    }
+    for (const t of schedule.tasks) if (!t.done) add(dueKey(t.due), 'task')
     return m
   }, [schedule.assignments, schedule.events, schedule.tasks])
+
+  // Most urgent first, so on a crowded day the test dot is never the one squeezed out.
+  const MARK_ORDER = ['test', 'assignment', 'homework', 'task']
 
   const selDate = keyToDate(selectedKey)
   const selCycle = cycleDay(selDate)
@@ -82,7 +95,7 @@ export default function CalendarTab({ schedule }) {
         {days.map((d) => {
           const key = toKey(d)
           const inMonth = d.getMonth() === anchor.getMonth()
-          const count = countByDay[key] || 0
+          const marks = MARK_ORDER.filter((k) => marksByDay[key]?.has(k))
           const pub = publicHolidayOn(d)
           const brk = schoolBreakOn(d)
           const weekend = d.getDay() === 0 || d.getDay() === 6
@@ -101,10 +114,10 @@ export default function CalendarTab({ schedule }) {
                   way a school break is. It used to also carry a corner dot, which said
                   the same thing a third time. */}
               <span className="cal-num">{d.getDate()}</span>
-              {count > 0 && (
+              {marks.length > 0 && (
                 <span className="cal-dots">
-                  {Array.from({ length: Math.min(count, 3) }).map((_, i) => (
-                    <span key={i} className="cal-dot" />
+                  {marks.map((k) => (
+                    <span key={k} className={`cal-dot dot-${k}`} />
                   ))}
                 </span>
               )}
@@ -113,6 +126,11 @@ export default function CalendarTab({ schedule }) {
         })}
       </div>
 
+      <div className="cal-legend">
+        <span><span className="cal-dot dot-test" /> Test</span>
+        <span><span className="cal-dot dot-assignment" /> Assignment</span>
+        <span><span className="cal-dot dot-homework" /> Homework</span>
+      </div>
       <div className="cal-legend">
         <span><span className="cal-legend-break" /> School holidays</span>
         <span><span className="cal-legend-pub" /> Public holiday</span>

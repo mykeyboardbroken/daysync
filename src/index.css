@@ -101,6 +101,21 @@ body {
   /* The page must never scroll sideways. Anything too wide (a day strip, a table)
      scrolls inside its own container instead of shoving the whole layout across. */
   overflow-x: hidden;
+  /* Kills the 300ms double-tap-to-zoom delay on taps. */
+  touch-action: manipulation;
+  -webkit-text-size-adjust: 100%;
+}
+
+/* iOS zooms the ENTIRE PAGE in whenever you focus an input whose font is under 16px —
+   and it does not zoom back out afterwards. Every input here was 14px, which is why
+   tapping a task title or a search box left the whole app zoomed. 16px on phones stops
+   it at the source; desktop keeps the smaller, tidier size. */
+@media (max-width: 640px) {
+  input,
+  select,
+  textarea {
+    font-size: 16px;
+  }
 }
 
 /* "Reduce motion" in Settings, and the OS-level preference, both kill every

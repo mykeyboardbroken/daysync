@@ -499,9 +499,20 @@
 .cal-day.public .cal-num { color: var(--cal-public); font-weight: 600; }
 .cal-day.selected .cal-num { color: #fff; }
 .cal-weekday.weekend { color: var(--accent); }
-.cal-dots { display: flex; gap: 3px; }
-.cal-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--accent); }
-.cal-day.selected .cal-dot { background: #fff; }
+/* Colour-coded so a TEST doesn't look identical to a piece of homework — the whole
+   reason you scan a calendar is "when's my next test?", and an all-accent dot buried
+   that. Bigger, too: 5px was almost invisible on a phone. */
+.cal-dots { display: flex; gap: 3px; margin-top: 1px; }
+.cal-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+.cal-dot.dot-test { background: var(--danger); }
+.cal-dot.dot-assignment { background: var(--accent); }
+.cal-dot.dot-homework { background: var(--warn); }
+.cal-dot.dot-task { background: var(--text-dim); }
+/* A test is the thing you least want to miss — give it a halo so it pops. */
+.cal-day .cal-dot.dot-test {
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--danger) 28%, transparent);
+}
+.cal-day.selected .cal-dot { background: #fff; box-shadow: none; }
 /* Legend under the grid. Both markers are swatches now, because both are shown on
    the grid the same way — as a tinted cell. */
 .cal-legend { display: flex; gap: 16px; font-size: 12px; color: var(--text-dim); }
