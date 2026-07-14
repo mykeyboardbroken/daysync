@@ -1,7 +1,13 @@
 import { useState, useMemo } from 'react'
 import { toKey, keyToDate, addDays, prettyDate, WEEKDAYS } from '../dateUtils'
 import { prepDay, buildNeeds } from '../schoolDay'
-import { publicHolidayOn, schoolBreakOn, nextSchoolDay } from '../schoolCalendar'
+import {
+  publicHolidayOn,
+  schoolBreakOn,
+  nextSchoolDay,
+  calendarNeedsUpdate,
+  nextCalendarYear,
+} from '../schoolCalendar'
 import WeekStrip from './WeekStrip'
 import Timetable from './Timetable'
 import NeedsSummary from './NeedsSummary'
@@ -45,9 +51,27 @@ export default function ClassesTab({ schedule }) {
   const reason = pub || brk || (weekend ? 'Weekend' : 'No school')
   const nextUp = noSchool ? nextSchoolDay(prepDate) : null
 
+  // Once we're past the last year we have term dates for, the timetable still works
+  // (weekdays are assumed to be school days) but we can't know the holidays — so say so
+  // out loud rather than showing a confidently wrong calendar.
+  const staleCalendar = calendarNeedsUpdate(prepDate)
+
   return (
     <div className="tab-content">
       <WeekStrip selectedKey={dayKey} onSelect={setDayKey} onShiftWeek={shiftWeek} />
+
+      {staleCalendar && (
+        <section className="card warn-card">
+          <div className="warn-head">
+            <Icon name="calendar" size={18} /> {nextCalendarYear()} term dates needed
+          </div>
+          <p className="stale-cal-text">
+            Your timetable still works, but DaySync doesn't know this year's term breaks
+            or holidays yet — so a holiday might show as a normal school day. Ask whoever
+            looks after the app to add them.
+          </p>
+        </section>
+      )}
 
       {noSchool && (
         <section className="card empty-state">

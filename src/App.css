@@ -912,6 +912,8 @@
 }
 .task-cat { display: inline-flex; align-items: center; color: var(--text-dim); flex-shrink: 0; }
 
+.stale-cal-text { font-size: 13px; color: var(--text-dim); line-height: 1.5; margin: 8px 0 0; }
+
 /* Weather-vs-training heads-up card */
 .warn-card { border-color: rgba(245, 158, 11, 0.5); background: rgba(245, 158, 11, 0.1); }
 .warn-head {

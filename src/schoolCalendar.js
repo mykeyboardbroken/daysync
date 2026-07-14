@@ -29,16 +29,59 @@ export const PERIODS = [
 // One known (school day -> cycle number) pin; everything else counts from here.
 const ANCHOR = { key: '2026-07-01', day: 5 }
 
-// The school year runs between these dates (outside = no school). 2026 terms.
-const YEAR_START = '2026-01-28' // first day
-const YEAR_END = '2026-12-05' // last day
-
-// Inclusive no-school date ranges ("YYYY-MM-DD") — the term breaks.
-const HOLIDAYS = [
-  { from: '2026-04-04', to: '2026-04-19', name: 'Term 1 holidays' },
-  { from: '2026-07-04', to: '2026-07-19', name: 'Term 2 holidays' },
-  { from: '2026-09-26', to: '2026-10-11', name: 'Term 3 holidays' },
+// ---------------------------------------------------------------------------
+// SCHOOL YEARS
+//
+// TO ADD A YEAR: copy the 2026 block, change the dates, done. Nothing else needs
+// touching.
+//
+// Why this is a list and not two constants: it used to be a single YEAR_START/
+// YEAR_END pair, which meant that from 6 Dec 2026 onwards EVERY date fell outside
+// the school year — so cycleDay() returned null forever, the timetable vanished,
+// and the app quietly read "No school" for the rest of time. It wouldn't have
+// crashed; it would just have become useless without telling anyone.
+//
+// Now: an unconfigured year degrades to "weekdays are school days" (so your
+// timetable still works) and the app SAYS so, rather than silently dying. See
+// `calendarNeedsUpdate()`.
+// ---------------------------------------------------------------------------
+const SCHOOL_YEARS = [
+  {
+    year: 2026,
+    start: '2026-01-28',
+    end: '2026-12-05',
+    // Inclusive no-school date ranges — the term breaks.
+    holidays: [
+      { from: '2026-04-04', to: '2026-04-19', name: 'Term 1 holidays' },
+      { from: '2026-07-04', to: '2026-07-19', name: 'Term 2 holidays' },
+      { from: '2026-09-26', to: '2026-10-11', name: 'Term 3 holidays' },
+    ],
+  },
+  // 2027: add it here as soon as the school publishes its term dates.
+  // {
+  //   year: 2027,
+  //   start: '2027-01-27',
+  //   end: '2027-12-04',
+  //   holidays: [
+  //     { from: '...', to: '...', name: 'Term 1 holidays' },
+  //   ],
+  // },
 ]
+
+const yearFor = (key) => SCHOOL_YEARS.find((y) => key >= y.start && key <= y.end) || null
+
+// The last year we actually have dates for.
+const LAST_CONFIGURED_YEAR = Math.max(...SCHOOL_YEARS.map((y) => y.year))
+
+// True once we're past every year we know about — i.e. the term dates need updating.
+// The app surfaces this rather than pretending school has ended forever.
+export function calendarNeedsUpdate(date = new Date()) {
+  return date.getFullYear() > LAST_CONFIGURED_YEAR
+}
+
+export function nextCalendarYear() {
+  return LAST_CONFIGURED_YEAR + 1
+}
 
 // NZ / Auckland public holidays for 2026 (observed dates included).
 const PUBLIC_HOLIDAYS = {
@@ -67,9 +110,16 @@ export function publicHolidayOn(date) {
 // holidays"); otherwise null. Regular weekends are not counted as a break.
 export function schoolBreakOn(date) {
   const key = toKey(date)
-  if (key < YEAR_START || key > YEAR_END) return 'Summer holidays'
-  const h = HOLIDAYS.find((x) => key >= x.from && key <= x.to)
-  return h ? h.name : null
+  const y = yearFor(key)
+  if (y) {
+    const h = y.holidays.find((x) => key >= x.from && key <= x.to)
+    return h ? h.name : null
+  }
+  // Outside every configured year. If we're PAST the last one, the term dates simply
+  // haven't been added yet — don't claim it's the summer holidays, because we have no
+  // idea. If we're before/between known years, it genuinely is the summer break.
+  if (calendarNeedsUpdate(date)) return null
+  return 'Summer holidays'
 }
 
 // A school day is a weekday inside the school year and not inside a holiday.
@@ -77,8 +127,12 @@ export function isSchoolDay(date) {
   const dow = date.getDay()
   if (dow === 0 || dow === 6) return false // weekend
   const key = toKey(date)
-  if (key < YEAR_START || key > YEAR_END) return false // before/after the year
-  return !HOLIDAYS.some((h) => key >= h.from && key <= h.to)
+  const y = yearFor(key)
+  if (y) return !y.holidays.some((h) => key >= h.from && key <= h.to)
+  // Past the last year we have dates for: fall back to "weekdays are school days" so
+  // the timetable and packing list keep working. Better a timetable that shows on a
+  // holiday (and says so) than an app that reads "No school" forever.
+  return calendarNeedsUpdate(date)
 }
 
 // Whether a period's class is shared across every cycle day (e.g. Tutor room).
