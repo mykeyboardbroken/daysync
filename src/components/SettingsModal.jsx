@@ -1,6 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
 import Icon from './Icon'
-import GoalsView from './GoalsView'
 
 // Slide the hue, keep saturation/lightness fixed → always a pleasant accent.
 function hslToHex(h, s, l) {
@@ -49,7 +48,6 @@ const PALETTE = [
 const SECTIONS = [
   { key: 'appearance', label: 'Appearance', icon: 'palette' },
   { key: 'profile', label: 'Profile', icon: 'user' },
-  { key: 'goals', label: 'Goals', icon: 'trendingUp' },
   { key: 'exercise', label: 'Exercise', icon: 'activity' },
   { key: 'backup', label: 'Backup', icon: 'file' },
   { key: 'about', label: 'About', icon: 'star' },
@@ -265,8 +263,7 @@ export default function SettingsModal({
                   {toggleRow('showGreeting', 'Greeting', 'The "Morning, Brian" line at the top', true)}
                   {toggleRow('showLevel', 'Level & XP', 'The level chip and your day streak', true)}
                   {toggleRow('showWeather', 'Weather', "Today's forecast under the date", true)}
-                  {toggleRow('showGoals', 'Your goals', 'The "what you\'re working on" card', true)}
-                </div>
+                                  </div>
               </div>
             )}
 
@@ -396,10 +393,6 @@ export default function SettingsModal({
 
               </div>
             )}
-
-            {/* The full Goals experience, not a cut-down settings version. It's the same
-                component that will become the Goals tab. */}
-            {section === 'goals' && <GoalsView schedule={schedule} />}
 
             {/* Exercise: workout AND sport training in one place. Both are opt-in —
                 nothing appears on your day until a time is picked below. */}

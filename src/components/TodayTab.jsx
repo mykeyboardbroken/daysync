@@ -5,7 +5,6 @@ import { bannerLine } from '../greeting'
 import { dueAlerts, repeatLabel } from '../alerts'
 import { useWeather } from '../useWeather'
 import { trainingWarnings } from '../trainingAlert'
-import { HORIZONS, goalProgress } from '../goals'
 import Icon from './Icon'
 import DayPlan from './DayPlan'
 import WeatherStrip from './WeatherStrip'
@@ -21,9 +20,6 @@ export default function TodayTab({ schedule }) {
   const banner = bannerLine(date, schedule.profile?.name)
   // What the user has chosen to see on Today (default: everything).
   const prefs = schedule.settings || {}
-
-  const myGoals = schedule.profile?.myGoals || {}
-  const hasMyGoals = HORIZONS.some((h) => (myGoals[h.key] || []).length > 0)
 
   // Re-check due reminders every 20s while the tab is open.
   const [, setTick] = useState(0)
@@ -119,40 +115,6 @@ export default function TodayTab({ schedule }) {
               </li>
             ))}
           </ul>
-        </section>
-      )}
-
-      {/* What they're aiming at, in their own words. A goal you write once and never
-          see again is just a wish, so it lives on the screen they open every day. */}
-      {hasMyGoals && prefs.showGoals !== false && (
-        <section className="card mygoals-card">
-          <div className="card-header">
-            <div><h2>What you're working on</h2></div>
-          </div>
-          {HORIZONS.map(({ key, label }) => {
-            const list = myGoals[key] || []
-            if (!list.length) return null
-            return (
-              <div className="mygoals-block" key={key}>
-                <p className="mygoals-label">{label}</p>
-                {list.map((g) => {
-                  const p = goalProgress(g)
-                  return (
-                    <div className="mygoals-row" key={g.id}>
-                      <span className={`mygoals-text ${p.complete ? 'complete' : ''}`}>
-                        {g.text}
-                      </span>
-                      {p.total > 0 && (
-                        <span className="mygoals-bar">
-                          <span className="mygoals-bar-fill" style={{ width: `${p.percent}%` }} />
-                        </span>
-                      )}
-                    </div>
-                  )
-                })}
-              </div>
-            )
-          })}
         </section>
       )}
 

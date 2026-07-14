@@ -1,4 +1,3 @@
-import { HORIZONS } from './goals'
 // The first-open onboarding survey. Add / edit questions here — the modal renders
 // them in order and stores answers by `id` into the user's profile.
 //
@@ -42,15 +41,6 @@ export const SURVEY_QUESTIONS = [
   // onboarding in a way a gym question never would. One question, skippable, and it
   // powers the drills. Training time defaults to the afternoon (see finishSurvey),
   // because that's when school sport actually happens.
-  // What they're actually aiming at, in their own words. Three horizons, because a
-  // goal with no timeframe is a wish. All optional — the Next button never blocks.
-  {
-    id: 'myGoals',
-    type: 'goals',
-    question: 'What are you working on?',
-    hint: "Anything — confidence, grades, fitness, friends, a habit you want to break. As many or as few as you like, and you can change them any time.",
-    horizons: HORIZONS,
-  },
   {
     id: 'sports',
     type: 'multi',
