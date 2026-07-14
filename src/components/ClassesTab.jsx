@@ -1,9 +1,11 @@
 import { useState, useMemo } from 'react'
 import { toKey, keyToDate, addDays, prettyDate, WEEKDAYS } from '../dateUtils'
 import { prepDay, buildNeeds } from '../schoolDay'
+import { publicHolidayOn, schoolBreakOn, nextSchoolDay } from '../schoolCalendar'
 import WeekStrip from './WeekStrip'
 import Timetable from './Timetable'
 import NeedsSummary from './NeedsSummary'
+import Icon from './Icon'
 
 // The School tab's "Classes" view: browse the timetable by day and see the
 // packing list for it. After the last bell today it rolls forward to the next
@@ -33,9 +35,34 @@ export default function ClassesTab({ schedule }) {
     setDayKey(toKey(addDays(keyToDate(dayKey), delta * 7)))
   }
 
+  // No cycle day means no school — a weekend, a public holiday, or the term break.
+  // The timetable and packing list both hide themselves, which used to leave the
+  // page completely blank. Say what's going on instead.
+  const noSchool = !prepCycle
+  const pub = publicHolidayOn(prepDate)
+  const brk = schoolBreakOn(prepDate)
+  const weekend = prepDate.getDay() === 0 || prepDate.getDay() === 6
+  const reason = pub || brk || (weekend ? 'Weekend' : 'No school')
+  const nextUp = noSchool ? nextSchoolDay(prepDate) : null
+
   return (
     <div className="tab-content">
       <WeekStrip selectedKey={dayKey} onSelect={setDayKey} onShiftWeek={shiftWeek} />
+
+      {noSchool && (
+        <section className="card empty-state">
+          <span className="empty-state-icon" aria-hidden="true">
+            <Icon name="sun" size={26} />
+          </span>
+          <h2 className="empty-state-title">No school {prepIsToday ? 'today' : 'that day'}</h2>
+          <p className="empty-state-sub">{reason}. Enjoy it.</p>
+          {nextUp && (
+            <p className="empty-state-next">
+              Back on {WEEKDAYS[nextUp.getDay()]} · {prettyDate(nextUp)}
+            </p>
+          )}
+        </section>
+      )}
 
       {prepCycle && (
         <NeedsSummary
