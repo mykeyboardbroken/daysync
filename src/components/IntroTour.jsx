@@ -32,6 +32,10 @@ const INSTALL = {
   body: 'Tap the Share button in Safari, then “Add to Home Screen”. This keeps your data safe — iPhones clear saved data for websites you haven’t opened in a while, and installed apps are exempt.',
 }
 
+// Must outlast the .intro-screen.leaving animation, or the screen would pop away
+// mid-dissolve.
+const EXIT_MS = 460
+
 export default function IntroTour({ onDone }) {
   // Only worth asking to install if they're in a browser tab, not already installed.
   const installed =
@@ -40,13 +44,23 @@ export default function IntroTour({ onDone }) {
   const cards = installed || !isIOS ? CARDS : [...CARDS, INSTALL]
 
   const [i, setI] = useState(0)
+  const [leaving, setLeaving] = useState(false)
   const last = i >= cards.length - 1
   const card = cards[i]
 
+  // Dissolve out, then hand over — the app eases in underneath at the same moment
+  // (see .app-reveal), so it reads as one handoff rather than an overlay blinking off.
+  // Guarded so a double-tap can't fire onDone twice.
+  function finish() {
+    if (leaving) return
+    setLeaving(true)
+    setTimeout(onDone, EXIT_MS)
+  }
+
   return (
-    <div className="intro-screen">
+    <div className={`intro-screen ${leaving ? 'leaving' : ''}`}>
       <div className="intro-inner">
-        <button type="button" className="intro-skip-top" onClick={onDone}>
+        <button type="button" className="intro-skip-top" onClick={finish}>
           Skip
         </button>
 
@@ -67,7 +81,7 @@ export default function IntroTour({ onDone }) {
         <button
           type="button"
           className="primary-btn intro-next"
-          onClick={() => (last ? onDone() : setI(i + 1))}
+          onClick={() => (last ? finish() : setI(i + 1))}
         >
           {last ? 'Start using DaySync' : 'Next'}
         </button>

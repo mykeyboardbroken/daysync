@@ -1348,12 +1348,34 @@
   padding: 6px 2px;
   cursor: pointer;
 }
+/* Dissolving out of the intro and into the app. Mirrors the survey's handoff: the
+   overlay fades and scales up, and .app-reveal eases the app in underneath at the
+   same moment, so it reads as one movement rather than a screen blinking off. */
+.intro-screen.leaving {
+  animation: survey-exit 460ms cubic-bezier(0.4, 0, 1, 1) forwards;
+  pointer-events: none;
+}
+/* Each card slides in from the right as you advance — the motion tells you you're
+   moving forward through them, which a plain fade doesn't. */
 .intro-body {
   flex: 1;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  animation: survey-step 0.32s ease both;
+  animation: intro-card 0.42s cubic-bezier(0.32, 0.72, 0, 1) both;
+}
+@keyframes intro-card {
+  from { opacity: 0; transform: translateX(26px); }
+  to { opacity: 1; transform: none; }
+}
+/* The icon lands with a little weight rather than sliding flatly with the text. */
+.intro-icon { animation: intro-pop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+@keyframes intro-pop {
+  from { opacity: 0; transform: scale(0.6); }
+  to { opacity: 1; transform: scale(1); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .intro-screen.leaving, .intro-body, .intro-icon { animation: none; }
 }
 .intro-icon {
   width: 62px;

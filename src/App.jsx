@@ -43,19 +43,20 @@ export default function App() {
   // null = closed; otherwise the add flow: 'menu' | 'assignment' | 'date' | …
   const [adding, setAdding] = useState(null)
 
-  // The moment the survey completes, ease the app in behind it rather than having
-  // it snap into place as the overlay unmounts.
-  const wasOnboarded = useRef(schedule.onboarded)
+  // Ease the app in the moment the INTRO finishes — that's the last thing covering it.
+  // (This used to key off the survey, but the intro then sat on top of the app while
+  // its reveal animation played underneath, so nobody ever saw it.)
+  const wasIntroDone = useRef(schedule.introDone)
   const [justOnboarded, setJustOnboarded] = useState(false)
   useEffect(() => {
-    if (!wasOnboarded.current && schedule.onboarded) {
+    if (!wasIntroDone.current && schedule.introDone) {
       setJustOnboarded(true)
       const t = setTimeout(() => setJustOnboarded(false), 900)
-      wasOnboarded.current = true
+      wasIntroDone.current = true
       return () => clearTimeout(t)
     }
-    wasOnboarded.current = schedule.onboarded
-  }, [schedule.onboarded])
+    wasIntroDone.current = schedule.introDone
+  }, [schedule.introDone])
 
   // Apply the chosen colour theme to the whole document. A "custom" theme layers
   // the user's own primary/secondary on top via inline CSS variables.
