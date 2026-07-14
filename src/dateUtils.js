@@ -51,12 +51,21 @@ export function weekDays(date) {
 }
 
 // "14:30" -> "2:30 PM"
+// Whether clock times render as 24-hour. Set once from settings (see App.jsx) rather
+// than threaded through every component that shows a time.
+let use24Hour = false
+export function setClock24(on) {
+  use24Hour = !!on
+}
+
 export function formatTime(time) {
   if (!time) return ''
   const [h, m] = time.split(':').map(Number)
+  const mm = String(m).padStart(2, '0')
+  if (use24Hour) return `${String(h).padStart(2, '0')}:${mm}`
   const period = h >= 12 ? 'PM' : 'AM'
   const hour12 = h % 12 === 0 ? 12 : h % 12
-  return `${hour12}:${String(m).padStart(2, '0')} ${period}`
+  return `${hour12}:${mm} ${period}`
 }
 
 // "Monday, July 1"

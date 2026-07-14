@@ -61,7 +61,14 @@ function emptyData() {
     // hover/pressed shade is derived from it), base = 'dark' | 'bright' (which
     // background palette to sit it on).
     customColors: { primary: '#6366f1', base: 'dark' },
-    settings: { showStreaks: false, weightUnit: 'kg' }, // general prefs
+    settings: {
+      showStreaks: false,
+      clock24: false, // 24-hour times instead of AM/PM
+      reduceMotion: false, // kill the animations
+      showWeather: true, // the weather line on Today
+      showLevel: true, // the level / XP chip on Today
+      showGreeting: true, // the "Morning, Brian" line
+    },
   }
 }
 

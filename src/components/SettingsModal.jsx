@@ -44,12 +44,16 @@ const PALETTE = [
 // Top-level settings categories. Add more here; each opens its own panel.
 const SECTIONS = [
   { key: 'appearance', label: 'Appearance', icon: 'palette' },
+  { key: 'today', label: 'Today screen', icon: 'sun' },
   { key: 'tasks', label: 'Tasks', icon: 'check' },
   { key: 'profile', label: 'Profile', icon: 'user' },
   { key: 'exercise', label: 'Exercise', icon: 'activity' },
   { key: 'feedback', label: 'Feedback', icon: 'mail' },
   { key: 'backup', label: 'Backup', icon: 'file' },
+  { key: 'about', label: 'About', icon: 'star' },
 ]
+
+export const APP_VERSION = '1.0'
 
 // Where feedback emails go (the app maker).
 const FEEDBACK_EMAIL = 'briankimnz@gmail.com'
@@ -87,6 +91,24 @@ export default function SettingsModal({
   const toggleProfileArr = (key, opt) => {
     const cur = profile[key] || []
     onSetProfile(key, cur.includes(opt) ? cur.filter((x) => x !== opt) : [...cur, opt])
+  }
+
+  // One switch row. `fallback` is what the setting means when it's never been set —
+  // the show/hide options default to ON, so an existing user doesn't suddenly lose
+  // their weather or greeting when this ships.
+  const toggleRow = (key, label, hint, fallback = false) => {
+    const on = settings?.[key] ?? fallback
+    return (
+      <button type="button" className="toggle-row" onClick={() => onSetSetting(key, !on)}>
+        <span className="toggle-text">
+          <span className="toggle-label">{label}</span>
+          <span className="toggle-hint">{hint}</span>
+        </span>
+        <span className={`toggle ${on ? 'on' : ''}`}>
+          <span className="toggle-knob" />
+        </span>
+      </button>
+    )
   }
   const [section, setSection] = useState(null)
   const [backupMsg, setBackupMsg] = useState('')
@@ -224,6 +246,16 @@ export default function SettingsModal({
                     aria-label="Accent hue"
                   />
                 </div>
+
+                <p className="settings-section-head">Display</p>
+                <div className="settings-menu">
+                  {toggleRow('clock24', '24-hour time', 'Show 14:30 instead of 2:30 PM')}
+                  {toggleRow(
+                    'reduceMotion',
+                    'Reduce motion',
+                    'Turn off the sliding and fading animations',
+                  )}
+                </div>
               </div>
             )}
 
@@ -241,6 +273,56 @@ export default function SettingsModal({
                   <span className="toggle-knob" />
                 </span>
               </button>
+            )}
+
+            {section === 'today' && (
+              <div className="settings-menu">
+                {toggleRow(
+                  'showGreeting',
+                  'Greeting',
+                  'The "Morning, Brian" line at the top',
+                  true,
+                )}
+                {toggleRow(
+                  'showLevel',
+                  'Level & XP',
+                  'The level chip and your day streak',
+                  true,
+                )}
+                {toggleRow(
+                  'showWeather',
+                  'Weather',
+                  "Today's forecast under the date",
+                  true,
+                )}
+              </div>
+            )}
+
+            {section === 'about' && (
+              <div className="color-pickers">
+                <div className="about-mark" aria-hidden="true">
+                  <Icon name="checkmark" size={26} />
+                </div>
+                <h3 className="about-name">DaySync</h3>
+                <p className="about-version">Version {APP_VERSION}</p>
+                <p className="settings-field-label about-blurb">
+                  Your school day and your life in one place — timetable, homework, grades,
+                  routines, reminders and a focus timer.
+                </p>
+                <p className="settings-field-label">
+                  Everything lives on your own device. No tracking, no ads, and nothing is
+                  sent anywhere unless you export it yourself.
+                </p>
+                <button
+                  type="button"
+                  className="settings-row"
+                  onClick={() => setSection('feedback')}
+                >
+                  <span className="settings-row-icon"><Icon name="mail" size={17} /></span>
+                  <span className="settings-row-label">Send feedback</span>
+                  <Icon name="chevronRight" size={18} className="settings-chevron" />
+                </button>
+              </div>
             )}
 
             {section === 'profile' && (

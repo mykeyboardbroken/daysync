@@ -103,6 +103,18 @@ body {
   overflow-x: hidden;
 }
 
+/* "Reduce motion" in Settings, and the OS-level preference, both kill every
+   transition and animation app-wide. !important because individual rules set their
+   own transitions and would otherwise win. */
+[data-reduce-motion] *,
+[data-reduce-motion] *::before,
+[data-reduce-motion] *::after {
+  animation-duration: 0.001ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.001ms !important;
+  scroll-behavior: auto !important;
+}
+
 /* The installed iOS app draws under the status bar, and its clock/battery glyphs are
    WHITE (apple-mobile-web-app-status-bar-style: black-translucent). That's right for
    the dark base, but on the bright base it's white-on-near-white — you can't see the

@@ -162,6 +162,21 @@
 }
 .auth-signout { align-self: flex-start; margin-bottom: 8px; }
 
+/* About panel */
+.about-mark {
+  width: 54px;
+  height: 54px;
+  border-radius: 15px;
+  display: grid;
+  place-items: center;
+  color: #fff;
+  background: var(--accent);
+  margin: 6px 0 16px;
+}
+.about-name { font-size: 20px; margin: 0 0 2px; }
+.about-version { color: var(--text-dim); font-size: 13px; margin: 0 0 18px; }
+.about-blurb { margin-bottom: 14px; }
+
 /* Destructive row (Reset everything) — reads as dangerous without a boxed look. */
 .settings-row-danger { color: var(--danger); }
 .settings-row-danger .settings-row-icon {

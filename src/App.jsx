@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
+import { setClock24 } from './dateUtils'
 import { useSchedule } from './useSchedule'
 import { useAuth } from './useAuth'
 import AuthScreen from './components/AuthScreen'
@@ -77,6 +78,16 @@ export default function App() {
       .querySelector('meta[name="theme-color"]')
       ?.setAttribute('content', bright ? '#f6f8fb' : '#0f172a')
   }, [schedule.theme, schedule.customColors])
+
+  // Display preferences that apply app-wide.
+  const { clock24, reduceMotion } = schedule.settings || {}
+  // Applied during render, not in an effect: an effect runs AFTER the render that
+  // already formatted the times, so the clock would lag a render behind the toggle.
+  // It's idempotent, so re-running it on every render is harmless.
+  setClock24(clock24)
+  useEffect(() => {
+    document.documentElement.toggleAttribute('data-reduce-motion', !!reduceMotion)
+  }, [reduceMotion])
 
   function closeAdd() {
     setAdding(null)

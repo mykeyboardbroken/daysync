@@ -18,6 +18,8 @@ export default function TodayTab({ schedule }) {
   const date = new Date()
   const cycle = cycleDay(date)
   const banner = bannerLine(date, schedule.profile?.name)
+  // What the user has chosen to see on Today (default: everything).
+  const prefs = schedule.settings || {}
 
   // Re-check due reminders every 20s while the tab is open.
   const [, setTick] = useState(0)
@@ -69,10 +71,16 @@ export default function TodayTab({ schedule }) {
         </div>
       )}
 
-      <div className="today-top-row">
-        <h1 className="greeting-main">{banner}</h1>
-        <LevelBar xp={schedule.xp} loginStreak={schedule.loginStreak} />
-      </div>
+      {(prefs.showGreeting !== false || prefs.showLevel !== false) && (
+        <div className="today-top-row">
+          {prefs.showGreeting !== false && <h1 className="greeting-main">{banner}</h1>}
+          {prefs.showLevel === false ? (
+            <span className="spacer" />
+          ) : (
+            <LevelBar xp={schedule.xp} loginStreak={schedule.loginStreak} />
+          )}
+        </div>
+      )}
 
       <header className="today-header">
         <div className="th-left">
@@ -89,11 +97,13 @@ export default function TodayTab({ schedule }) {
         )}
       </header>
 
-      <WeatherStrip
-        entry={byDate?.[toKey(weatherDate)]}
-        status={weatherStatus}
-        note={showTomorrowWeather ? 'Tomorrow' : null}
-      />
+      {prefs.showWeather !== false && (
+        <WeatherStrip
+          entry={byDate?.[toKey(weatherDate)]}
+          status={weatherStatus}
+          note={showTomorrowWeather ? 'Tomorrow' : null}
+        />
+      )}
 
       {warnings.length > 0 && (
         <section className="card warn-card">
