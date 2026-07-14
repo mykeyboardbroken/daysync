@@ -1,149 +1,220 @@
-# DaySync — Handoff
+# DaySync — handoff
 
-A personal **school + life planner** for a college student. React + Vite, runs
-entirely in the browser, **all data in `localStorage`** (key `schedule-app.data`).
-**No backend, no accounts, no network** except a free weather API (Open-Meteo).
+A school + life planner for students. React 19 + Vite 7, deployed on Vercel as an
+installable PWA. Built by Brian Kim (13, first year of college) for his own year group.
+
+**Repo:** `mykeyboardbroken/daysync` → Vercel auto-deploys on push to `main`.
+**Status:** feature-complete v1, pre-launch. No users yet.
 
 ---
 
-## Run / build
+## 1. What it is (and what it deliberately isn't)
 
-```bash
-npm install
-npm run dev      # local dev server
-npm run build    # production build → dist/
+DaySync is a **school planner**. Its one real moat is that it understands a *school day*:
+the rotating 6-day cycle timetable, term breaks, public holidays, what to pack for
+tomorrow's classes. Notion and Todoist can't do that.
+
+Everything else (routines, focus timer, workouts) is supporting cast. **When in doubt,
+invest in the school features and leave the rest alone.**
+
+### Design rules we converged on the hard way
+
+All of these were learned by getting them wrong first. Don't quietly undo them:
+
+1. **No pressure, no assumptions.** The app never infers anything about a user from
+   their gender or body. It doesn't ask for weight/height. Training is opt-in and
+   invisible until switched on. (An earlier version inferred workout emphasis from
+   gender and prescribed barbell lifts to 13-year-olds. Both removed.)
+2. **Every optional feature is OFF by default** and hidden until enabled.
+3. **Onboarding is short.** Four questions. A signup wall or a 20-question survey is how
+   you lose half the people who tap your link.
+4. **No AI, no server, no bills.** Everything — workouts, sport drills, timetable OCR —
+   runs on-device. This is a feature, not a limitation: free forever, works offline, and
+   every suggestion was chosen by a human who can be held to it.
+5. **Delete features.** Goals, the daily challenge, and the equipment picker were each
+   built and then cut. That was the right call every time.
+
+---
+
+## 2. Architecture
+
+- **State:** one hook, `src/useSchedule.js`. Everything lives under a single
+  `localStorage` key (`schedule-app.data`), so one save keeps it all consistent.
+- **`normalize(parsed)`** runs every migration on load AND on backup import. It is the
+  only place the data shape is fixed.
+- **`freshData()`** is what a brand-new install gets (9 starter routines). It does NOT
+  run `normalize()` — it pre-sets every `seeded*` flag so migrations skip it.
+- **`load()`**: no data → `freshData()`; unreadable data → parks the corrupt blob under
+  `schedule-app.data.corrupt` and starts fresh. Never overwrite a damaged original.
+
+### Key files
+
+| File | What |
+|---|---|
+| `useSchedule.js` | The store. All state, actions, migrations. ~1400 lines. |
+| `schoolCalendar.js` | **Hardcoded to Brian's school** — cycle days, period times, term dates, holidays. |
+| `timetableOcr.js` | Screenshot → timetable grid (tesseract.js, on-device). |
+| `workouts.js` | Bodyweight workout rotation + per-sport skill drills. No AI. |
+| `survey.js` | Onboarding questions. |
+| `alerts.js` | Reminder due-time logic (DST-safe). |
+| `gamify.js` | XP → level tiers. |
+| `supabase.js` / `useAuth.js` | Optional cloud sync. Dormant unless env keys are set. |
+
+---
+
+## 3. Features
+
+**Tabs:** Today · Academics · Calendar · Focus · Settings
+
+- **Today** — reminder banners, greeting, level/XP chip, date + cycle day, weather, and
+  the day plan split into **Morning / Afternoon / Night sub-tabs**. It auto-selects the
+  part of the day you're actually in, and each tab carries a count of what's still left
+  so nothing hides behind a tab. Tasks expand on tap; drag-reorder by the grip in edit
+  mode (pointer events — HTML5 drag-and-drop does not work on touch).
+- **Academics** — Classes (cycle-day timetable + auto packing list + screenshot import),
+  Work (homework/assignments), Grades (PDF report import), Coming up. Shows a proper
+  "No school" empty state on weekends/holidays.
+- **Calendar** — month grid. Dots are **colour-coded**: 🔴 test · 🟣 assignment ·
+  🟠 homework · ⚪ task. School and public holidays are shaded.
+- **Focus** — Pomodoro; goes full-screen black while running. Distraction list.
+- **Settings** — Appearance · Profile · Exercise · Backup · About.
+
+**Training (opt-in):**
+- **Sport training** — 12 sports (incl. netball, volleyball, dance, hockey). One sport a
+  day, rotating. Rate each skill Weak / Okay / Strong on the task itself and the drills
+  lean toward your weak areas. Sits in a time slot you choose.
+- **Workout** — behind a single switch in Settings, **off by default**. Bodyweight only.
+  Rotation: Push → Pull → Legs → **Rest** → Cardio → Core → **Rest**.
+
+**Onboarding:** survey (name → gender → age → sports) → outro animation → **IntroTour**
+(3 cards explaining the app, + a sport-drills card with an inline on/off switch, + an
+**Add to Home Screen** card on iOS) → app.
+
+---
+
+## 4. Cloud sync / accounts — READ THIS
+
+**Configured, but needs a Vercel redeploy to actually go live.**
+
+- Supabase project: `https://uxguwihkskflpjlyqgcd.supabase.co`
+- `user_data` table + RLS policies created (`supabase-setup.sql`). Verified working — an
+  unauthenticated read returns `[]`, not other people's data.
+- Keys are in `.env.local`, which is **gitignored — never commit it**.
+
+**PENDING:** add these two in **Vercel → Settings → Environment Variables**, then
+**redeploy**. Vite bakes env vars in at *build* time, so adding them without a rebuild
+does nothing at all.
+
+```
+VITE_SUPABASE_URL=https://uxguwihkskflpjlyqgcd.supabase.co
+VITE_SUPABASE_ANON_KEY=sb_publishable_Xl-xEgSbPRWZbZb94IWuyA_AYKog4so
 ```
 
-- Node/npm on this machine need a PATH refresh in a fresh shell:
-  `$env:Path = [Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [Environment]::GetEnvironmentVariable("Path","User")`
-- **Git is installed** (2.55, via winget) at `C:\Program Files\Git\cmd\git.exe`
-  (not on PATH in fresh shells — call it by full path). Repo is committed locally;
-  **there is NO remote** (see "Backing up" below).
+**Sign-in is OPT-IN, never a wall.** The app opens straight into the day, local-only.
+Signing in is a row in Settings → Backup. With no env vars the whole feature is
+invisible — no dead UI promising something that can't happen.
+
+**Sync rules — both original bugs are fixed; don't regress them:**
+- Every local save is timestamped (`schedule-app.updatedAt`). On sign-in the **newer side
+  wins**: cloud newer → adopt it; local newer → keep it and push up.
+- A **failed pull never pushes.** Writing over a cloud copy you've never read is exactly
+  how you lose data. It retries on the `online` event.
+- The login-streak effect depends on `[synced]`, **not `[]`**. With `[]`, the cloud pull
+  replaced the whole data object and silently discarded the streak bump — every launch,
+  forever.
+
+**Still to decide in Supabase:** Authentication → Email → "Confirm email" is probably
+still ON. Recommend turning it OFF (it's friction, and school mail filters eat the
+confirmation emails).
 
 ---
 
-## The tabs (bottom nav)
+## 5. Known issues / gotchas
 
-**Today · Academics · Calendar · Focus · Settings**
-
-### Today
-- **Greeting banner** — one line: "Good morning/afternoon/night, {name}" by hour
-  (5–12 / 12–17 / 21–5); the in-between evening shows a rotating cheer-up quote.
-  (`greeting.js`)
-- **Weather** — boxless one-liner. After **8pm** shows tomorrow's. Location hardcoded
-  Auckland (`useWeather.js`).
-- **Level/XP card** — tap to open a details modal (progress ring, streak, tier ladder).
-- **Training weather heads-up** — amber card if a training today (co-curricular task or
-  training-like title) overlaps the day's likely-rain window; looks ahead to tomorrow
-  after 8pm. (`trainingAlert.js`)
-- **Today's plan** — un-boxed sections Morning / Afternoon / Night (+ Anytime on top when
-  used). Tasks + generated workouts drop into their buckets.
-  - Tap a task → expands to show **steps + Edit**. Checkbox = done; done rows go darker.
-    Category icon per row. Description clamps to one line (expands when open); fallback
-    "Routine for {category}".
-  - **Edit button** (top-right of the plan): grip handle to **drag-reorder** (HTML5 drag —
-    desktop mouse solid, touch unreliable), a remove ✕, and a "+ Add a default task"
-    picker (re-add built-in defaults; added ones show a check).
-- **Notes** (when any).
-
-### Academics (`SchoolTab.jsx`)
-- **Coming up** at top (assignments due ≤48h + upcoming tests/dates; homework counts as
-  an assignment). Sub-tabs: **Classes · Work · Grades**.
-  - **Classes** — WeekStrip day browser + Pack-for list + timetable (6-day cycle, rolls
-    forward after last bell). Timetable OCR import is fragile, tuned to Rangitoto.
-  - **Work** — filters All / **Homework** / Assignments / Tests / Done. Homework = an
-    assignment with `kind: 'homework'`.
-  - **Grades** — report cards from a PDF (`pdfImport.js`, fragile) + hand-added results.
-
-### Calendar (`CalendarTab.jsx`)
-- Month grid, dots per dated item. **Weekends** tinted + accent numbers. **School
-  holidays** (term breaks / summer) green tint; **NZ/Auckland public holidays (2026)** a
-  red dot + red cell that overrides the break tint. Tap a day → detail + add Date/Task.
-
-### Focus (`FocusTab.jsx`)
-- Pomodoro timer. Presets **30 min / 1 hr / 2 hr** (default 30) + custom slider up to
-  **3 hours**. Start → **full-screen black + time only**; tap reveals an auto-hiding ✕
-  (top-left) to pause/exit.
-- **"Stay away from" list** (accountability, editable). **Leave detection** (Page
-  Visibility) counts tab-switches mid-session. Finishing awards **1 XP/min** and logs
-  total focused minutes.
-- **Cannot block apps** — a web app has no such power. Real blocking = OS Screen Time
-  (iOS Family Controls), which is **native-app-only + needs Apple's entitlement**.
-
-### Settings (full tab, `SettingsModal.jsx`)
-Borderless divider list with accent icon tiles. Panels:
-- **Appearance** — Dark/Bright base + accent (12 swatches + hue slider). Only a "custom"
-  theme now (presets removed; old presets migrate to custom).
-- **Tasks** — Show streaks toggle (off by default).
-- **Profile** — editable Name, Age, Weight units (kg default), Workout location
-  (Gym/Home), Home equipment, Sports, Sport-training time, Workout time.
-- **Backup** — Export/Import all data as JSON.
+1. **The school calendar is hardcoded to one school** (`schoolCalendar.js`). Perfect for
+   Brian's year group; unusable by anyone else. This is the single biggest blocker to
+   the app working outside his school.
+2. **`YEAR_END = '2026-12-05'`.** After that date `cycleDay()` returns null forever and
+   every day reads "No school". **This is a time bomb — update it for 2027.**
+3. **iOS deletes localStorage for sites not opened in ~7 days**, unless the app is
+   installed to the Home Screen. That's why the Add-to-Home-Screen card exists in the
+   intro. It is the main way a user silently loses everything.
+4. **The timetable screenshot import has never been tested on a real timetable.** It now
+   reads "Day 1–6" row labels — the earlier version only read *dates*, so a cycle-day
+   screenshot imported **nothing**, and dated rows falling inside a term break were
+   silently dropped. **Test this before launch. Everything the app is for depends on it.**
+5. **Dead code:** `reminders.js`, `RemindersList.jsx`, `ReminderModal.jsx`,
+   `GradesSummary.jsx` are unused, plus a number of unused CSS classes.
 
 ---
 
-## Onboarding survey (`survey.js`, `SurveyModal.jsx`)
-Full-screen, animated, first-open (shows while `!onboarded`). Asks: name, age, sports
-(multi), gym access, home equipment (if no gym), sport-training time, workout time.
-Supports `showIf` conditional questions. Answers → `profile`.
+## 6. Pre-launch audit — fixes worth not regressing
 
-## Workout generator (`workouts.js`, free/offline)
-Two sessions, each in its own chosen bucket ("I don't" hides one):
-- **Sport training** — ONE sport per day (rotates). Real drills grouped by skill aspect;
-  expanded panel rates each aspect **Weak / Okay / Strong** (`profile.sportSkills`),
-  drills weight toward weak (full pass first, then extra weak). Heading "Recommended
-  drills", no reshuffle.
-- **Workout** — general strength rotating **Push → Pull → Legs by day** + core, using only
-  available equipment (or full gym). Has a "New workout" reshuffle.
-- **Age scaling** (`intensityForAge`): 16–34 (college) = full; 35–49 slightly shorter;
-  <16 / 50+ shorter & easier.
-- A morning workout hides the standalone "Stretch / Move" (its warm-up covers it).
+A full audit was run (data layer + UI). Nine real bugs found and fixed:
 
-## Gamification (`gamify.js`)
-- **XP** on completion (task 10 / assignment 15 / event 20 / workout 25 / focus 1-per-min).
-  Symmetric — un-checking removes XP.
-- **Levels** — 12 named tiers + icons (Sprout → Mythic); cost rises each level
-  (gap L→L+1 = 50·L XP). `levelInfo(xp)`.
-- **Login streak** — +1 per day opened, resets on a gap.
-
-## Default tasks (seeded once, deletable, re-addable via `taskTemplates.js`)
-Morning: **Journaling** (first, steps), **Stretch / Move** (second). Afternoon:
-**Hydration check**, **Reading**, **Clean your room** (Sun), **Organise your wardrobe**
-(Sat). Night: **Night grooming**, **Get ready for tomorrow** (pinned last), **Check
-tomorrow's plans**. Ordering uses a task `order` field (set by dragging) with
-`pinFirst`/`pinLast` fallbacks.
+- **Migrations were rewriting user-created tasks on every load.** A task you named "Pack
+  your bag" got renamed, recategorised, and had its weekdays wiped. Title-based rewrites
+  now run **once** (`seededLegacyTitleFix`) and never look at a title again.
+- **A corrupt save wiped everything.** Now parked under a backup key, not overwritten.
+- **Storage full crashed the app.** Now degrades to running in memory.
+- **A malformed backup import** could hand the renderer a `null` array. Every collection
+  is shape-forced in `normalize()` before any migration touches it.
+- **XP bug:** "Add result" created an already-done event without awarding XP, so
+  un-ticking it later *deducted* 20 XP that was never earned.
+- **Reminders drifted an hour after DST.** Daily/weekly repeats now step by calendar
+  days, not fixed milliseconds. NZ changes the clocks twice a year.
+- **"Export backup" did nothing on iPhone** — the blob URL was revoked on the very next
+  line, which cancels the download in Safari. Now uses the iOS share sheet.
+- **Bright theme:** completed tasks were muddy grey slabs and the skill buttons were
+  light-on-light. Both now use theme-aware tokens. In the installed app the iOS status
+  bar glyphs are white, so bright mode lays a dark strip behind them.
+- **iOS zoomed the entire page** whenever you tapped an input — any input under 16px
+  triggers it, and it never zooms back out. Inputs are 16px on phones now.
 
 ---
 
-## Data model — `useSchedule.js`
-One `localStorage` object. `normalize()` fills defaults + runs all migrations on load AND
-on backup import. Key slices: `assignments` (with `kind`), `events`, `notes`, `bring`,
-`timetable`, `reports`, `extras`, `tasks` (unified one-off/repeating:
-`{title, description, steps[], bucket, category, repeat, days[], log{}, due, done, order, pinFirst/pinLast}`),
-`theme`/`customColors`, `settings`, `profile` (survey + sportSkills), `xp`,
-`loginStreak`/`lastActive`, `workoutLog`/`workoutSeed`, `focusDistractions`/`focusMinutes`,
-plus one-time `seeded*` flags. Tasks are the single model (habits were folded in as
-repeating tasks).
+## 7. CSS traps that already bit us (don't re-introduce)
 
-## Reliability
-- **ErrorBoundary** wraps the app (`main.jsx`) → recoverable screen, not a white page.
-- App identity: **DaySync** (`index.html`, `public/icon.svg`, `public/manifest.webmanifest`)
-  — install-ready except for PNG icons (see below).
+- **`position: fixed` breaks inside a transformed ancestor.** The post-survey reveal
+  animates a transform, so it wraps *content only* — the tab bar and FAB sit outside it.
+- **A flex container with `align-items: stretch` can't scroll its overflowing child.**
+  The survey/intro screens need `align-items: flex-start`, or tall content (the 12-option
+  sports question) is physically unreachable.
+- **A flex item won't shrink below its content without `min-width: 0`.** The week strip
+  overflowed *every* iPhone because of this.
+- `body { overflow-x: hidden }` is a safety net, not a fix.
 
 ---
 
-## Known limits / roadmap (rough priority)
-1. **Not deployed** — localhost only. Next: deploy (Vercel/Netlify) + PWA. Needs **PNG app
-   icons** (192/512/180) in `public/` for real install prompts (only an SVG now).
-2. **Accounts / sharing** — deferred. Needs a backend (Supabase recommended: auth + DB +
-   persistent sessions, free tier). Turns app from local→cloud.
-3. **App blocking** — impossible from web; would need a separate **native iOS app** (Swift
-   + Family Controls entitlement).
-4. **2026 is hardcoded** — school term dates + NZ public holidays (`schoolCalendar.js`) and
-   **Auckland** weather (`useWeather.js`). Update yearly / per user.
-5. **Fragile importers** — PDF report + timetable OCR tuned to specific formats.
-6. **Drag-reorder** unreliable on touch; add pointer-based dragging or arrows for phones.
-7. No tests; no reminders/notifications (needs PWA).
+## 8. Dev
 
-## Dead files to clean up (if still present)
-`ReminderModal.jsx`, `RemindersList.jsx`, `reminders.js`, `GradesSummary.jsx`,
-`LifeTab.jsx` — unused, safe to delete.
+```bash
+npm run dev      # localhost:5173
+npm run build    # NOT a typecheck. A green build once shipped a TDZ crash —
+                 # it cannot catch runtime errors.
+```
+
+Git is not on PATH; use `"C:\Program Files\Git\cmd\git.exe"`.
+
+**Testing approach:** there is no test framework. The pattern used throughout was to
+write a throwaway script in `.smoke/`, bundle it with esbuild, and headlessly render
+components with `react-dom/server` — this catches real crashes that `npm run build`
+cannot. Stub `pdfjs-dist/.../pdf.worker.min.mjs?url` and define `import.meta.env`.
+Always render with an **empty** store too; that's where crashes hide.
+
+---
+
+## 9. What to do next
+
+1. **Add the Vercel env vars and redeploy** → sync goes live. Then verify the pill in
+   Settings → Backup actually says **Synced**.
+2. **Test the timetable screenshot import on a real timetable.** Highest-value thing
+   left. If setup is painful, nobody uses the school features — and then DaySync is just
+   a to-do list with extra steps.
+3. **Fix `YEAR_END`** before December 2026.
+4. Tell people. Lead with **Add to Home Screen** — it's what protects their data.
+5. Only then consider: school-agnostic timetables (the real unlock for growth beyond one
+   school) and push notifications (needs the cloud, which now exists).
+
+There's a VC pitch deck at `DaySync-Pitch.pptx` (regenerate with `node make-deck.mjs`).
+It's deliberately honest about having zero users — slide 6 has a "Not yet" column.
