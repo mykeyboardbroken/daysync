@@ -5,7 +5,7 @@ import { bannerLine } from '../greeting'
 import { dueAlerts, repeatLabel } from '../alerts'
 import { useWeather } from '../useWeather'
 import { trainingWarnings } from '../trainingAlert'
-import { HORIZONS } from '../goals'
+import { HORIZONS, goalProgress } from '../goals'
 import Icon from './Icon'
 import DayPlan from './DayPlan'
 import WeatherStrip from './WeatherStrip'
@@ -135,11 +135,21 @@ export default function TodayTab({ schedule }) {
             return (
               <div className="mygoals-block" key={key}>
                 <p className="mygoals-label">{label}</p>
-                <ul className="mygoals-list">
-                  {list.map((g, i) => (
-                    <li key={i}>{g}</li>
-                  ))}
-                </ul>
+                {list.map((g) => {
+                  const p = goalProgress(g)
+                  return (
+                    <div className="mygoals-row" key={g.id}>
+                      <span className={`mygoals-text ${p.complete ? 'complete' : ''}`}>
+                        {g.text}
+                      </span>
+                      {p.total > 0 && (
+                        <span className="mygoals-bar">
+                          <span className="mygoals-bar-fill" style={{ width: `${p.percent}%` }} />
+                        </span>
+                      )}
+                    </div>
+                  )
+                })}
               </div>
             )
           })}

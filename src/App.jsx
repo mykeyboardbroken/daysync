@@ -118,6 +118,7 @@ export default function App() {
         {tab === 'focus' && <FocusTab schedule={schedule} />}
         {tab === 'settings' && (
           <SettingsModal
+            schedule={schedule}
             customColors={schedule.customColors}
             onSetCustomColor={schedule.setCustomColor}
             settings={schedule.settings}

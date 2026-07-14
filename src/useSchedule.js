@@ -4,7 +4,7 @@ import { toKey, keyToDate, addDays } from './dateUtils'
 import { supabase, isCloudEnabled, DATA_TABLE } from './supabase'
 
 // XP awarded for completing each kind of thing.
-const XP = { task: 10, assignment: 15, event: 20, workout: 25 }
+const XP = { task: 10, assignment: 15, event: 20, workout: 25, goalStep: 10 }
 
 const STORAGE_KEY = 'schedule-app.data'
 // Where an unreadable save gets parked so it isn't overwritten and lost forever.
@@ -553,6 +553,22 @@ export function normalize(parsed) {
   // Title-based rewrites are done for good — from here on, a task's title is just a
   // title and the app will never reinterpret it.
   data.seededLegacyTitleFix = true
+  // Goals were plain strings; they're now objects that can carry steps. The survey
+  // still hands back strings, so this runs on every load rather than once — it's a
+  // shape fix, not a rewrite, and it leaves an already-converted goal alone.
+  if (data.profile?.myGoals) {
+    const fixed = {}
+    for (const [horizon, list] of Object.entries(data.profile.myGoals)) {
+      fixed[horizon] = (Array.isArray(list) ? list : [])
+        .map((g) =>
+          typeof g === 'string'
+            ? { id: makeId(), text: g, steps: [] }
+            : { id: g.id || makeId(), text: g.text || '', steps: g.steps || [] },
+        )
+        .filter((g) => g.text)
+    }
+    data.profile = { ...data.profile, myGoals: fixed }
+  }
   // Workouts are bodyweight-only now — there's no gym or equipment question anymore,
   // so drop the answers from older profiles rather than leave dead data lying around.
   if (data.profile && ('gym' in data.profile || 'equipment' in data.profile)) {
@@ -1132,6 +1148,82 @@ export function useSchedule(userId = null) {
     setData((prev) => ({ ...prev, introDone: true }))
   }, [])
 
+  // ---- Goals ----
+  // Stored on the profile as { short: [goal], medium: [goal], long: [goal] }, where a
+  // goal is { id, text, steps: [{ id, text, done }] }.
+  const editGoals = (prev, fn) => ({
+    ...prev,
+    profile: { ...prev.profile, myGoals: fn(prev.profile?.myGoals || {}) },
+  })
+
+  const addGoal = useCallback((horizon, text) => {
+    const t = (text || '').trim()
+    if (!t) return
+    setData((prev) =>
+      editGoals(prev, (g) => ({
+        ...g,
+        [horizon]: [...(g[horizon] || []), { id: makeId(), text: t, steps: [] }],
+      })),
+    )
+  }, [])
+
+  const deleteGoal = useCallback((horizon, goalId) => {
+    setData((prev) =>
+      editGoals(prev, (g) => ({
+        ...g,
+        [horizon]: (g[horizon] || []).filter((x) => x.id !== goalId),
+      })),
+    )
+  }, [])
+
+  const addGoalStep = useCallback((horizon, goalId, text) => {
+    const t = (text || '').trim()
+    if (!t) return
+    setData((prev) =>
+      editGoals(prev, (g) => ({
+        ...g,
+        [horizon]: (g[horizon] || []).map((x) =>
+          x.id === goalId
+            ? { ...x, steps: [...(x.steps || []), { id: makeId(), text: t, done: false }] }
+            : x,
+        ),
+      })),
+    )
+  }, [])
+
+  const deleteGoalStep = useCallback((horizon, goalId, stepId) => {
+    setData((prev) =>
+      editGoals(prev, (g) => ({
+        ...g,
+        [horizon]: (g[horizon] || []).map((x) =>
+          x.id === goalId ? { ...x, steps: (x.steps || []).filter((s) => s.id !== stepId) } : x,
+        ),
+      })),
+    )
+  }, [])
+
+  // Ticking a step earns XP, the same as any other thing you actually did.
+  const toggleGoalStep = useCallback((horizon, goalId, stepId) => {
+    setData((prev) => {
+      let delta = 0
+      const next = editGoals(prev, (g) => ({
+        ...g,
+        [horizon]: (g[horizon] || []).map((x) => {
+          if (x.id !== goalId) return x
+          return {
+            ...x,
+            steps: (x.steps || []).map((s) => {
+              if (s.id !== stepId) return s
+              delta = s.done ? -XP.goalStep : XP.goalStep
+              return { ...s, done: !s.done }
+            }),
+          }
+        }),
+      }))
+      return { ...next, xp: Math.max(0, (prev.xp || 0) + delta) }
+    })
+  }, [])
+
   // Update a single profile field (edited from Settings → Profile).
   const setProfile = useCallback((key, value) => {
     setData((prev) => ({ ...prev, profile: { ...prev.profile, [key]: value } }))
@@ -1300,6 +1392,11 @@ export function useSchedule(userId = null) {
     profile: data.profile,
     finishSurvey,
     finishIntro,
+    addGoal,
+    deleteGoal,
+    addGoalStep,
+    deleteGoalStep,
+    toggleGoalStep,
     introDone: data.introDone,
     restartSurvey,
     setProfile,

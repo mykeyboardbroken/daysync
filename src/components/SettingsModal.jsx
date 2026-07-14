@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import Icon from './Icon'
-import { HORIZONS } from '../goals'
+import GoalsView from './GoalsView'
 
 // Slide the hue, keep saturation/lightness fixed → always a pleasant accent.
 function hslToHex(h, s, l) {
@@ -77,6 +77,7 @@ const SPORT_OPTIONS = [
 const TIME_OPTIONS = ['Morning', 'Afternoon', 'Night', 'Anytime', "I don't"]
 
 export default function SettingsModal({
+  schedule,
   customColors,
   onSetCustomColor,
   settings,
@@ -396,58 +397,9 @@ export default function SettingsModal({
               </div>
             )}
 
-            {section === 'goals' && (
-              <div className="color-pickers">
-                <p className="settings-section-head">Your goals</p>
-                <p className="settings-field-label">
-                  What you're actually aiming at. These show on your Today screen.
-                </p>
-
-                {HORIZONS.map((h) => {
-                  const list = (profile.myGoals || {})[h.key] || []
-                  const setList = (next) =>
-                    onSetProfile('myGoals', { ...(profile.myGoals || {}), [h.key]: next })
-                  return (
-                    <div className="goalset-block" key={h.key}>
-                      <p className="goalset-label">{h.label}</p>
-                      {list.map((g, i) => (
-                        <div className="goalset-row" key={i}>
-                          <span className="goalset-text">{g}</span>
-                          <button
-                            type="button"
-                            className="goalset-del"
-                            onClick={() => setList(list.filter((_, n) => n !== i))}
-                            aria-label={`Remove ${g}`}
-                          >
-                            ✕
-                          </button>
-                        </div>
-                      ))}
-                      <input
-                        type="text"
-                        className="goalset-input"
-                        placeholder={h.placeholder}
-                        onKeyDown={(e) => {
-                          if (e.key !== 'Enter') return
-                          e.preventDefault()
-                          const t = e.currentTarget.value.trim()
-                          if (!t) return
-                          setList([...list, t])
-                          e.currentTarget.value = ''
-                        }}
-                        onBlur={(e) => {
-                          const t = e.currentTarget.value.trim()
-                          if (!t) return
-                          setList([...list, t])
-                          e.currentTarget.value = ''
-                        }}
-                      />
-                    </div>
-                  )
-                })}
-
-              </div>
-            )}
+            {/* The full Goals experience, not a cut-down settings version. It's the same
+                component that will become the Goals tab. */}
+            {section === 'goals' && <GoalsView schedule={schedule} />}
 
             {/* Exercise: workout AND sport training in one place. Both are opt-in —
                 nothing appears on your day until a time is picked below. */}

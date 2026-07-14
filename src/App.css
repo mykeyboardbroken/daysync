@@ -946,34 +946,91 @@
 }
 .goalset-input:focus { outline: none; border-style: solid; border-color: var(--accent); }
 
-/* The Today card listing them. */
-.mygoals-block + .mygoals-block { margin-top: 12px; }
+/* The Today card: goals with a progress bar each. */
+.mygoals-block + .mygoals-block { margin-top: 14px; }
 .mygoals-label {
   font-size: 11px;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.05em;
   color: var(--text-dim);
-  margin: 0 0 6px;
+  margin: 0 0 8px;
 }
-.mygoals-list { margin: 0; padding: 0; list-style: none; }
-.mygoals-list li {
-  font-size: 14px;
-  line-height: 1.5;
-  padding: 3px 0 3px 16px;
-  position: relative;
-  overflow-wrap: break-word;
+.mygoals-row { margin-bottom: 10px; }
+.mygoals-text { font-size: 14px; line-height: 1.45; display: block; overflow-wrap: break-word; }
+.mygoals-text.complete { color: var(--text-dim); text-decoration: line-through; }
+.mygoals-bar {
+  display: block;
+  height: 4px;
+  margin-top: 6px;
+  border-radius: 999px;
+  background: var(--surface-2);
+  overflow: hidden;
 }
-.mygoals-list li::before {
-  content: '';
-  position: absolute;
-  left: 2px;
-  top: 11px;
-  width: 5px;
-  height: 5px;
-  border-radius: 50%;
+.mygoals-bar-fill {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
   background: var(--accent);
+  transition: width 0.35s cubic-bezier(0.32, 0.72, 0, 1);
 }
+
+/* ---- Goals view (Settings → Goals; the future Goals tab) ---- */
+.goals-view { display: flex; flex-direction: column; gap: 16px; }
+.goal-section .card-header { margin-bottom: 12px; }
+.goal-count { color: var(--text-dim); font-size: 13px; }
+.goal-row { border-top: 1px solid var(--border); padding: 10px 0; }
+.goal-row:first-of-type { border-top: none; }
+.goal-main {
+  display: block;
+  width: 100%;
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--text);
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.goal-row-top { display: flex; align-items: center; gap: 10px; }
+.goal-text { flex: 1; font-size: 15px; line-height: 1.4; overflow-wrap: break-word; min-width: 0; }
+.goal-row.complete .goal-text { color: var(--text-dim); text-decoration: line-through; }
+.goal-done-tick { color: var(--accent); flex-shrink: 0; }
+.goal-caret { color: var(--text-dim); opacity: 0.55; flex-shrink: 0; transition: transform 0.2s; }
+.goal-caret.open { transform: rotate(90deg); }
+.goal-bar-row { display: flex; align-items: center; gap: 8px; margin-top: 8px; }
+.goal-bar {
+  flex: 1;
+  height: 5px;
+  border-radius: 999px;
+  background: var(--surface-2);
+  overflow: hidden;
+  min-width: 0;
+}
+.goal-bar-fill {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: var(--accent);
+  transition: width 0.35s cubic-bezier(0.32, 0.72, 0, 1);
+}
+.goal-bar-label { font-size: 11px; color: var(--text-dim); flex-shrink: 0; }
+.goal-steps { padding: 10px 0 4px; }
+.goal-step { display: flex; align-items: center; gap: 10px; padding: 5px 0; }
+.goal-step-text { flex: 1; font-size: 14px; min-width: 0; overflow-wrap: break-word; }
+.goal-step-text.done { color: var(--text-dim); text-decoration: line-through; }
+.goal-step-del {
+  background: none;
+  border: none;
+  color: var(--text-dim);
+  cursor: pointer;
+  font-size: 13px;
+  padding: 2px 4px;
+  flex-shrink: 0;
+}
+.goal-step-del:hover { color: var(--danger); }
+.goal-step-input { margin-top: 6px; }
+.goal-delete { margin-top: 10px; }
 
 /* ---------- Reminders (top-of-Today banners) ---------- */
 .reminders { display: flex; flex-direction: column; gap: 8px; }
