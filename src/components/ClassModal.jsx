@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { PERIODS, CYCLE_DAYS } from '../schoolCalendar'
 import { formatTime } from '../dateUtils'
+import { roomlessSubject } from '../timetableOcr'
 
 // Add/edit the class in one period slot of a cycle day: subject, room, and
 // anything to bring. When `lockSlot` is set (editing a specific row) the day and
@@ -86,7 +87,7 @@ export default function ClassModal({ lockSlot, initial, onSave, onDelete, onClos
               type="text"
               value={room}
               onChange={(e) => setRoom(e.target.value)}
-              placeholder={needsSubject ? 'e.g. B12 (optional)' : 'e.g. B12'}
+              placeholder={roomlessSubject(subject) ? 'Leave blank if it moves each week' : needsSubject ? 'e.g. B12 (optional)' : 'e.g. B12'}
               autoFocus={!needsSubject}
             />
           </label>

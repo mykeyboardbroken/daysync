@@ -259,8 +259,16 @@ export async function extractTimetable(file) {
       .trim()
 
     if (!grid[cd]) grid[cd] = {}
-    grid[cd][periodId] = { subject, room: roomCode }
+    // Strings / music is a travelling class — it moves room week to week, so whatever
+    // room the screenshot happens to show is wrong more often than right. Leave it
+    // blank for the user to fill in, rather than importing a room that misleads them.
+    grid[cd][periodId] = { subject, room: roomlessSubject(subject) ? '' : roomCode }
   }
 
   return { grid, rawText }
+}
+
+// Subjects that shouldn't carry an auto-filled room (they don't have a fixed one).
+export function roomlessSubject(subject) {
+  return /string|music|band|orchestra|choir|itinerant/i.test(subject || '')
 }
