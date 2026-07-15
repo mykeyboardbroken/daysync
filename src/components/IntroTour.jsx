@@ -44,7 +44,7 @@ const INSTALL = {
 // mid-dissolve.
 const EXIT_MS = 460
 
-export default function IntroTour({ onDone, schedule, canSignIn, signedIn, onSignIn }) {
+export default function IntroTour({ onDone, schedule, canSignIn, signedIn }) {
   const profile = schedule?.profile || {}
   const sports = profile.sports || []
 
@@ -66,15 +66,14 @@ export default function IntroTour({ onDone, schedule, canSignIn, signedIn, onSig
       }
     : null
 
-  // Offer an account here — this is the moment they care about not losing their setup.
-  // Only if the cloud is actually configured and they haven't already signed up.
+  // Just tell them backup exists and where to find it — don't ask them to sign up
+  // mid-tour. Only shown if the cloud is configured and they haven't already.
   const backupCard =
     canSignIn && !signedIn
       ? {
           icon: 'cloud',
-          title: "Don't lose your stuff",
-          body: 'Make a free account and your day is saved — so if you get a new phone, or don’t open the app for a while, everything’s still here. It also syncs to your laptop. Totally optional; you can skip and do it later in Settings.',
-          signup: true,
+          title: "Back up your stuff",
+          body: 'Everything lives on this device by default. If you want it saved — so it survives a new phone and syncs to your laptop — make a free account any time in Settings › Backup. Totally optional.',
         }
       : null
 
@@ -132,12 +131,6 @@ export default function IntroTour({ onDone, schedule, canSignIn, signedIn, onSig
             </button>
           )}
 
-          {/* Opens the signup sheet. Skipping is just Next — no account required. */}
-          {card.signup && (
-            <button type="button" className="primary-btn intro-signup" onClick={onSignIn}>
-              Create a free account
-            </button>
-          )}
         </div>
 
         <div className="intro-dots" aria-hidden="true">
@@ -148,10 +141,10 @@ export default function IntroTour({ onDone, schedule, canSignIn, signedIn, onSig
 
         <button
           type="button"
-          className={`intro-next ${card.signup ? 'ghost-btn' : 'primary-btn'}`}
+          className="primary-btn intro-next"
           onClick={() => (last ? finish() : setI(i + 1))}
         >
-          {card.signup ? 'Maybe later' : last ? 'Start using DaySync' : 'Next'}
+          {last ? 'Start using DaySync' : 'Next'}
         </button>
       </div>
     </div>

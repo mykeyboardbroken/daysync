@@ -1393,7 +1393,9 @@
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   padding: max(24px, env(safe-area-inset-top)) 22px calc(24px + env(safe-area-inset-bottom));
-  animation: survey-fade 0.35s ease;
+  /* Opaque from the very first frame — NOT a fade-in. Fading in from transparent let
+     the app show through underneath in the gap after the survey, which read as a
+     flash. The per-card .intro-body animation still gives it life. */
 }
 .intro-inner {
   width: 100%;
@@ -1491,8 +1493,11 @@
 .survey-screen.finishing {
   animation: survey-exit 520ms cubic-bezier(0.4, 0, 1, 1) 980ms forwards;
 }
+/* Scale up but STAY OPAQUE. It used to fade to opacity 0, which revealed the app
+   behind it for half a second before the intro mounted — the flash you saw. The
+   survey now holds solid until it unmounts and the (opaque) intro takes over. */
 @keyframes survey-exit {
-  to { opacity: 0; transform: scale(1.06); }
+  to { transform: scale(1.04); }
 }
 .survey-done {
   display: flex;
