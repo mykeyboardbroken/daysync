@@ -87,8 +87,15 @@ All of these were learned by getting them wrong first. Don't quietly undo them:
   Rotation: Push → Pull → Legs → **Rest** → Cardio → Core → **Rest**.
 
 **Onboarding:** survey (name → gender → age → sports) → outro animation → **IntroTour**
-(3 cards explaining the app, + a sport-drills card with an inline on/off switch, + an
-**Add to Home Screen** card on iOS) → app.
+→ app. The intro cards: 3 explaining the app, + a sport-drills card with an inline
+on/off switch (only if they play a sport), + an *informational* backup card telling
+them they can make an account in Settings (only if cloud is configured & they're not
+signed in — no signup button, just points them there), + an **Add to Home Screen** card
+on iOS. Every card after the survey is skippable.
+
+The survey → intro handoff is seamless: the survey outro scales but stays **opaque**
+(it must NOT fade to transparent, or the app flashes through underneath), and the intro
+is opaque from its first frame (no fade-in). Don't re-introduce either fade.
 
 ---
 
@@ -134,15 +141,22 @@ confirmation emails).
 1. **The school calendar is hardcoded to one school** (`schoolCalendar.js`). Perfect for
    Brian's year group; unusable by anyone else. This is the single biggest blocker to
    the app working outside his school.
-2. **`YEAR_END = '2026-12-05'`.** After that date `cycleDay()` returns null forever and
-   every day reads "No school". **This is a time bomb — update it for 2027.**
+2. **Term dates run out after 2026, but this now degrades gracefully.** The calendar is a
+   `SCHOOL_YEARS` list. Past the last configured year, `isSchoolDay()` falls back to
+   "weekdays are school days" so the timetable keeps working, and Academics shows a
+   banner ("2027 term dates needed") instead of silently reading "No school" forever.
+   **TO ADD A YEAR:** copy the 2026 block in `schoolCalendar.js`, change the dates. A
+   commented-out 2027 stub is already there. Do this when the school publishes 2027 dates.
 3. **iOS deletes localStorage for sites not opened in ~7 days**, unless the app is
    installed to the Home Screen. That's why the Add-to-Home-Screen card exists in the
    intro. It is the main way a user silently loses everything.
-4. **The timetable screenshot import has never been tested on a real timetable.** It now
-   reads "Day 1–6" row labels — the earlier version only read *dates*, so a cycle-day
-   screenshot imported **nothing**, and dated rows falling inside a term break were
-   silently dropped. **Test this before launch. Everything the app is for depends on it.**
+4. **The timetable screenshot import has never been tested on a real timetable.** It reads
+   "Day 1–6" row labels (an earlier version only read *dates*, so a cycle-day screenshot
+   imported nothing). Recent fixes: OCR corrects a leading letter misread as its
+   look-alike digit (**S29 was read as 529**; also 61→G1, 814→B14 — numeric-only rooms
+   left alone), and Strings/music/orchestra/choir/band import with a **blank room**
+   (travelling classes — see `roomlessSubject()` in `timetableOcr.js`). **Still test this
+   end-to-end before launch. Everything the app is for depends on it.**
 5. **Dead code:** `reminders.js`, `RemindersList.jsx`, `ReminderModal.jsx`,
    `GradesSummary.jsx` are unused, plus a number of unused CSS classes.
 
@@ -206,15 +220,22 @@ Always render with an **empty** store too; that's where crashes hide.
 
 ## 9. What to do next
 
-1. **Add the Vercel env vars and redeploy** → sync goes live. Then verify the pill in
-   Settings → Backup actually says **Synced**.
-2. **Test the timetable screenshot import on a real timetable.** Highest-value thing
-   left. If setup is painful, nobody uses the school features — and then DaySync is just
-   a to-do list with extra steps.
-3. **Fix `YEAR_END`** before December 2026.
-4. Tell people. Lead with **Add to Home Screen** — it's what protects their data.
-5. Only then consider: school-agnostic timetables (the real unlock for growth beyond one
-   school) and push notifications (needs the cloud, which now exists).
+**The only two things blocking launch — both need Brian, not code:**
+
+1. **Add the Vercel env vars and redeploy** → sync goes live. In Vercel → Settings →
+   Environment Variables, add `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` (values in
+   §4), then Deployments → Redeploy. Verify: Settings → Backup shows a "Sync & backup"
+   row, and after creating an account the pill says **Synced**. Also flip off "Confirm
+   email" in Supabase (§4).
+2. **Test the timetable screenshot import on a real timetable.** Highest-value thing left.
+   If setup is painful, nobody uses the school features — and then DaySync is just a
+   to-do list with extra steps. The S29/Strings fixes just landed, so it's a good moment.
+
+**Then:** tell people. Lead with **Add to Home Screen** — it's what protects their data.
+
+**Later / growth:** school-agnostic timetables (the real unlock beyond one school), and
+push notifications (needs the cloud, which now exists). Add 2027 term dates when the
+school publishes them (§5.2).
 
 There's a VC pitch deck at `DaySync-Pitch.pptx` (regenerate with `node make-deck.mjs`).
 It's deliberately honest about having zero users — slide 6 has a "Not yet" column.
