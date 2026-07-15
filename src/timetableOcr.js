@@ -77,6 +77,19 @@ function toWords(data) {
     .filter((w) => w.text)
 }
 const mean = (a) => a.reduce((s, v) => s + v, 0) / a.length
+
+// Undo the letter/digit confusion OCR makes on room codes. School rooms are almost
+// always a LETTER prefix + digits (S29, G1, T14), but Tesseract routinely reads the
+// leading letter as the digit it resembles: S→5, G→6, B→8, I→1, O→0, Z→2. That's why
+// "S29" came back as "529". We only rewrite the FIRST character, and only when it's one
+// of those look-alikes followed by more digits — so a short numeric room like "5" is
+// left alone. The import review screen is the safety net if it ever guesses wrong.
+const LEADING_DIGIT_TO_LETTER = { 5: 'S', 6: 'G', 8: 'B', 1: 'I', 0: 'O', 2: 'Z' }
+function fixRoomOcr(code) {
+  const m = /^([568102])(\d+)$/.exec(code || '')
+  if (m) return LEADING_DIGIT_TO_LETTER[m[1]] + m[2]
+  return code
+}
 function splitInto(values, n) {
   const s = [...values].sort((a, b) => a - b)
   if (s.length <= n) return s.map((v) => [v])
@@ -221,7 +234,7 @@ export async function extractTimetable(file) {
     const right = cWords
       .filter((w) => w !== room && Math.abs(w.cy - room.cy) < lineH * 0.6 && w.x0 >= room.x1 - 2)
       .sort((a, b) => a.x0 - b.x0)
-    const roomCode = (right[0]?.text || '').replace(/[.,]/g, '').trim()
+    const roomCode = fixRoomOcr((right[0]?.text || '').replace(/[.,]/g, '').trim())
 
     // Subject = alphabetic words below the room line, strictly in this column,
     // grouped into lines (top→bottom) then read left→right.
