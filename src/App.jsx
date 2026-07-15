@@ -42,8 +42,14 @@ export default function App() {
   const [tab, setTab] = useState('today')
   // null = closed; otherwise the add flow: 'menu' | 'assignment' | 'date' | …
   const [adding, setAdding] = useState(null)
-  // The sign-in sheet, opened deliberately from Settings — never forced on anyone.
+  // The auth sheet, opened deliberately (Settings or the intro) — never forced on anyone.
+  // `authMode` decides whether it opens on sign-in or sign-up.
   const [showAuth, setShowAuth] = useState(false)
+  const [authMode, setAuthModeState] = useState('signin')
+  const setAuthMode = (mode) => {
+    setAuthModeState(mode)
+    setShowAuth(true)
+  }
 
   // Ease the app in the moment the INTRO finishes — that's the last thing covering it.
   // (This used to key off the survey, but the intro then sat on top of the app while
@@ -132,7 +138,7 @@ export default function App() {
             cloudEnabled={auth.enabled}
             account={auth.session ? { email: auth.session.user?.email, username: auth.username } : null}
             syncState={schedule.syncState}
-            onOpenAuth={() => setShowAuth(true)}
+            onOpenAuth={() => setAuthMode('signin')}
             onSignOut={auth.signOut}
           />
         )}
@@ -156,13 +162,20 @@ export default function App() {
           never finds the timetable, homework or focus timer — and never installs the
           app, which is how iOS quietly eats their data. */}
       {schedule.onboarded && !schedule.introDone && (
-        <IntroTour onDone={schedule.finishIntro} schedule={schedule} />
+        <IntroTour
+          onDone={schedule.finishIntro}
+          schedule={schedule}
+          canSignIn={auth.enabled}
+          signedIn={!!auth.session}
+          onSignIn={() => setAuthMode('signup')}
+        />
       )}
 
       {showAuth && !auth.session && (
         <AuthScreen
           onSignIn={auth.signIn}
           onSignUp={auth.signUp}
+          startMode={authMode}
           onClose={() => setShowAuth(false)}
         />
       )}

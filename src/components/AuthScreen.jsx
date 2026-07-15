@@ -3,8 +3,10 @@ import Icon from './Icon'
 
 // Full-screen sign in / sign up. Shown before anything else when cloud accounts
 // are enabled and nobody is signed in.
-export default function AuthScreen({ onSignIn, onSignUp, onClose }) {
-  const [mode, setMode] = useState('signin') // 'signin' | 'signup'
+export default function AuthScreen({ onSignIn, onSignUp, onClose, startMode = 'signin' }) {
+  // Default to signup when opened from onboarding — a new user has no account yet, so
+  // "Welcome back / Sign in" would be the wrong first thing to show them.
+  const [mode, setMode] = useState(startMode) // 'signin' | 'signup'
   const [username, setUsername] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
